@@ -1,9 +1,16 @@
+import React from "react";
 import Image from "next/image";
 
+/**
+ * Renders the homepage layout.
+ * @returns The rendered homepage layout.
+ */
 export default function Home() {
   return (
     <>
-      <div className="bg-[url('/bg.png')] bg-cover h-[100vh] flex flex-col items-center justify-center">
+      <div
+        className="bg-[url('/bg.png')] bg-cover h-[100vh] flex flex-col items-center justify-center"
+        style={{ backgroundImage: "url('/bg.png')" }}>
         <Image
           src={"/logo.png"}
           alt="logo"
@@ -11,8 +18,17 @@ export default function Home() {
           height={200}
           className="mb-20"
         />
-        <h1 className="text-5xl mb-96 text-white font-bold [text-shadow:_0_0_5px_rgb(0_0_0_/_50%)]">
-          OnThePixel.net
+        <h1 className="text-center text-5xl font-bold tracking-tight text-white mb-80">
+          <div className="inline-grid">
+            <span className="col-start-1 row-start-1 bg-clip-text text-5xl font-bold tracking-tight text-transparent text-white">
+              OnThePixel.net
+            </span>
+            <span
+              aria-hidden="true"
+              className="bg-gradient col-start-1 row-start-1 overflow-visible text-5xl font-bold tracking-tight opacity-100 blur-lg">
+              OnThePixel.net
+            </span>
+          </div>
         </h1>
       </div>
 
