@@ -11,6 +11,7 @@ export default function NavBar() {
   useEffect(() => {
     const button = document.querySelector("#menu-button");
     const menu = document.querySelector("#menu");
+    if (!button || !menu) return;
     const toggleMenu = () => {
       menu.classList.toggle("hidden");
     };
