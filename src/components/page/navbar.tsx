@@ -108,7 +108,7 @@ export default function NavBar() {
               <Link
                 href="/leaderboard"
                 className={`md:p-4 py-2 block hover:text-white ${
-                  pathname === "/leaderboard" ? "text-green-500" : ""
+                  pathname.startsWith("/leaderboard") ? "text-green-500" : ""
                 }`}>
                 Leaderboard
               </Link>

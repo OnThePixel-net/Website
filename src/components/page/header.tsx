@@ -57,7 +57,7 @@ export default function Component() {
           <Button
             className="bg-green-700 px-4 py-2 size-12 rounded flex items-center"
             onClick={() => copyToClipboard("OnThePixel.net")}>
-            <FaCopy />
+            <FaCopy className="text-white size-20" />
           </Button>
           <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
             TEAM

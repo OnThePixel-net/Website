@@ -10,7 +10,7 @@ export default function Team() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {/*  */}
-          <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
+          <div className="bg-[#1e1e1e] p-6 m-1 rounded-lg flex items-center hover:scale-105 transition-transform duration-300">
             <Image
               alt="TinyBrickBoy"
               src="https://minotar.net/helm/TinyBrickBoy"

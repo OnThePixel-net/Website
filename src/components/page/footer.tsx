@@ -47,19 +47,19 @@ export default function Footer() {
         <div>
           <h3 className="text-xl font-semibold mb-4">Navigation</h3>
           <nav className="flex flex-col space-y-2">
-            <Link className="hover:text-green-500" href="#">
+            <Link className="hover:text-green-500" href="/">
               Home
             </Link>
-            <Link className="hover:text-green-500" href="#">
+            <Link className="hover:text-green-500" href="/shop">
               Shop
             </Link>
-            <Link className="hover:text-green-500" href="#">
+            <Link className="hover:text-green-500" href="/rules">
               Rules
             </Link>
-            <Link className="hover:text-green-500" href="#">
+            <Link className="hover:text-green-500" href="/team">
               Team
             </Link>
-            <Link className="hover:text-green-500" href="#">
+            <Link className="hover:text-green-500" href="/leaderboard">
               Leaderboard
             </Link>
           </nav>
