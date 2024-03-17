@@ -18,13 +18,19 @@ export default function Footer() {
         <div>
           <h3 className="text-xl font-semibold mb-4">Social Media</h3>
           <nav className="flex flex-col space-y-2">
-            <Link className="hover:text-green-500" href="#">
-              Facebook
+            <Link
+              className="hover:text-green-500"
+              href="https://twitter.com/@onthepixelnet">
+              Twitter
             </Link>
-            <Link className="hover:text-green-500" href="#">
+            <Link
+              className="hover:text-green-500"
+              href="https://youtube.com/@thebestminecraftserver">
               YouTube
             </Link>
-            <Link className="hover:text-green-500" href="#">
+            <Link
+              className="hover:text-green-500"
+              href="https://discord.onthepixel.net">
               Discord
             </Link>
           </nav>
@@ -39,29 +45,29 @@ export default function Footer() {
               Shop
             </Link>
             <Link className="hover:text-green-500" href="#">
-              Regulations
+              Rules
             </Link>
             <Link className="hover:text-green-500" href="#">
-              Our Wiki
+              Team
             </Link>
             <Link className="hover:text-green-500" href="#">
-              Voucher
+              Leaderboard
             </Link>
           </nav>
         </div>
         <div className="text-sm">
-          <p>COPYRIGHT 2023 Etercraft.net</p>
+          <p>COPYRIGHT 2023 OnThePixel.net</p>
           <p>
-            The Etercraft.net server is in no way associated with Mojang AB.
+            The OnThePixel.net server is in no way associated with Mojang AB.
           </p>
-          <p>Project created by the new EterCraft team with help species</p>
+          <p>Project created by the new OnThePixel team with help species</p>
         </div>
       </div>
     </footer>
   );
 }
 
-function DiscIcon(props) {
+function DiscIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -80,7 +86,7 @@ function DiscIcon(props) {
   );
 }
 
-function FacebookIcon(props) {
+function FacebookIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -98,7 +104,7 @@ function FacebookIcon(props) {
   );
 }
 
-function PiggyBankIcon(props) {
+function PiggyBankIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -118,7 +124,7 @@ function PiggyBankIcon(props) {
   );
 }
 
-function YoutubeIcon(props) {
+function YoutubeIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
