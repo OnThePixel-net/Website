@@ -1,12 +1,13 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
 
 export default function NavBar() {
   const pathname = usePathname();
+  const [onlinePlayers, setOnlinePlayers] = useState(0); // Step 2
 
   useEffect(() => {
     const button = document.querySelector("#menu-button");
@@ -21,6 +22,13 @@ export default function NavBar() {
     };
   }, []);
 
+  useEffect(() => {
+    fetch("https://api.mcsrvstat.us/3/onthepixel.net")
+      .then((response) => response.json())
+      .then((data) => setOnlinePlayers(data.players.online))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
   return (
     <header className="fixed w-full">
       <nav className="flex flex-wrap items-center justify-between w-full py-4 md:py-0 px-4 text-lg text-gray-300 bg-opacity-50 bg-[#1b1818]">
@@ -32,7 +40,9 @@ export default function NavBar() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
           </span>
-          <span>Online players: 2</span>
+          <p>
+            Online players: <span>{onlinePlayers}</span>
+          </p>
         </div>
 
         <svg
