@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { FaRegCopy } from "react-icons/fa";
+import { FaCopy } from "react-icons/fa6";
 
 export default function Component() {
   function copyToClipboard(text: string) {
@@ -31,7 +31,7 @@ export default function Component() {
       <main className="flex flex-col items-center">
         <div className="relative mb-4">
           <Image
-            alt="Small Round Image"
+            alt="Logo"
             height="100"
             src="/logo.png"
             style={{
@@ -42,7 +42,7 @@ export default function Component() {
           />
         </div>
         <h1
-          className="text-6xl font-bold mb-4"
+          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4"
           style={{
             color: "#fff",
             textShadow: "0 0 15px #fff",
@@ -51,15 +51,15 @@ export default function Component() {
         </h1>
         <p className="mb-8 text-center">Join now - Don&#39;t play alone!</p>
         <div className="flex space-x-4">
-          <Button className="bg-green-700 px-6 py-2 rounded flex w-36 items-center hover:scale-105 transition-transform duration-500">
+          <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
             LEADERBOARD
           </Button>
           <Button
-            className="bg-green-700 px-6 py-2 rounded flex items-center"
+            className="bg-green-700 px-4 py-2 size-12 rounded flex items-center"
             onClick={() => copyToClipboard("OnThePixel.net")}>
-            <FaRegCopy />
+            <FaCopy />
           </Button>
-          <Button className="bg-green-700 px-6 py-2 rounded flex items-center w-36 hover:scale-105 transition-transform duration-500">
+          <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
             TEAM
           </Button>
         </div>

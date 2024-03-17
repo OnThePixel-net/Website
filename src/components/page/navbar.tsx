@@ -7,7 +7,8 @@ import { usePathname } from "next/navigation";
 
 export default function NavBar() {
   const pathname = usePathname();
-  const [onlinePlayers, setOnlinePlayers] = useState(0); // Step 2
+  const [onlinePlayers, setOnlinePlayers] = useState(0);
+  const [pingEnabled, setPingEnabled] = useState(true);
 
   useEffect(() => {
     const button = document.querySelector("#menu-button");
@@ -25,7 +26,10 @@ export default function NavBar() {
   useEffect(() => {
     fetch("https://api.mcsrvstat.us/3/onthepixel.net")
       .then((response) => response.json())
-      .then((data) => setOnlinePlayers(data.players.online))
+      .then((data) => {
+        setOnlinePlayers(data.players.online);
+        setPingEnabled(data.debug.ping);
+      })
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
@@ -36,7 +40,7 @@ export default function NavBar() {
           <Link href="/">
             <Image src="/logo.png" width={40} height={40} alt="logo" />
           </Link>
-          <span className="relative flex h-3 w-3">
+          <span className={`relative flex h-3 w-3`}>
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
           </span>

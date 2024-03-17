@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 export default function ChangeLog() {
   return (
@@ -17,13 +18,19 @@ export default function ChangeLog() {
             }}>
             Closed beta coming soon!
           </h3>
-          <span className="text-xs text-gray-400">01/12/2023</span>
+          <span className="text-xs text-gray-400">March 23, 2024</span>
           <p className="text-sm mt-2">
             We are proud to announce that the server is already in its final
             phases. Unfortunately, some functions as well as those of your own
             will require the time of the most patient of you, this means that we
-            are starting recruitment for the Closed Beta, which will start
-            around December 27. Thank you for being with us{" "}
+            are starting recruitment for the Closed Beta, if you are interested,
+            open a ticket on our{" "}
+            <Link
+              className="text-green-200 underline"
+              href={"https://discord.onthepixel.net"}>
+              Disord Server
+            </Link>
+            . Thank you for being with us.
           </p>
         </div>
         {/*  */}
@@ -34,15 +41,13 @@ export default function ChangeLog() {
               color: "#00de6d",
               textShadow: "0 0 10px #00de6d",
             }}>
-            Closed beta coming soon!
+            New website!
           </h3>
-          <span className="text-xs text-gray-400">01/12/2023</span>
+          <span className="text-xs text-gray-400">March 17, 2024</span>
           <p className="text-sm mt-2">
-            We are proud to announce that the server is already in its final
-            phases. Unfortunately, some functions as well as those of your own
-            will require the time of the most patient of you, this means that we
-            are starting recruitment for the Closed Beta, which will start
-            around December 27. Thank you for being with us{" "}
+            Welcome to the new OnThePixel website! Thank you for your patience.
+            I'll be adding more content to the website soon! You can expact more
+            information on our social media accounts in the coming weeks.
           </p>
         </div>
       </div>
