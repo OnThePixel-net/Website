@@ -46,8 +46,8 @@ export default function ChangeLog() {
           <span className="text-xs text-gray-400">March 17, 2024</span>
           <p className="text-sm mt-2">
             Welcome to the new OnThePixel website! Thank you for your patience.
-            I'll be adding more content to the website soon! You can expact more
-            information on our social media accounts in the coming weeks.
+            I&#39;ll be adding more content to the website soon! You can expact
+            more information on our social media accounts in the coming weeks.
           </p>
         </div>
       </div>
