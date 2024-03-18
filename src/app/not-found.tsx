@@ -30,7 +30,7 @@ export default function NotFound() {
         />
         <h1 className="text-4xl sm:text-6xl font-bold mb-4">404</h1>
         <p className="text-xl sm:text-2xl mb-8">
-          Some things aren't meant to last forever.
+          Some things aren&apos;t meant to last forever.
         </p>
         <Link href="/">
           <Button className="bg-[#22c55e] text-white">Go Home</Button>
