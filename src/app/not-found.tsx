@@ -5,7 +5,7 @@ import Image from "next/image";
 export default function NotFound() {
   return (
     <>
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 -z-10">
         <Image
           alt="Background Image"
           className="object-cover w-full h-full filter brightness-75"
