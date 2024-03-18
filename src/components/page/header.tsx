@@ -12,8 +12,8 @@ export default function Component() {
   return (
     <div
       key="1"
-      className="relative min-h-screen flex flex-col items-center justify-center text-white -z-10">
-      <div className="absolute inset-0">
+      className="relative min-h-screen flex flex-col items-center justify-center text-white">
+      <div className="absolute inset-0 -z-10">
         <Image
           alt="Background Image"
           className="object-cover w-full h-full filter brightness-75"
@@ -51,17 +51,21 @@ export default function Component() {
         </h1>
         <p className="mb-8 text-center">Join now - Don&#39;t play alone!</p>
         <div className="flex space-x-4">
-          <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
-            LEADERBOARD
-          </Button>
+          <Link href="/leaderboard">
+            <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
+              LEADERBOARD
+            </Button>
+          </Link>
           <Button
             className="bg-green-700 px-4 py-2 size-12 rounded flex items-center"
             onClick={() => copyToClipboard("OnThePixel.net")}>
             <FaCopy className="text-white size-20" />
           </Button>
-          <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
-            TEAM
-          </Button>
+          <Link href="/team">
+            <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
+              TEAM
+            </Button>
+          </Link>
         </div>
       </main>
     </div>
