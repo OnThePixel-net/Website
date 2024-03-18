@@ -9,23 +9,25 @@ export default function Leaderboards() {
     <section className="bg-gray-950 pt-36">
       <div className="container mx-auto px-4 py-10">
         <h1 className="text-2xl font-bold mb-5">LEADERBOARDS</h1>
+        {/*  */}
         <div className="flex py-4">
           <div className="flex flex-col justify-center">
             <Image
               src={"/placeholder.png"}
-              alt={"Pixel"}
+              alt={"Pixels"}
               width={500}
               height={250}
             />
           </div>
           <div className="ml-4">
             <Link
-              href="/leaderboard/points"
+              href="/leaderboard/pixels"
               className="text-xl font-bold mt-4 text-green-200 underline">
-              Pixel
+              Pixels
             </Link>
             <p>
-              This is the leaderboard for the pixels, so the currency of OnThePixel.net
+              This is the leaderboard for the Pixels, so the currency of
+              OnThePixel.net
             </p>
           </div>
         </div>

@@ -12,8 +12,8 @@ export default function Component() {
   return (
     <div
       key="1"
-      className="relative min-h-screen flex flex-col items-center justify-center text-white">
-      <div className="absolute inset-0 z-[-1]">
+      className="relative min-h-screen flex flex-col items-center justify-center text-white -z-10">
+      <div className="absolute inset-0">
         <Image
           alt="Background Image"
           className="object-cover w-full h-full filter brightness-75"
