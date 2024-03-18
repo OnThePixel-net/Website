@@ -13,22 +13,19 @@ export default function Leaderboards() {
           <div className="flex flex-col justify-center">
             <Image
               src={"/placeholder.png"}
-              alt={"BedWars"}
+              alt={"Pixel"}
               width={500}
               height={250}
             />
           </div>
           <div className="ml-4">
             <Link
-              href="/leaderboard/bedwars"
+              href="/leaderboard/points"
               className="text-xl font-bold mt-4 text-green-200 underline">
-              BedWars
+              Pixel
             </Link>
             <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eius id
-              praesentium impedit veritatis aut, odit debitis cupiditate enim
-              harum fuga aspernatur? Accusantium, animi quisquam iste nemo odit
-              architecto perferendis in.
+              This is the leaderboard for the pixels, so the currency of OnThePixel.net
             </p>
           </div>
         </div>
@@ -44,9 +41,9 @@ export default function Leaderboards() {
           </div>
           <div className="ml-4">
             <Link
-              href="/leaderboard/points"
+              href="/leaderboard/bedwars"
               className="text-xl font-bold mt-4 text-green-200 underline">
-              Points
+              BedWars
             </Link>
             <p>
               Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eius id
