@@ -2,11 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import TopPage from "@/components/page/top";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function PointsLeaderboard() {
   interface Player {
     name: string;
     points: number;
+    uuid: string;
   }
 
   const [players, setPlayers] = useState<Player[]>([]);
@@ -26,7 +29,7 @@ export default function PointsLeaderboard() {
           <h1 className="text-2xl font-bold mb-5">POINTS LEADERBOARD</h1>
           <table className="w-full overflow-hidden mt-5 rounded-[10px] border-collapse">
             <thead>
-              <tr className="even:bg-gray-800 hover:bg-gray-700">
+              <tr className="even:bg-gray-800">
                 <th className="text-left p-2.5 border-b-[#666666] border-b border-solid">
                   Rank
                 </th>
@@ -45,7 +48,20 @@ export default function PointsLeaderboard() {
                     {index + 1}
                   </td>
                   <td className="p-2.5 border-b-[#666666] border-b border-solid">
-                    {player.name}
+                    <td className="p-2.5 border-b-[#666666] flex items-center">
+                      <Image
+                        alt={player.uuid}
+                        src={`https://minotar.net/helm/${player.name}/25`}
+                        width={25}
+                        height={25}
+                        className="mr-2"
+                      />
+                      <Link
+                        className="underline"
+                        href={`https://laby.net/@${player.name}`}>
+                        {player.name}
+                      </Link>
+                    </td>
                   </td>
                   <td className="p-2.5 border-b-[#666666] border-b border-solid">
                     {player.points}
