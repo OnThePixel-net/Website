@@ -18,7 +18,7 @@ export default function Team() {
               height={40}
             />
             <div className="ml-4">
-              <p className="font-bold">TinyBrickBoy</p>
+              <p className="font-bold">tinybrickboy</p>
               <p
                 className="text-sm"
                 style={{
@@ -38,7 +38,7 @@ export default function Team() {
               height={40}
             />
             <div className="ml-4">
-              <p className="font-bold">Paranoia8972</p>
+              <p className="font-bold">paranoia8972</p>
               <p
                 className="text-sm"
                 style={{
@@ -78,7 +78,7 @@ export default function Team() {
               height={40}
             />
             <div className="ml-4">
-              <p className="font-bold">WichtigeEnte</p>
+              <p className="font-bold">wichtigeente</p>
               <p
                 className="text-sm"
                 style={{
@@ -86,6 +86,46 @@ export default function Team() {
                   textShadow: "0 0 10px #ff505e",
                 }}>
                 ADMIN
+              </p>
+            </div>
+          </div>
+          {/*  */}
+          <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
+            <Image
+              alt="WichtigeEnte"
+              src="https://minotar.net/helm/cbzw"
+              width={40}
+              height={40}
+            />
+            <div className="ml-4">
+              <p className="font-bold">jonasrjn</p>
+              <p
+                className="text-sm"
+                style={{
+                  color: "#ff505e",
+                  textShadow: "0 0 10px #ff505e",
+                }}>
+                ADMIN
+              </p>
+            </div>
+          </div>
+          {/*  */}
+          <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
+            <Image
+              alt="kinimod86"
+              src="https://minotar.net/helm/Leeviatanpavian"
+              width={40}
+              height={40}
+            />
+            <div className="ml-4">
+              <p className="font-bold">kinimod86</p>
+              <p
+                className="text-sm"
+                style={{
+                  color: "#00de6d",
+                  textShadow: "0 0 10px #00de6d",
+                }}>
+                BUILDER
               </p>
             </div>
           </div>
@@ -122,10 +162,10 @@ export default function Team() {
               <p
                 className="text-sm"
                 style={{
-                  color: "#ff505e",
-                  textShadow: "0 0 10px #ff505e",
+                  color: "#00de6d",
+                  textShadow: "0 0 10px #00de6d",
                 }}>
-                ADMIN
+                BUILDER
               </p>
             </div>
           </div> */}
