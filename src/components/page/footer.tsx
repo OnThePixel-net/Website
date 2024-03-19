@@ -62,6 +62,9 @@ export default function Footer() {
             <Link className="hover:text-green-500" href="/leaderboard">
               Leaderboard
             </Link>
+            <Link className="hover:text-green-500" href="/impressum">
+              Impressum
+            </Link>
           </nav>
         </div>
         <div className="text-sm">

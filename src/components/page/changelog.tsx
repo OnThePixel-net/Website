@@ -5,9 +5,9 @@ export default function ChangeLog() {
   return (
     <section className="py-10 px-4 bg-gray-950">
       <div className="container mx-auto px-4 py-10">
-        <h2 id="team" className="text-3xl font-bold mb-4">
+        <h1 id="team" className="text-3xl font-bold mb-4">
           CHANGELOG
-        </h2>
+        </h1>
         {/*  */}
         <div className="bg-[#1e1e1e] p-4 my-4 border-l-4 border-green-500">
           <h3

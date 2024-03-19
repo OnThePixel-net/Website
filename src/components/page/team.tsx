@@ -5,9 +5,9 @@ export default function Team() {
   return (
     <section className="py-10 px-4 bg-gray-950">
       <div className="container mx-auto px-4 py-10">
-        <h2 id="team" className="text-3xl font-bold mb-4">
+        <h1 id="team" className="text-3xl font-bold mb-4">
           TEAM
-        </h2>
+        </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {/*  */}
           <div className="bg-[#1e1e1e] p-6 m-1 rounded-lg flex items-center hover:scale-105 transition-transform duration-300">
@@ -82,10 +82,10 @@ export default function Team() {
               <p
                 className="text-sm"
                 style={{
-                  color: "#00de6d",
-                  textShadow: "0 0 10px #00de6d",
+                  color: "#ff505e",
+                  textShadow: "0 0 10px #ff505e",
                 }}>
-                BUILDER
+                ADMIN
               </p>
             </div>
           </div>

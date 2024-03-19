@@ -43,3 +43,7 @@
 ::-webkit-scrollbar-thumb {
   background-color: #008b43;
 }
+
+.navbar-blur {
+  background-image: linear-gradient(to bottom, blur(10px), blur(5px));
+}

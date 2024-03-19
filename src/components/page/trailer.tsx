@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 export default function Trailer() {
   return (
     <section className="bg-gray-950">
-      <div className="container mx-auto px-4 py-10">
-        <h2 className="text-2xl font-bold mb-4 text-center">TRAILER</h2>
+      <div className="mx-auto px-4 py-10">
+        <h1 className="text-2xl font-bold mb-4 text-center">TRAILER</h1>
         <div className="grid grid-cols-1 gap-4">
           <div className="col-span-1">
             <iframe
