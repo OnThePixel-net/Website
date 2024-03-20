@@ -112,6 +112,26 @@ export default function Team() {
           {/*  */}
           <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
             <Image
+              alt="JakoLedrok12"
+              src="https://minotar.net/helm/JakoLedrok12"
+              width={40}
+              height={40}
+            />
+            <div className="ml-4">
+              <p className="font-bold">.ledrock</p>
+              <p
+                className="text-sm"
+                style={{
+                  color: "#ff505e",
+                  textShadow: "0 0 10px #ff505e",
+                }}>
+                ADMIN
+              </p>
+            </div>
+          </div>
+          {/*  */}
+          <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
+            <Image
               alt="kinimod86"
               src="https://minotar.net/helm/Leeviatanpavian"
               width={40}
@@ -130,15 +150,15 @@ export default function Team() {
             </div>
           </div>
           {/*  */}
-          {/* <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
+          <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
             <Image
-              alt="Paranoia8972"
-              src="https://minotar.net/helm/Paranoia8972"
+              alt="Mexot"
+              src="https://minotar.net/helm/Mexot"
               width={40}
               height={40}
             />
             <div className="ml-4">
-              <p className="font-bold">Paranoia8972</p>
+              <p className="font-bold">themexot</p>
               <p
                 className="text-sm"
                 style={{
@@ -148,7 +168,7 @@ export default function Team() {
                 SUPPORTER
               </p>
             </div>
-          </div> */}
+          </div>
           {/*  */}
           {/* <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
             <Image

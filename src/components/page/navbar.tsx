@@ -35,7 +35,7 @@ export default function NavBar() {
 
   return (
     <header className="fixed w-full z-10 navbar-blur">
-      <nav className="flex flex-wrap items-center justify-between w-full py-4 md:py-0 px-4 text-lg text-gray-300 bg-opacity-50 bg-[#1b1818]">
+      <nav className="flex flex-wrap items-center justify-between w-full py-2 md:py-0 px-4 text-lg text-gray-300 bg-opacity-50 bg-[#1b1818]">
         <div className="flex items-center space-x-4">
           <Link href="/">
             <Image src="/logo.png" width={40} height={40} alt="logo" />
