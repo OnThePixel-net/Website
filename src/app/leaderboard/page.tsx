@@ -38,7 +38,7 @@ export default function Leaderboards() {
           <div className="flex py-4">
             <div className="flex flex-col justify-center">
               <Image
-                src={"/placeholder.png"}
+                src={"/bedwars.jpg"}
                 alt={"BedWars"}
                 width={500}
                 height={250}
@@ -62,7 +62,7 @@ export default function Leaderboards() {
           <div className="flex py-4">
             <div className="flex flex-col justify-center">
               <Image
-                src={"/placeholder.png"}
+                src={"/parkour.png"}
                 alt={"BedWars"}
                 width={500}
                 height={250}
