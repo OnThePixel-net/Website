@@ -29,7 +29,7 @@ export default function Leaderboards() {
                 Pixels
               </Link>
               <p>
-                This is the leaderboard for the Pixels, so the currency of
+                This is the Leaderboard for the Pixels, so the currency of
                 OnThePixel.net
               </p>
             </div>
@@ -51,10 +51,7 @@ export default function Leaderboards() {
                 BedWars
               </Link>
               <p>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eius
-                id praesentium impedit veritatis aut, odit debitis cupiditate
-                enim harum fuga aspernatur? Accusantium, animi quisquam iste
-                nemo odit architecto perferendis in.
+                The Bedwars leaderboard ranks players by score, kills and deaths.
               </p>
             </div>
           </div>
@@ -75,10 +72,7 @@ export default function Leaderboards() {
                 Parkour
               </Link>
               <p>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eius
-                id praesentium impedit veritatis aut, odit debitis cupiditate
-                enim harum fuga aspernatur? Accusantium, animi quisquam iste
-                nemo odit architecto perferendis in.
+                 The Parkour Leaderboard ranks based on how far players have progressed on the course.
               </p>
             </div>
           </div>
