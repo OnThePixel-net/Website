@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -61,9 +60,9 @@ export default function Component() {
             onClick={() => copyToClipboard("OnThePixel.net")}>
             <FaCopy className="text-white size-20" />
           </Button>
-          <Link href="/team">
+          <Link href="https://discord.onthepixel.net">
             <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
-              TEAM
+              DISCORD
             </Button>
           </Link>
         </div>

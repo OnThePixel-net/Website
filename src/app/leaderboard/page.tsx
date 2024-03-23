@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -15,12 +13,15 @@ export default function Leaderboards() {
           {/*  */}
           <div className="flex py-4">
             <div className="flex flex-col justify-center">
-              <Image
-                src={"/placeholder.png"}
-                alt={"Pixels"}
-                width={500}
-                height={250}
-              />
+              <Link href="/leaderboard/pixels">
+                <Image
+                  src={"/placeholder.png"}
+                  alt={"Pixels"}
+                  width={500}
+                  height={250}
+                  className="h-[200px] w-[400px] cursor-pointer rounded-xl border object-cover"
+                />
+              </Link>
             </div>
             <div className="ml-4">
               <Link
@@ -37,12 +38,15 @@ export default function Leaderboards() {
           {/*  */}
           <div className="flex py-4">
             <div className="flex flex-col justify-center">
-              <Image
-                src={"/bedwars.jpg"}
-                alt={"BedWars"}
-                width={500}
-                height={250}
-              />
+              <Link href="/leaderboard/bedwars">
+                <Image
+                  src={"/bedwars.jpg"}
+                  alt={"BedWars"}
+                  width={500}
+                  height={250}
+                  className="h-[200px] w-[400px] cursor-pointer rounded-xl border object-cover"
+                />
+              </Link>
             </div>
             <div className="ml-4">
               <Link
@@ -51,19 +55,23 @@ export default function Leaderboards() {
                 BedWars
               </Link>
               <p>
-                The Bedwars leaderboard ranks players by score, kills and deaths.
+                The Bedwars leaderboard ranks players by score, kills and
+                deaths.
               </p>
             </div>
           </div>
           {/*  */}
           <div className="flex py-4">
             <div className="flex flex-col justify-center">
-              <Image
-                src={"/parkour.png"}
-                alt={"BedWars"}
-                width={500}
-                height={250}
-              />
+              <Link href="/leaderboard/parkour">
+                <Image
+                  src={"/parkour.png"}
+                  alt={"BedWars"}
+                  width={500}
+                  height={250}
+                  className="h-[200px] w-[400px] cursor-pointer rounded-xl border object-cover"
+                />
+              </Link>
             </div>
             <div className="ml-4">
               <Link
@@ -72,7 +80,8 @@ export default function Leaderboards() {
                 Parkour
               </Link>
               <p>
-                 The Parkour Leaderboard ranks based on how far players have progressed on the course.
+                The Parkour Leaderboard ranks based on how far players have
+                progressed on the course.
               </p>
             </div>
           </div>
