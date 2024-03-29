@@ -6,7 +6,7 @@ export default function Trailer() {
       <div className="mx-auto px-4 py-10 max-w-screen-xl">
         <h1 className="text-2xl font-bold mb-4 text-center">TRAILER</h1>
         <iframe
-          src="https://www.youtube.com/embed/0RvoFmAmrg4?controls=0"
+          src="https://www.youtube.com/embed/0RvoFmAmrg4?controls=0&rel=0"
           title="OnThePixel.net Trailer"
           frameBorder="0"
           style={{
