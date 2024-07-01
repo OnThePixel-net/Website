@@ -6,7 +6,8 @@ export default function NotFound() {
   return (
     <div
       key="1"
-      className="relative min-h-screen flex flex-col items-center justify-center text-white">
+      className="relative min-h-screen flex flex-col items-center justify-center text-white"
+    >
       <div className="absolute inset-0 -z-10">
         <Image
           alt="Background Image"
@@ -40,7 +41,8 @@ export default function NotFound() {
           style={{
             color: "#fff",
             textShadow: "0 0 15px #fff",
-          }}>
+          }}
+        >
           404
         </h1>
         <p className="mb-8 text-center">

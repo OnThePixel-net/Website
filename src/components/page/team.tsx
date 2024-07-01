@@ -1,7 +1,66 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
-export default function Team() {
+interface Member {
+  id: string;
+  minecraft_name: string;
+  discord_name: string;
+  role: string;
+}
+
+function Team() {
+  const [teamMembers, setTeamMembers] = useState<Member[]>([]);
+
+  useEffect(() => {
+    fetch("https://pb.encryptopia.dev/api/collections/otp_team/records")
+      .then((response) => response.json())
+      .then((data) => setTeamMembers(data.items))
+      .catch((error) => console.error("Error fetching team members:", error));
+  }, []);
+
+  useEffect(() => {
+    const cacheKey = "teamMembersCache";
+    const cacheExpiry = 24 * 60 * 60 * 1000;
+
+    const fetchData = async () => {
+      const response = await fetch(
+        "https://pb.encryptopia.dev/api/collections/otp_team/records"
+      );
+      const data = await response.json();
+      setTeamMembers(data.items);
+      const cacheData = {
+        items: data.items,
+        timestamp: new Date().getTime(),
+      };
+      localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    };
+
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+      const { items, timestamp } = JSON.parse(cachedData);
+      const isCacheValid = new Date().getTime() - timestamp < cacheExpiry;
+      if (isCacheValid) {
+        setTeamMembers(items);
+        return;
+      }
+    }
+    fetchData().catch((error) =>
+      console.error("Error fetching team members:", error)
+    );
+  }, []);
+
+  const roleColors: { [key: string]: string } = {
+    owner: "#f1c40f",
+    admin: "#ff505e",
+    developer: "#5ac2de",
+    builder: "#00de6d",
+    supporter: "#a1101a",
+  };
+
+  const getRoleColor = (role: string) =>
+    roleColors[role.toLowerCase()] || "#ffffff";
+
   return (
     <section className="py-10 px-4 bg-gray-950">
       <div className="container mx-auto px-4 py-10">
@@ -9,189 +68,35 @@ export default function Team() {
           TEAM
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {/*  */}
-          <div className="bg-[#1e1e1e] p-6 m-1 rounded-lg flex items-center hover:scale-105 transition-transform duration-300">
-            <Image
-              alt="TinyBrickBoy"
-              src="https://minotar.net/helm/TinyBrickBoy"
-              width={40}
-              height={40}
-            />
-            <div className="ml-4">
-              <p className="font-bold">tinybrickboy</p>
-              <p
-                className="text-sm"
-                style={{
-                  color: "#f1c40f",
-                  textShadow: "0 0 10px #f1c40f",
-                }}>
-                OWNER
-              </p>
+          {teamMembers.map((member) => (
+            <div
+              key={member.id}
+              className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300"
+            >
+              <Image
+                alt={member.minecraft_name}
+                src={`https://minotar.net/helm/${member.minecraft_name}`}
+                width={40}
+                height={40}
+              />
+              <div className="ml-4">
+                <p className="font-bold">{member.discord_name}</p>
+                <p
+                  className="text-sm"
+                  style={{
+                    color: getRoleColor(member.role),
+                    textShadow: `0 0 10px ${getRoleColor(member.role)}`,
+                  }}
+                >
+                  {member.role.toUpperCase()}
+                </p>
+              </div>
             </div>
-          </div>
-          {/*  */}
-          <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
-            <Image
-              alt="Paranoia8972"
-              src="https://minotar.net/helm/Paranoia8972"
-              width={40}
-              height={40}
-            />
-            <div className="ml-4">
-              <p className="font-bold">paranoia8972</p>
-              <p
-                className="text-sm"
-                style={{
-                  color: "#f1c40f",
-                  textShadow: "0 0 10px #f1c40f",
-                }}>
-                OWNER
-              </p>
-            </div>
-          </div>
-          {/*  */}
-          {/* <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
-            <Image
-              alt="Paranoia8972"
-              src="https://minotar.net/helm/Paranoia8972"
-              width={40}
-              height={40}
-            />
-            <div className="ml-4">
-              <p className="font-bold">Paranoia8972</p>
-              <p
-                className="text-sm"
-                style={{
-                  color: "#5ac2de",
-                  textShadow: "0 0 10px #5ac2de",
-                }}>
-                DEVELOPER
-              </p>
-            </div>
-          </div> */}
-          {/*  */}
-          <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
-            <Image
-              alt="WichtigeEnte"
-              src="https://minotar.net/helm/WichtigeEnte"
-              width={40}
-              height={40}
-            />
-            <div className="ml-4">
-              <p className="font-bold">wichtigeente</p>
-              <p
-                className="text-sm"
-                style={{
-                  color: "#ff505e",
-                  textShadow: "0 0 10px #ff505e",
-                }}>
-                ADMIN
-              </p>
-            </div>
-          </div>
-          {/*  */}
-          <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
-            <Image
-              alt="WichtigeEnte"
-              src="https://minotar.net/helm/cbzw"
-              width={40}
-              height={40}
-            />
-            <div className="ml-4">
-              <p className="font-bold">jonasrjn</p>
-              <p
-                className="text-sm"
-                style={{
-                  color: "#ff505e",
-                  textShadow: "0 0 10px #ff505e",
-                }}>
-                ADMIN
-              </p>
-            </div>
-          </div>
-          {/*  */}
-          <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
-            <Image
-              alt="JakoLedrok12"
-              src="https://minotar.net/helm/JakoLedrok12"
-              width={40}
-              height={40}
-            />
-            <div className="ml-4">
-              <p className="font-bold">.ledrock</p>
-              <p
-                className="text-sm"
-                style={{
-                  color: "#ff505e",
-                  textShadow: "0 0 10px #ff505e",
-                }}>
-                ADMIN
-              </p>
-            </div>
-          </div>
-          {/*  */}
-          <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
-            <Image
-              alt="kinimod86"
-              src="https://minotar.net/helm/Leeviatanpavian"
-              width={40}
-              height={40}
-            />
-            <div className="ml-4">
-              <p className="font-bold">kinimod86</p>
-              <p
-                className="text-sm"
-                style={{
-                  color: "#00de6d",
-                  textShadow: "0 0 10px #00de6d",
-                }}>
-                BUILDER
-              </p>
-            </div>
-          </div>
-          {/*  */}
-          <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
-            <Image
-              alt="Mexot"
-              src="https://minotar.net/helm/Mexot"
-              width={40}
-              height={40}
-            />
-            <div className="ml-4">
-              <p className="font-bold">themexot</p>
-              <p
-                className="text-sm"
-                style={{
-                  color: "#a1101a",
-                  textShadow: "0 0 10px #a1101a",
-                }}>
-                SUPPORTER
-              </p>
-            </div>
-          </div>
-          {/*  */}
-          {/* <div className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300">
-            <Image
-              alt="Paranoia8972"
-              src="https://minotar.net/helm/Paranoia8972"
-              width={40}
-              height={40}
-            />
-            <div className="ml-4">
-              <p className="font-bold">Paranoia8972</p>
-              <p
-                className="text-sm"
-                style={{
-                  color: "#00de6d",
-                  textShadow: "0 0 10px #00de6d",
-                }}>
-                BUILDER
-              </p>
-            </div>
-          </div> */}
-          {/*  */}
+          ))}
         </div>
       </div>
     </section>
   );
 }
+
+export default Team;
