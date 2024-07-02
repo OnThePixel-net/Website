@@ -12,6 +12,16 @@ interface Member {
 function Team() {
   const [teamMembers, setTeamMembers] = useState<Member[]>([]);
 
+  const roleOrder = ["owner", "admin", "developer", "builder", "supporter"];
+
+  const getRoleIndex = (role: string) => {
+    const index = roleOrder.indexOf(role.toLowerCase());
+    return index === -1 ? roleOrder.length : index;
+  };
+
+  const sortedTeamMembers = teamMembers.sort(
+    (a, b) => getRoleIndex(a.role) - getRoleIndex(b.role)
+  );
   useEffect(() => {
     fetch("https://pb.encryptopia.dev/api/collections/otp_team/records")
       .then((response) => response.json())
@@ -68,7 +78,7 @@ function Team() {
           TEAM
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {teamMembers.map((member) => (
+          {sortedTeamMembers.map((member) => (
             <div
               key={member.id}
               className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300"
