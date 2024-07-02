@@ -47,3 +47,7 @@
 .navbar-blur {
   background-image: linear-gradient(to bottom, blur(10px), blur(5px));
 }
+
+.changelog a {
+  @apply underline text-green-200;
+}
