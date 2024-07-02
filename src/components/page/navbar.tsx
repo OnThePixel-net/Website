@@ -14,12 +14,27 @@ export default function NavBar() {
     const button = document.querySelector("#menu-button");
     const menu = document.querySelector("#menu");
     if (!button || !menu) return;
+
     const toggleMenu = () => {
       menu.classList.toggle("hidden");
     };
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menu &&
+        !menu.contains(event.target as Node) &&
+        !button.contains(event.target as Node)
+      ) {
+        menu.classList.add("hidden");
+      }
+    };
+
     button.addEventListener("click", toggleMenu);
+    document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       button.removeEventListener("click", toggleMenu);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -55,7 +70,8 @@ export default function NavBar() {
           className="h-6 w-6 cursor-pointer md:hidden block"
           fill="none"
           viewBox="0 0 24 24"
-          stroke="currentColor">
+          stroke="currentColor"
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -66,14 +82,16 @@ export default function NavBar() {
 
         <div
           className="hidden w-full md:flex md:items-center md:w-auto"
-          id="menu">
+          id="menu"
+        >
           <ul className="pt-4 text-base text-gray-300 md:flex md:justify-between md:pt-0">
             <li>
               <Link
                 href="/"
                 className={`md:p-4 py-2 block hover:text-white ${
                   pathname === "/" ? "text-green-500" : ""
-                }`}>
+                }`}
+              >
                 Home
               </Link>
             </li>
@@ -82,7 +100,8 @@ export default function NavBar() {
                 href="/shop"
                 className={`md:p-4 py-2 block hover:text-white ${
                   pathname === "/shop" ? "text-green-500" : ""
-                }`}>
+                }`}
+              >
                 Shop
               </Link>
             </li>
@@ -91,7 +110,8 @@ export default function NavBar() {
                 href="/team"
                 className={`md:p-4 py-2 block hover:text-white ${
                   pathname === "/team" ? "text-green-500" : ""
-                }`}>
+                }`}
+              >
                 Team
               </Link>
             </li>
@@ -100,7 +120,8 @@ export default function NavBar() {
                 href="/rules"
                 className={`md:p-4 py-2 block hover:text-white ${
                   pathname === "/rules" ? "text-green-500" : ""
-                }`}>
+                }`}
+              >
                 Rules
               </Link>
             </li>
@@ -109,7 +130,8 @@ export default function NavBar() {
                 href="/leaderboard"
                 className={`md:p-4 py-2 block hover:text-white ${
                   pathname.startsWith("/leaderboard") ? "text-green-500" : ""
-                }`}>
+                }`}
+              >
                 Leaderboard
               </Link>
             </li>

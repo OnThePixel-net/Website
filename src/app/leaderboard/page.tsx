@@ -26,11 +26,12 @@ export default function Leaderboards() {
             <div className="ml-4">
               <Link
                 href="/leaderboard/pixels"
-                className="text-xl font-bold mt-4 text-green-200 underline">
+                className="text-xl font-bold mt-4 text-green-200 underline"
+              >
                 Pixels
               </Link>
               <p>
-                This is the Leaderboard for the Pixels, so the currency of
+                This is the Leaderboard for the Pixels, the currency of
                 OnThePixel.net
               </p>
             </div>
@@ -51,7 +52,8 @@ export default function Leaderboards() {
             <div className="ml-4">
               <Link
                 href="/leaderboard/bedwars"
-                className="text-xl font-bold mt-4 text-green-200 underline">
+                className="text-xl font-bold mt-4 text-green-200 underline"
+              >
                 BedWars
               </Link>
               <p>
@@ -76,7 +78,8 @@ export default function Leaderboards() {
             <div className="ml-4">
               <Link
                 href="/leaderboard/parkour"
-                className="text-xl font-bold mt-4 text-green-200 underline">
+                className="text-xl font-bold mt-4 text-green-200 underline"
+              >
                 Parkour
               </Link>
               <p>
