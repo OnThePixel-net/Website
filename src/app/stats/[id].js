@@ -1,6 +1,6 @@
 // pages/users/[id].js
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 const UserPage = () => {
   const router = useRouter();
@@ -15,10 +15,10 @@ const UserPage = () => {
           const data = await response.json();
           setUserData(data);
         } else {
-          console.error('Failed to fetch user data');
+          console.error("Failed to fetch user data");
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
       }
     };
 
@@ -34,6 +34,7 @@ const UserPage = () => {
           <h1>User Details</h1>
           <p>Name: {userData.name}</p>
           <p>Email: {userData.email}</p>
+          <p>Roles: {userData.roles}</p>
           {/* Display other user stats */}
         </div>
       ) : (
@@ -44,4 +45,3 @@ const UserPage = () => {
 };
 
 export default UserPage;
-

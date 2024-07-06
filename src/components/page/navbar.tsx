@@ -1,9 +1,11 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { navLinks } from "@/config/nav";
+import { Button } from "@/components/ui/button";
+import SignIn from "@/components/auth/SignIn";
 
 export default function NavBar() {
   const pathname = usePathname();
@@ -85,55 +87,20 @@ export default function NavBar() {
           id="menu"
         >
           <ul className="pt-4 text-base text-gray-300 md:flex md:justify-between md:pt-0">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className={`md:p-4 py-2 block hover:text-white ${
+                    pathname === link.href ? "text-green-500" : ""
+                  }`}
+                >
+                  {link.title}
+                </Link>
+              </li>
+            ))}
             <li>
-              <Link
-                href="/"
-                className={`md:p-4 py-2 block hover:text-white ${
-                  pathname === "/" ? "text-green-500" : ""
-                }`}
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/shop"
-                className={`md:p-4 py-2 block hover:text-white ${
-                  pathname === "/shop" ? "text-green-500" : ""
-                }`}
-              >
-                Shop
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/team"
-                className={`md:p-4 py-2 block hover:text-white ${
-                  pathname === "/team" ? "text-green-500" : ""
-                }`}
-              >
-                Team
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/rules"
-                className={`md:p-4 py-2 block hover:text-white ${
-                  pathname === "/rules" ? "text-green-500" : ""
-                }`}
-              >
-                Rules
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/leaderboard"
-                className={`md:p-4 py-2 block hover:text-white ${
-                  pathname.startsWith("/leaderboard") ? "text-green-500" : ""
-                }`}
-              >
-                Leaderboard
-              </Link>
+              <SignIn />
             </li>
           </ul>
         </div>
