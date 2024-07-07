@@ -1,10 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { FaTwitter, FaDiscord, FaYoutube } from "react-icons/fa";
 import { BsBoxes } from "react-icons/bs";
 import Image from "next/image";
+import { footerLinks } from "@/config/links";
 
 export default function Footer() {
   return (
@@ -19,61 +18,56 @@ export default function Footer() {
             alt="Logo"
           />
           <div className="flex space-x-4">
-            <FaTwitter className="h-6 w-6" />
-            <FaYoutube className="h-6 w-6" />
-            <FaDiscord className="h-6 w-6" />
+            <Link
+              href={"https://twitter.com/@onthepixel?mx=1"}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaTwitter className="size-6 hover:text-green-500 transition" />
+            </Link>
+            <Link
+              href={"https://youtube.com/@thebestminecraftserver"}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaYoutube className="size-6 hover:text-green-500 transition" />
+            </Link>
+            <Link
+              href={"https://discord.onthepixel.net"}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaDiscord className="size-6 hover:text-green-500 transition " />
+            </Link>
           </div>
         </div>
-        <div>
-          <h3 className="text-xl font-semibold mb-4">Social Media</h3>
-          <nav className="flex flex-col space-y-2">
-            <Link
-              className="hover:text-green-500"
-              href="https://twitter.com/@onthepixelnet">
-              Twitter
-            </Link>
-            <Link
-              className="hover:text-green-500"
-              href="https://youtube.com/@thebestminecraftserver">
-              YouTube
-            </Link>
-            <Link
-              className="hover:text-green-500"
-              href="https://discord.onthepixel.net">
-              Discord
-            </Link>
-          </nav>
-        </div>
-        <div>
-          <h3 className="text-xl font-semibold mb-4">Navigation</h3>
-          <nav className="flex flex-col space-y-2">
-            <Link className="hover:text-green-500" href="/">
-              Home
-            </Link>
-            <Link className="hover:text-green-500" href="/shop">
-              Shop
-            </Link>
-            <Link className="hover:text-green-500" href="/rules">
-              Rules
-            </Link>
-            <Link className="hover:text-green-500" href="/team">
-              Team
-            </Link>
-            <Link className="hover:text-green-500" href="/leaderboard">
-              Leaderboard
-            </Link>
-            <Link className="hover:text-green-500" href="/impressum">
-              Impressum
-            </Link>
-          </nav>
-        </div>
-        <div className="text-sm">
-          <p>COPYRIGHT 2023 OnThePixel.net</p>
-          <p>
-            The OnThePixel.net server is in no way associated with Mojang AB.
-          </p>
-          <p>Project created by the new OnThePixel team</p>
-        </div>
+        {footerLinks.map((section) => (
+          <div key={section.group}>
+            <h3 className="text-xl font-semibold mb-4">
+              {section.group.charAt(0).toUpperCase() + section.group.slice(1)}
+            </h3>
+            <nav className="flex flex-col space-y-2">
+              {section.links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="hover:text-green-500 transition"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {link.title}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        ))}
+      </div>
+      <div className="border-dashed border-t-slate-800 border-t-2 w-full my-4"></div>
+      <div className="text-sm text-right whitespace-nowrap -mb-4">
+        <p>
+          Copyright &copy; 2022-{new Date().getFullYear()} OnThePixel.net - All
+          Rights Reserved. - Not affiliated with Mojang or Microsoft!
+        </p>
       </div>
     </footer>
   );

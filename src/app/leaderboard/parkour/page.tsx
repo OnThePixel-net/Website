@@ -22,7 +22,7 @@ export default function ParkourLeaderboard() {
   }, []);
 
   return (
-    <>
+    <div className="min-h-screen">
       <TopPage />
       <section className="bg-gray-950 pt-36">
         <div className="container mx-auto px-4 py-10">
@@ -58,7 +58,8 @@ export default function ParkourLeaderboard() {
                       />
                       <Link
                         className="underline"
-                        href={`https://laby.net/@${player.name}`}>
+                        href={`https://laby.net/@${player.name}`}
+                      >
                         {player.name}
                       </Link>
                     </td>
@@ -72,6 +73,6 @@ export default function ParkourLeaderboard() {
           </table>
         </div>
       </section>
-    </>
+    </div>
   );
 }

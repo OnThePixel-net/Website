@@ -1,17 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { navLinks } from "@/config/nav";
-import { Button } from "@/components/ui/button";
-import SignIn from "@/components/auth/SignIn";
+import React, { useEffect } from "react";
+import PlayerCount from "@/components/page/playercount";
+import NavLinks from "@/components/page/navlinks";
 
 export default function NavBar() {
-  const pathname = usePathname();
-  const [onlinePlayers, setOnlinePlayers] = useState(0);
-  const [pingEnabled, setPingEnabled] = useState(true);
-
   useEffect(() => {
     const button = document.querySelector("#menu-button");
     const menu = document.querySelector("#menu");
@@ -40,32 +32,9 @@ export default function NavBar() {
     };
   }, []);
 
-  useEffect(() => {
-    fetch("https://api.mcsrvstat.us/3/onthepixel.net")
-      .then((response) => response.json())
-      .then((data) => {
-        setOnlinePlayers(data.players.online);
-        setPingEnabled(data.debug.ping);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
   return (
     <header className="fixed w-full z-10 navbar-blur">
       <nav className="flex flex-wrap items-center justify-between w-full py-2 md:py-0 px-4 text-lg text-gray-300 bg-opacity-50 bg-[#1b1818]">
-        <div className="flex items-center space-x-4">
-          <Link href="/">
-            <Image src="/logo.png" width={40} height={40} alt="logo" />
-          </Link>
-          <span className={`relative flex h-3 w-3`}>
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-          </span>
-          <p>
-            Online players: <span>{onlinePlayers}</span>
-          </p>
-        </div>
-
         <svg
           xmlns="http://www.w3.org/2000/svg"
           id="menu-button"
@@ -81,28 +50,12 @@ export default function NavBar() {
             d="M4 6h16M4 12h16M4 18h16"
           />
         </svg>
-
+        <PlayerCount />
         <div
           className="hidden w-full md:flex md:items-center md:w-auto"
           id="menu"
         >
-          <ul className="pt-4 text-base text-gray-300 md:flex md:justify-between md:pt-0">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className={`md:p-4 py-2 block hover:text-white ${
-                    pathname === link.href ? "text-green-500" : ""
-                  }`}
-                >
-                  {link.title}
-                </Link>
-              </li>
-            ))}
-            <li>
-              <SignIn />
-            </li>
-          </ul>
+          <NavLinks />
         </div>
       </nav>
     </header>

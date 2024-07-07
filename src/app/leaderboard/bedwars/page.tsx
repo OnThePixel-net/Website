@@ -23,7 +23,7 @@ export default function BWLeaderboard() {
   }, []);
 
   return (
-    <>
+    <div className="min-h-screen">
       <TopPage />
       <section className="bg-gray-950 pt-36">
         <div className="container mx-auto px-4 py-10">
@@ -65,7 +65,8 @@ export default function BWLeaderboard() {
                       />
                       <Link
                         className="underline"
-                        href={`https://laby.net/@${player.name}`}>
+                        href={`https://laby.net/@${player.name}`}
+                      >
                         {player.name}
                       </Link>
                     </td>
@@ -85,6 +86,6 @@ export default function BWLeaderboard() {
           </table>
         </div>
       </section>
-    </>
+    </div>
   );
 }

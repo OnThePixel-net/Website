@@ -6,6 +6,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "minotar.net",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.discordapp.com",
+      },
     ],
   },
 };
