@@ -2,12 +2,6 @@ import React from "react";
 import TopPage from "@/components/page/top";
 
 export default function TNTRun() {
-  // Funktion zum Kopieren der IP-Adresse
-  const copyIP = () => {
-    navigator.clipboard.writeText("play.tntrun.de");
-    alert("IP address copied to clipboard!");
-  };
-
   return (
     <>
       <TopPage />
@@ -45,12 +39,9 @@ export default function TNTRun() {
             <p className="text-gray-300 max-w-xl mx-auto mb-6">
               Become part of the TNT Run community and test your skills. Visit our website <a href="https://tntrun.de" className="text-blue-400 underline">tntrun.de</a> and start playing today!
             </p>
-            <button
-              onClick={copyIP}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mb-6"
-            >
-              Copy Server IP: play.tntrun.de
-            </button>
+            <p className="text-gray-400 text-lg font-semibold">
+              Server IP: <span className="text-white">play.tntrun.de</span>
+            </p>
             <p className="text-gray-400">Launch Minecraft and paste the IP to join!</p>
           </div>
         </div>
