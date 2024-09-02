@@ -5,14 +5,22 @@ export default function TNTRun() {
   const [copied, setCopied] = useState(false);
   const serverIP = "play.tntrun.de";
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(serverIP);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset the copied state after 2 seconds
-    } catch (err) {
-      console.error("Failed to copy text: ", err);
-    }
+  const handleCopy = () => {
+    // Create a temporary input element
+    const input = document.createElement("input");
+    input.value = serverIP;
+    document.body.appendChild(input);
+
+    // Select and copy the text
+    input.select();
+    document.execCommand("copy");
+
+    // Clean up
+    document.body.removeChild(input);
+
+    // Show feedback
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000); // Reset the copied state after 2 seconds
   };
 
   return (
