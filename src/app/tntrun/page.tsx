@@ -9,10 +9,10 @@ export default function TNTRun() {
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-6 text-white">TNT Run</h1>
           <p className="text-gray-300 text-lg mb-8 max-w-3xl mx-auto">
-            In TNT Run, your goal is to avoid falling TNT and stay on the highest platform for as long as possible. Whether you're a beginner or a pro, there's something for everyone!
+            In TNT Run, your goal is to avoid falling TNT and stay on the highest platform for as long as possible. Whether you&apos;re a beginner or a pro, there&apos;s something for everyone!
           </p>
           <p className="text-gray-300 text-lg mb-8 max-w-3xl mx-auto">
-            Our TNT Run features exciting PvP opportunities and the chance to use Double Jumps to save yourself from falling. Win the game and earn our server currency Pixels, to enhance your experience!
+            Our TNT Run features exciting PvP opportunities and the chance to use Double Jumps to save yourself from falling. Win the game and earn our server currency, &quot;Pixels&quot;, to enhance your experience!
           </p>
           <a href="https://tntrun.de" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg">
             Play Now
