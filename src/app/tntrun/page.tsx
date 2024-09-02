@@ -4,7 +4,7 @@ import TopPage from "@/components/page/top";
 export default function TNTRun() {
   return (
     <>
-      <TopPage />
+      
       <section className="bg-gray-950 pt-36 pb-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-6 text-white">TNT Run</h1>
