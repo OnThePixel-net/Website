@@ -14,7 +14,7 @@ export default function TNTRun() {
           <p className="text-gray-300 text-lg mb-8 max-w-3xl mx-auto">
             Our TNT Run features exciting PvP opportunities and the chance to use Double Jumps to save yourself from falling. Win the game and earn our server currency, Pixels, to enhance your experience!
           </p>
-          ip: tntrun.de
+          <h2 className="text-4xl font-bold mb-6 text-white">Ip: tntrun.de</h2>
         </div>
       </section>
     </>
