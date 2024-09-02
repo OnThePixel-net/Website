@@ -4,7 +4,7 @@ import TopPage from "@/components/page/top";
 export default function TNTRun() {
   return (
     <>
-      <TopPage />
+      
       <section className="bg-gray-950 pt-36 pb-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-6 text-white">TNT Run</h1>
@@ -14,9 +14,7 @@ export default function TNTRun() {
           <p className="text-gray-300 text-lg mb-8 max-w-3xl mx-auto">
             Our TNT Run features exciting PvP opportunities and the chance to use Double Jumps to save yourself from falling. Win the game and earn our server currency, &quot;Pixels&quot;, to enhance your experience!
           </p>
-          <a href="https://tntrun.de" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg">
-            Play Now
-          </a>
+          ip: tntrun.de
         </div>
       </section>
     </>
