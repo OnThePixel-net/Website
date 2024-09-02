@@ -1,15 +1,18 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import TopPage from "@/components/page/top";
 
 export default function TNTRun() {
   const [copied, setCopied] = useState(false);
   const serverIP = "play.tntrun.de";
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(serverIP);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000); // Reset the copied state after 2 seconds
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(serverIP);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // Reset the copied state after 2 seconds
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
   };
 
   return (
