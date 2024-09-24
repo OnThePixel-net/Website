@@ -1,4 +1,3 @@
-import { signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
@@ -33,7 +32,6 @@ export default function SignOutPage() {
             <form
               action={async (formData) => {
                 "use server";
-                await signOut();
               }}
             >
               <Button

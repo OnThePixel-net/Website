@@ -7,7 +7,6 @@ export default async function Page() {
   return (
     <>
       <p>{}</p>
-      {user ? `Welcome, ${user.name}!` : "Loading..."}
     </>
   );
 }
