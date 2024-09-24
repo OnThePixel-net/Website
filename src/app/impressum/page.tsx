@@ -1,7 +1,7 @@
 import React from "react";
 import TopPage from "@/components/page/top";
 
-export default function Team() {
+export default function Impressum() {
   return (
     <>
       <TopPage />

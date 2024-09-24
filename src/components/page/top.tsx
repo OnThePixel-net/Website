@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function TopPage() {
   return (
     <section className="relative">
-      <div className="pt-[56px] relative">
+      <div className="relative">
         <Image
           alt="Background Image"
           className="object-cover w-full h-64 filter brightness-75"

@@ -4,24 +4,21 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { FaCopy } from "react-icons/fa6";
 
-export default function Component() {
+export default function Header() {
   function copyToClipboard(text: string) {
     navigator.clipboard.writeText(text);
   }
   return (
     <div
       key="1"
-      className="relative min-h-screen flex flex-col items-center justify-center text-white">
+      className="relative min-h-screen flex flex-col items-center justify-center text-white"
+    >
       <div className="absolute inset-0 -z-10">
         <Image
           alt="Background Image"
           className="object-cover w-full h-full filter brightness-75"
           height="1080"
           src="/bg.png"
-          style={{
-            aspectRatio: "1920/1080",
-            objectFit: "cover",
-          }}
           width="1920"
         />
         <div className="absolute inset-0" />
@@ -45,7 +42,8 @@ export default function Component() {
           style={{
             color: "#fff",
             textShadow: "0 0 15px #fff",
-          }}>
+          }}
+        >
           OnThePixel.net
         </h1>
         <p className="mb-8 text-center">Join now - Don&#39;t play alone!</p>
@@ -57,7 +55,8 @@ export default function Component() {
           </Link>
           <Button
             className="bg-green-700 px-4 py-2 size-12 rounded flex items-center"
-            onClick={() => copyToClipboard("OnThePixel.net")}>
+            onClick={() => copyToClipboard("OnThePixel.net")}
+          >
             <FaCopy className="text-white size-20" />
           </Button>
           <Link href="https://discord.onthepixel.net">
