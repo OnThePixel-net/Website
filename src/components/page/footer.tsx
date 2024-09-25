@@ -22,7 +22,7 @@ export default function Footer() {
           </Link>
           <div className="flex gap-4">
             <Link
-              href="#"
+              href="https://discord.onthepixel.net"
               className="text-muted-foreground hover:text-green-500"
               prefetch={false}
             >
@@ -30,15 +30,15 @@ export default function Footer() {
               <span className="sr-only">Twitter</span>
             </Link>
             <Link
-              href="#"
+              href="https://discord.onthepixel.net"
               className="text-muted-foreground hover:text-green-500"
               prefetch={false}
             >
               <RiDiscordLine className="h-6 w-6" />
-              <span className="sr-only">Facebook</span>
+              <span className="sr-only">Discord</span>
             </Link>
             <Link
-              href="#"
+              href="https://www.instagram.com/onthepixel_net/"
               className="text-muted-foreground hover:text-green-500"
               prefetch={false}
             >
@@ -49,7 +49,7 @@ export default function Footer() {
         </div>
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Company</h4>
+            <h4 className="text-sm font-semibold">OnThePixel</h4>
             <ul className="space-y-1">
               <li>
                 <Link
@@ -62,70 +62,43 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/team"
                   className="text-muted-foreground hover:text-green-500"
                   prefetch={false}
                 >
-                  Careers
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
-                >
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
-                >
-                  Contact
+                  Team
                 </Link>
               </li>
             </ul>
           </div>
           <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Products</h4>
+            <h4 className="text-sm font-semibold">Pages</h4>
             <ul className="space-y-1">
               <li>
                 <Link
-                  href="#"
+                  href="/leaderboard"
                   className="text-muted-foreground hover:text-green-500"
                   prefetch={false}
                 >
-                  Features
+                  Leaderboard
                 </Link>
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/stats"
                   className="text-muted-foreground hover:text-green-500"
                   prefetch={false}
                 >
-                  Integrations
+                  Statistics
                 </Link>
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/tntrun"
                   className="text-muted-foreground hover:text-green-500"
                   prefetch={false}
                 >
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
-                >
-                  Roadmap
+                  TNTRun
                 </Link>
               </li>
             </ul>
@@ -135,38 +108,11 @@ export default function Footer() {
             <ul className="space-y-1">
               <li>
                 <Link
-                  href="#"
+                  href="/imprint"
                   className="text-muted-foreground hover:text-green-500"
                   prefetch={false}
                 >
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
-                >
-                  Cookie Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
-                >
-                  Disclaimer
+                  Imprint
                 </Link>
               </li>
             </ul>
@@ -176,7 +122,7 @@ export default function Footer() {
             <ul className="space-y-1">
               <li>
                 <Link
-                  href="#"
+                  href="https://x.com/onthepixelnet"
                   className="text-muted-foreground hover:text-green-500"
                   prefetch={false}
                 >
@@ -185,25 +131,25 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="https://whatsapp.com/channel/0029VaA61GG84Om2YFUGV92N"
                   className="text-muted-foreground hover:text-green-500"
                   prefetch={false}
                 >
-                  Facebook
+                  WhatsApp
                 </Link>
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="https://www.tiktok.com/@onthepixel"
                   className="text-muted-foreground hover:text-green-500"
                   prefetch={false}
                 >
-                  LinkedIn
+                  TikTok
                 </Link>
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="https://www.instagram.com/onthepixel_net/"
                   className="text-muted-foreground hover:text-green-500"
                   prefetch={false}
                 >
