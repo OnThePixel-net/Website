@@ -25,7 +25,7 @@ const StatisticsPage: React.FC = () => {
 
   useEffect(() => {
     const storedUsername = window.location.pathname.split("/").pop();
-    if (storedUsername) {
+    if (storedUsername && storedUsername !== "stats") {
       setUsername(storedUsername);
     }
   }, []);
