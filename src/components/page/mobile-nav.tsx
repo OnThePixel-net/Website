@@ -23,21 +23,20 @@ export function MobileNav() {
           href="/"
           className="flex items-center"
         >
-          <span className="font-bold">ASdd</span>
+          <span className="font-bold">OnThePixel.net</span>
         </MobileLink>
         <div className="flex flex-col gap-3 mt-3">
-          <MobileLink onOpenChange={setOpen} href="/posts">
-            Posts
+          <MobileLink onOpenChange={setOpen} href="/leaderboard">
+            Leaderboard
           </MobileLink>
-          <MobileLink onOpenChange={setOpen} href="/tags">
-            Tags
+          <MobileLink onOpenChange={setOpen} href="/stats">
+            Statistics
           </MobileLink>
-          <Link target="_blank" rel="noreferrer" href="https://github.com">
-            GitHub
-          </Link>
-          <Link target="_blank" rel="noreferrer" href="https://x.com">
-            Twitter
-          </Link>
+          <MobileLink onOpenChange={setOpen} href="/team">
+            Team
+          </MobileLink>
+          <Link href="https://discord.onthepixel.net">Discord</Link>
+          <Link href="https://x.com/onthepixelnet">Twitter</Link>
         </div>
       </SheetContent>
     </Sheet>
