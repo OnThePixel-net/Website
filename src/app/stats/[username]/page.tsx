@@ -21,6 +21,7 @@ const StatisticsPage: React.FC = () => {
   }
 
   const [stats, setStats] = useState<Stats | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const storedUsername = window.location.pathname.split("/").pop();
@@ -33,8 +34,20 @@ const StatisticsPage: React.FC = () => {
     if (username) {
       fetch(`https://api.onthepixel.net/stats/${username}`)
         .then((response) => response.json())
-        .then((data) => setStats(data))
-        .catch((error) => console.error("Error fetching data:", error));
+        .then((data) => {
+          if (data.error) {
+            setError(data.error);
+            setStats(null);
+          } else {
+            setError(null);
+            setStats(data);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          setError("Error fetching data");
+          setStats(null);
+        });
 
       const newUrl = `/stats/${username}`;
       window.history.pushState({ path: newUrl }, "", newUrl);
@@ -57,30 +70,29 @@ const StatisticsPage: React.FC = () => {
           placeholder="Enter username"
           className="mb-5 w-80"
         />
+        {error && <p className="text-red-500">{error}</p>}
         {stats && (
-          <div>
-            <Card>
-              <div className="flex flex-col lg:flex-row lg:items-center">
-                <div className="relative w-40 h-40 overflow-hidden rounded-lg shadow-lg bg-gray-600 my-4 ml-4 border-green-600">
-                  <Image
-                    src={`https://vzge.me/full/400/${username}.png`}
-                    className="absolute left-0 right-0 m-auto translate-y-10 scale-110 bg-gray-600"
-                    alt={username}
-                    width={400}
-                    height={400}
-                  />
-                </div>
-                <div className="mt-4 lg:mt-0 lg:ml-4 ml-2">
-                  <p>
-                    <strong>Rank:</strong> {stats.playerinfo.rank.id}
-                  </p>
-                  <p>
-                    <strong>Playtime:</strong> {stats.stats.playtime.pretty}
-                  </p>
-                </div>
+          <Card>
+            <div className="flex flex-col lg:flex-row lg:items-center">
+              <div className="relative w-40 h-40 overflow-hidden rounded-lg shadow-lg bg-gray-600 my-4 ml-4 border-green-600">
+                <Image
+                  src={`https://vzge.me/full/400/${username}.png`}
+                  className="absolute left-0 right-0 m-auto translate-y-10 scale-110 bg-gray-600"
+                  alt={username}
+                  width={400}
+                  height={400}
+                />
               </div>
-            </Card>
-          </div>
+              <div className="mt-4 lg:mt-0 lg:ml-4 ml-2">
+                <p>
+                  <strong>Rank:</strong> {stats.playerinfo.rank.id}
+                </p>
+                <p>
+                  <strong>Playtime:</strong> {stats.stats.playtime.pretty}
+                </p>
+              </div>
+            </div>
+          </Card>
         )}
       </div>
     </section>
