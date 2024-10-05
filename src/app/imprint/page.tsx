@@ -12,9 +12,11 @@ export default function Impressum() {
           <p>
             Leo Scherr
             <br />
-            Kapellenstr. 33
+            c/o Block Services
             <br />
-            46325 Borken
+            Stuttgarter Str. 106
+            <br />
+            70736 Fellbach
           </p>
           <h2 className="text-xl font-semibold mt-8 mb-4">Kontakt</h2>
           <p>
