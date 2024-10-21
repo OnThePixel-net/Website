@@ -3,8 +3,6 @@ import { prisma } from "@/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  console.log(`Received ${req.method} request`);
-
   try {
     const teamMembers = await prisma.team.findMany({
       select: {
@@ -15,12 +13,7 @@ export async function GET(req: NextRequest) {
     });
     return NextResponse.json(teamMembers, { status: 200 });
   } catch (error) {
-    console.error("Error fetching team members:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json(
-      { error: "Failed to fetch team members", details: errorMessage },
-      { status: 500 }
-    );
+    error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ status: 500 });
   }
 }
