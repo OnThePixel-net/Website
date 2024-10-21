@@ -9,11 +9,12 @@ import {
   CardHeader,
   CardDescription,
 } from "@/components/ui/card";
-import SignIn from "@/components/page/sign-in";
 
 export default async function SignInPage(props: {
-  searchParams: { callbackUrl: string | undefined };
+  searchParams: Promise<{ callbackUrl: string | undefined }>;
 }) {
+  const { callbackUrl } = await props.searchParams;
+
   return (
     <>
       <div
