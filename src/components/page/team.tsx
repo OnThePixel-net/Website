@@ -1,64 +1,32 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
-interface Member {
-  id: string;
-  minecraft_name: string;
-  discord_name: string;
-  role: string;
-}
+const Team = () => {
+  interface TeamMember {
+    id: string;
+    minecraft_name: string;
+    discord_name: string;
+    role: string;
+  }
 
-function Team() {
-  const [teamMembers, setTeamMembers] = useState<Member[]>([]);
-
-  const roleOrder = ["owner", "admin", "developer", "builder", "supporter"];
-
-  const getRoleIndex = (role: string) => {
-    const index = roleOrder.indexOf(role.toLowerCase());
-    return index === -1 ? roleOrder.length : index;
-  };
-
-  const sortedTeamMembers = teamMembers.sort(
-    (a, b) => getRoleIndex(a.role) - getRoleIndex(b.role)
-  );
-  useEffect(() => {
-    fetch("https://pb.encryptopia.dev/api/collections/otp_team/records")
-      .then((response) => response.json())
-      .then((data) => setTeamMembers(data.items))
-      .catch((error) => console.error("Error fetching team members:", error));
-  }, []);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
   useEffect(() => {
-    const cacheKey = "teamMembersCache";
-    const cacheExpiry = 24 * 60 * 60 * 1000;
-
-    const fetchData = async () => {
-      const response = await fetch(
-        "https://pb.encryptopia.dev/api/collections/otp_team/records"
-      );
-      const data = await response.json();
-      setTeamMembers(data.items);
-      const cacheData = {
-        items: data.items,
-        timestamp: new Date().getTime(),
-      };
-      localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    const fetchTeamMembers = async () => {
+      try {
+        const response = await fetch("/api/team");
+        const data = await response.json();
+        setTeamMembers(data);
+      } catch (error) {
+        console.error("Failed to fetch team members", error);
+      }
     };
 
-    const cachedData = localStorage.getItem(cacheKey);
-    if (cachedData) {
-      const { items, timestamp } = JSON.parse(cachedData);
-      const isCacheValid = new Date().getTime() - timestamp < cacheExpiry;
-      if (isCacheValid) {
-        setTeamMembers(items);
-        return;
-      }
-    }
-    fetchData().catch((error) =>
-      console.error("Error fetching team members:", error)
-    );
+    fetchTeamMembers();
   }, []);
+
+  const roleOrder = ["owner", "admin", "developer", "builder", "supporter"];
 
   const roleColors: { [key: string]: string } = {
     owner: "#f1c40f",
@@ -78,10 +46,10 @@ function Team() {
           TEAM
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {sortedTeamMembers.map((member) => (
+          {teamMembers.map((member) => (
             <div
               key={member.id}
-              className="bg-[#1e1e1e] p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300"
+              className="bg-white/10 p-6 m-1 rounded-md flex items-center hover:scale-105 transition-transform duration-300"
             >
               <Image
                 alt={member.minecraft_name}
@@ -107,6 +75,6 @@ function Team() {
       </div>
     </section>
   );
-}
+};
 
 export default Team;

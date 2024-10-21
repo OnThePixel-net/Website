@@ -1,12 +1,23 @@
 "use client";
 import React, { useState } from "react";
-import TopPage from "@/components/page/top";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { FaCopy } from "react-icons/fa6";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Balancer } from "react-wrap-balancer";
 
 export default function TNTRun() {
   const [copied, setCopied] = useState(false);
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText("play.tntrun.de");
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => {
       setCopied(false);
@@ -14,38 +25,53 @@ export default function TNTRun() {
   };
 
   return (
-    <>
-      <TopPage />
-      <section className="bg-gray-950 pt-36 pb-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-6 text-white">TNT Run</h1>
-          <p className="text-gray-300 text-lg mb-8 max-w-3xl mx-auto">
-            In TNT Run, your goal is to avoid falling down and stay on the
-            platforms for as long as possible. Whether you&apos;re a beginner or
-            a pro, there&apos;s something for everyone!
-          </p>
-          <p className="text-gray-300 text-lg mb-8 max-w-3xl mx-auto">
-            Our TNT Run features exciting PvP opportunities and the chance to
-            use Double Jumps to save yourself from falling. Win the game and
-            earn our server currency, Pixels, to enhance your experience!
-          </p>
-          <div className="flex justify-center items-center mb-8">
-            <span className="text-gray-300 text-lg">IP: play.tntrun.de</span>
-            <button
-              onClick={copyToClipboard}
-              className="ml-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
+    <div
+      key="1"
+      className="relative min-h-screen flex flex-col items-center justify-center text-white"
+    >
+      <div className="absolute inset-0 -z-10">
+        <Image
+          alt="Background Image"
+          className="object-cover w-full h-full filter brightness-75"
+          height="1080"
+          src="/tntrun.png"
+          width="1920"
+        />
+        <div className="absolute inset-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-950" />
+      </div>
+      <main className="flex flex-col items-center">
+        <Card className="p-4 aspect-video mx-8">
+          <CardHeader className="text-center">
+            <CardTitle
+              className="text-4xl sm:text-5xl md:text-6xl font-bold"
+              style={{
+                color: "#fff",
+                textShadow: "0 0 15px #fff",
+              }}
             >
-              {copied ? "Copied!" : "Copy IP"}
-            </button>
-          </div>
-          <a
-            href="https://tntrun.de"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
-          >
-            Play Now
-          </a>
-        </div>
-      </section>
-    </>
+              TNT Run
+            </CardTitle>
+            <CardDescription className="text-center">
+              by OnThePixel.net
+            </CardDescription>
+          </CardHeader>
+
+          <h2 className="text-2xl text-bold text-center">
+            <Balancer>
+              Race against time as the floor crumbles beneath your feet!
+            </Balancer>
+          </h2>
+          <CardFooter className="mt-8">
+            <Button
+              onClick={() => copyToClipboard("play.tntrun.de")}
+              className="mx-auto bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500"
+            >
+              <FaCopy className="text-white size-6 mr-2" /> <span>Copy IP</span>
+            </Button>
+          </CardFooter>
+        </Card>
+      </main>
+    </div>
   );
 }

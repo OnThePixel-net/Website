@@ -7,7 +7,7 @@ function ChangeLog() {
         </h1>
         <div
           key={1}
-          className="bg-[#1e1e1e] p-4 my-4 border-l-4 border-green-500 rounded-lg"
+          className="bg-white/10 p-4 my-4 border-l-4 border-green-500 rounded-lg"
         >
           <h3
             className="text-lg font-bold text-green-500"

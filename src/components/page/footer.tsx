@@ -1,171 +1,283 @@
-import React from "react";
+"use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Twitter, Instagram } from "lucide-react";
-import { RiDiscordLine } from "react-icons/ri";
+import { Button } from "@/components/ui/button";
+import {
+  IconBrandX,
+  IconBrandDiscord,
+  IconBrandTwitch,
+  IconBrandYoutube,
+} from "@tabler/icons-react";
 
 export default function Footer() {
   return (
-    <footer className="py-12 bg-gray-950">
-      <div className="container flex flex-col items-center gap-8 md:flex-row md:justify-between">
-        <div className="flex flex-col items-center gap-4 md:items-start">
-          <Link href="/" className="flex items-center gap-2" prefetch={false}>
-            <Image
-              src="/logo.png"
-              width={32}
-              height={32}
-              alt="Logo"
-              className="h-8 w-8"
-              style={{ aspectRatio: "32/32", objectFit: "cover" }}
-            />
-            <span className="text-lg font-bold">OnThePixel.net</span>
-          </Link>
-          <div className="flex gap-4">
+    <footer className="py-12 px-4 md:px-6">
+      <div className="container mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+          <div className="md:col-span-2 hidden md:block">
+            <div className="flex items-center mb-4">
+              <Link href={"/"}>
+                <Image
+                  className="text-3xl font-bold mr-2"
+                  src={"/logo.png"}
+                  alt="OnThePixel.net"
+                  width={40}
+                  height={40}
+                />
+              </Link>
+            </div>
+            <h2 className="text-xl font-bold mb-2">OnThePixel.net</h2>
             <Link
-              href="https://discord.onthepixel.net"
-              className="text-muted-foreground hover:text-green-500"
-              prefetch={false}
+              href="https://status.onthepixel.net"
+              rel="noopener noreferrer"
+              target="_blank"
             >
-              <Twitter className="h-5 w-5" />
-              <span className="sr-only">Twitter</span>
+              <div className="flex items-center mb-4 w-auto bg-white/5 max-w-32 pr-1 rounded-lg pl-2 py-2 hover:bg-white/10 group transition-all">
+                <span className="relative flex h-3 w-3 mr-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                <span className="text-sm text-gray-400 group-hover:text-gray-300">
+                  System Status
+                </span>
+              </div>
             </Link>
-            <Link
-              href="https://discord.onthepixel.net"
-              className="text-muted-foreground hover:text-green-500"
-              prefetch={false}
-            >
-              <RiDiscordLine className="h-6 w-6" />
-              <span className="sr-only">Discord</span>
-            </Link>
-            <Link
-              href="https://www.instagram.com/onthepixel_net/"
-              className="text-muted-foreground hover:text-green-500"
-              prefetch={false}
-            >
-              <Instagram className="h-5 w-5" />
-              <span className="sr-only">Instagram</span>
-            </Link>
+            <div className="text-sm mb-4">Follow Us</div>
+            <div className="flex space-x-4">
+              <Link
+                href="https://x.com/onthepixelnet"
+                rel="noopener noreferrer"
+                target="_blank"
+                className="text-gray-400 hover:text-green-500"
+              >
+                <IconBrandX size={20} />
+              </Link>
+              <Link
+                href="https://discord.com/invite/Dpx3eK9t3z"
+                rel="noopener noreferrer"
+                target="_blank"
+                className="text-gray-400 hover:text-green-500"
+              >
+                <IconBrandDiscord size={20} />
+              </Link>
+              <Link
+                href="https://twitch.tv/onthepixel"
+                rel="noopener noreferrer"
+                target="_blank"
+                className="text-gray-400 hover:text-green-500"
+              >
+                <IconBrandTwitch size={20} />
+              </Link>
+              <Link
+                href="https://youtube.com/@thebestminecraftserver"
+                rel="noopener noreferrer"
+                target="_blank"
+                className="text-gray-400 hover:text-green-500"
+              >
+                <IconBrandYoutube size={20} />
+              </Link>
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold">OnThePixel</h4>
-            <ul className="space-y-1">
+          <div>
+            <h3 className="font-semibold mb-2">OnThePixel</h3>
+            <ul className="space-y-2">
               <li>
                 <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
+                  href="/about"
+                  className="text-gray-400 hover:text-green-500"
                 >
-                  About
+                  About us
                 </Link>
               </li>
               <li>
                 <Link
                   href="/team"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
+                  className="text-gray-400 hover:text-green-500"
                 >
-                  Team
+                  Meet the Team
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/tntrun"
+                  className="text-gray-400 hover:text-green-500"
+                >
+                  TNT Run
                 </Link>
               </li>
             </ul>
           </div>
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Pages</h4>
-            <ul className="space-y-1">
+          <div>
+            <h3 className="font-semibold mb-2">Resources</h3>
+            <ul className="space-y-2">
               <li>
                 <Link
                   href="/leaderboard"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
+                  className="text-gray-400 hover:text-green-500"
                 >
                   Leaderboard
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/stats"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
+                  href="/statistics"
+                  className="text-gray-400 hover:text-green-500"
                 >
                   Statistics
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/tntrun"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
-                >
-                  TNTRun
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Legal</h4>
-            <ul className="space-y-1">
-              <li>
-                <Link
                   href="/imprint"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
+                  className="text-gray-400 hover:text-green-500"
                 >
                   Imprint
                 </Link>
               </li>
-            </ul>
-          </div>
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Follow Us</h4>
-            <ul className="space-y-1">
               <li>
                 <Link
-                  href="https://x.com/onthepixelnet"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
+                  href="/privacy"
+                  className="text-gray-400 hover:text-green-500"
                 >
-                  Twitter
+                  Privacy Policy
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-semibold mb-2">Follow Us</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="https://youtube.com/@thebestminecraftserver"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  className="text-gray-400 hover:text-green-500"
+                >
+                  YouTube
                 </Link>
               </li>
               <li>
                 <Link
-                  href="https://whatsapp.com/channel/0029VaA61GG84Om2YFUGV92N"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
+                  href="https://twitch.tv/onthepixel"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  className="text-gray-400 hover:text-green-500"
                 >
-                  WhatsApp
+                  Twitch
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="https://discord.com/invite/Dpx3eK9t3z"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  className="text-gray-400 hover:text-green-500"
+                >
+                  Discord
                 </Link>
               </li>
               <li>
                 <Link
                   href="https://www.tiktok.com/@onthepixel"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  className="text-gray-400 hover:text-green-500"
                 >
                   TikTok
                 </Link>
               </li>
               <li>
                 <Link
-                  href="https://www.instagram.com/onthepixel_net/"
-                  className="text-muted-foreground hover:text-green-500"
-                  prefetch={false}
+                  href="https://www.instagram.com/onthepixel_net"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  className="text-gray-400 hover:text-green-500"
                 >
                   Instagram
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="https://x.com/onthepixelnet"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  className="text-gray-400 hover:text-green-500"
+                >
+                  Twitter
                 </Link>
               </li>
             </ul>
           </div>
         </div>
-      </div>
-      <div className="border-dashed border-t-slate-800 border-t-2 w-full my-4"></div>
-      <div className="text-sm -mb-8 pl-4">
-        <p>
-          Copyright &copy; 2022-{new Date().getFullYear()} OnThePixel.net - All
-          Rights Reserved. - Not affiliated with Mojang or Microsoft!
-        </p>
+        <div className="md:col-span-2 block md:hidden mt-12">
+          <div className="flex items-center mb-4">
+            <Link href={"/"}>
+              <Image
+                className="text-3xl font-bold mr-2"
+                src={"/logo.png"}
+                alt="OnThePixel.net"
+                width={40}
+                height={40}
+              />
+            </Link>
+          </div>
+          <h2 className="text-xl font-bold mb-2">OnThePixel.net</h2>
+          <div className="flex items-center mb-4 w-auto bg-white/5 max-w-32 pr-1 rounded-lg pl-2 py-2">
+            <span className="relative flex h-3 w-3 mr-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </span>
+            <span className="text-sm text-gray-400">System Status</span>
+          </div>
+          <div className="text-sm mb-4">Follow Us</div>
+          <div className="flex space-x-4">
+            <Link
+              href="https://x.com/onthepixelnet"
+              rel="noopener noreferrer"
+              target="_blank"
+              className="text-gray-400 hover:text-green-500"
+            >
+              <IconBrandX size={20} />
+            </Link>
+            <Link
+              href="https://discord.com/invite/Dpx3eK9t3z"
+              rel="noopener noreferrer"
+              target="_blank"
+              className="text-gray-400 hover:text-green-500"
+            >
+              <IconBrandDiscord size={20} />
+            </Link>
+            <Link
+              href="https://twitch.tv/onthepixel"
+              rel="noopener noreferrer"
+              target="_blank"
+              className="text-gray-400 hover:text-green-500"
+            >
+              <IconBrandTwitch size={20} />
+            </Link>
+            <Link
+              href="https://youtube.com/@thebestminecraftserver"
+              rel="noopener noreferrer"
+              target="_blank"
+              className="text-gray-400 hover:text-green-500"
+            >
+              <IconBrandYoutube size={20} />
+            </Link>
+          </div>
+        </div>
+        <div className="mt-8 pt-8 border-t w-full border-slate-800 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-gray-400 text-sm mb-4 md:mb-0">
+            Copyright &copy; 2022-{new Date().getFullYear()} OnThePixel.net -
+            All Rights Reserved. - Not affiliated with Mojang or Microsoft!
+          </p>
+          <Button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="bg-white text-black px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition-colors"
+          >
+            Back to Top
+          </Button>
+        </div>
       </div>
     </footer>
   );

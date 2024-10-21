@@ -1,11 +1,15 @@
-import { redirect } from "next/navigation";
-import { AuthError } from "next-auth";
 import { Button } from "@/components/ui/button";
 import { FaDiscord } from "react-icons/fa";
 import Image from "next/image";
-import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
-
-const SIGNIN_ERROR_URL = "/login/error";
+import { signIn } from "@/auth";
+import {
+  Card,
+  CardFooter,
+  CardTitle,
+  CardHeader,
+  CardDescription,
+} from "@/components/ui/card";
+import SignIn from "@/components/page/sign-in";
 
 export default async function SignInPage(props: {
   searchParams: { callbackUrl: string | undefined };
@@ -31,25 +35,19 @@ export default async function SignInPage(props: {
           <div className="absolute inset-0" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-950" />
         </div>
-
-        <main className="bg-popover max-w-lg mx-auto my-4 rounded-lg p-10">
-          <h1 className="text-2xl font-bold text-center">
-            Sign in to your account
-          </h1>
-          <div className="mt-4">
-            {/* <form
+        <Card className="w-[380px]">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">
+              Sign in to your account
+            </CardTitle>
+            <CardDescription>Sign in with Discord to continue</CardDescription>
+          </CardHeader>
+          <CardFooter className="mt-8">
+            <form
+              className="w-full"
               action={async () => {
                 "use server";
-                try {
-                  await signIn("discord", {
-                    redirectTo: props.searchParams?.callbackUrl ?? "/dashboard",
-                  });
-                } catch (error) {
-                  if (error instanceof AuthError) {
-                    return redirect(`/api/auth/login?error=${error.type}`);
-                  }
-                  throw error;
-                }
+                await signIn("discord", { redirectTo: "/profile" });
               }}
             >
               <Button
@@ -59,10 +57,9 @@ export default async function SignInPage(props: {
                 <FaDiscord className="size-5 absolute left-0 ml-[11px]" />
                 <span>Sign in with Discord</span>
               </Button>
-            </form> */}
-            <LoginLink>Sign in</LoginLink>
-          </div>
-        </main>
+            </form>
+          </CardFooter>
+        </Card>
       </div>
     </>
   );
