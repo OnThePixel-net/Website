@@ -59,4 +59,10 @@ export const teamMembers: TeamMember[] = [
     minecraft_name: "themexot",
     role: "supporter",
   },
+  {
+    id: 7,
+    discord_name: "datenflieger",
+    minecraft_name: "datenflieger",
+    role: "developer",
+  },
 ];
