@@ -1,5 +1,5 @@
 import React from "react";
-import { changelogs } from "./changelog.ts";
+import { changelogs } from "./changelogData";
 
 export default function ChangeLog() {
   return (

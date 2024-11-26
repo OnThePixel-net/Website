@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { FaDiscord } from "react-icons/fa";
 import Image from "next/image";
-import { signIn } from "@/auth";
 import {
   Card,
   CardFooter,
@@ -48,7 +47,6 @@ export default async function SignInPage(props: {
               className="w-full"
               action={async () => {
                 "use server";
-                await signIn("discord", { redirectTo: "/profile" });
               }}
             >
               <Button

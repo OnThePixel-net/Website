@@ -1,4 +1,3 @@
-import { signIn } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { FaDiscord } from "react-icons/fa";
 
@@ -7,7 +6,6 @@ export default function SignIn() {
     <form
       action={async () => {
         "use server";
-        await signIn("discord", { redirectTo: "/profile" });
       }}
     >
       <Button
