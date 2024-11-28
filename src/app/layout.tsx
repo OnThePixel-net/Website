@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/page/footer";
 import { SiteHeader } from "@/components/page/site-header";
-import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,13 +19,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <SessionProvider>
         <body className={`${inter.className} bg-gray-950 scroll-smooth`}>
           <SiteHeader />
           <main>{children}</main>
           <Footer />
         </body>
-      </SessionProvider>
     </html>
   );
 }
