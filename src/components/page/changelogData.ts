@@ -6,9 +6,9 @@ export interface ChangelogEntry {
 
 export const changelogs: ChangelogEntry[] = [
   {
-    title: "New Feature: Dark Mode",
-    date: "2023-11-15",
-    content: "Implemented a new dark mode feature for better night-time viewing experience."
-  }
+    title: "New Team Member",
+    date: "2024-11-28",
+    content:
+      "We are excited to welcome Datenflieger as our new Developer to our team!",
+  },
 ];
-
