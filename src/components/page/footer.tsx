@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 import {
   IconBrandX,
   IconBrandDiscord,
@@ -10,15 +11,26 @@ import {
 } from "@tabler/icons-react";
 
 export default function Footer() {
+  const [pingStatus, setPingStatus] = useState(true);
+  useEffect(() => {
+    fetch("https://api.mcsrvstat.us/2/onthepixel.net")
+      .then((response) => response.json())
+      .then((data) => {
+        setPingStatus(data.debug.ping);
+      })
+      .catch((error) => {
+        console.error("Error fetching ping status:", error);
+      });
+  }, []);
   return (
-    <footer className="py-12 px-4 md:px-6">
+    <footer className="px-4 py-12 md:px-6">
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-          <div className="md:col-span-2 hidden md:block">
-            <div className="flex items-center mb-4">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-5">
+          <div className="hidden md:col-span-2 md:block">
+            <div className="mb-4 flex items-center">
               <Link href={"/"}>
                 <Image
-                  className="text-3xl font-bold mr-2"
+                  className="mr-2 text-3xl font-bold"
                   src={"/logo.png"}
                   alt="OnThePixel.net"
                   width={40}
@@ -26,23 +38,31 @@ export default function Footer() {
                 />
               </Link>
             </div>
-            <h2 className="text-xl font-bold mb-2">OnThePixel.net</h2>
+            <h2 className="mb-2 text-xl font-bold">OnThePixel.net</h2>
             <Link
               href="https://status.onthepixel.net"
               rel="noopener noreferrer"
               target="_blank"
             >
-              <div className="flex items-center mb-4 w-auto bg-white/5 max-w-32 pr-1 rounded-lg pl-2 py-2 hover:bg-white/10 group transition-all">
-                <span className="relative flex h-3 w-3 mr-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+              <div className="group mb-4 flex w-auto max-w-32 items-center rounded-lg bg-white/5 py-2 pl-2 pr-1 transition-all hover:bg-white/10">
+                <span className="relative mr-2 flex h-3 w-3">
+                  <span
+                    className={`absolute inline-flex h-full w-full animate-ping rounded-full ${
+                      pingStatus ? "bg-green-400" : "bg-red-400"
+                    } opacity-75`}
+                  ></span>
+                  <span
+                    className={`relative inline-flex h-3 w-3 rounded-full ${
+                      pingStatus ? "bg-green-500" : "bg-red-500"
+                    }`}
+                  ></span>
                 </span>
                 <span className="text-sm text-gray-400 group-hover:text-gray-300">
                   System Status
                 </span>
               </div>
             </Link>
-            <div className="text-sm mb-4">Follow Us</div>
+            <div className="mb-4 text-sm">Follow Us</div>
             <div className="flex space-x-4">
               <Link
                 href="https://x.com/onthepixelnet"
@@ -79,7 +99,7 @@ export default function Footer() {
             </div>
           </div>
           <div>
-            <h3 className="font-semibold mb-2">OnThePixel</h3>
+            <h3 className="mb-2 font-semibold">OnThePixel</h3>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -108,7 +128,7 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="font-semibold mb-2">Resources</h3>
+            <h3 className="mb-2 font-semibold">Resources</h3>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -145,7 +165,7 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="font-semibold mb-2">Follow Us</h3>
+            <h3 className="mb-2 font-semibold">Follow Us</h3>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -210,11 +230,11 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="md:col-span-2 block md:hidden mt-12">
-          <div className="flex items-center mb-4">
+        <div className="mt-12 block md:col-span-2 md:hidden">
+          <div className="mb-4 flex items-center">
             <Link href={"/"}>
               <Image
-                className="text-3xl font-bold mr-2"
+                className="mr-2 text-3xl font-bold"
                 src={"/logo.png"}
                 alt="OnThePixel.net"
                 width={40}
@@ -222,15 +242,23 @@ export default function Footer() {
               />
             </Link>
           </div>
-          <h2 className="text-xl font-bold mb-2">OnThePixel.net</h2>
-          <div className="flex items-center mb-4 w-auto bg-white/5 max-w-32 pr-1 rounded-lg pl-2 py-2">
-            <span className="relative flex h-3 w-3 mr-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+          <h2 className="mb-2 text-xl font-bold">OnThePixel.net</h2>
+          <div className="mb-4 flex w-auto max-w-32 items-center rounded-lg bg-white/5 py-2 pl-2 pr-1">
+            <span className="relative mr-2 flex h-3 w-3">
+              <span
+                className={`absolute inline-flex h-full w-full animate-ping rounded-full ${
+                  pingStatus ? "bg-green-400" : "bg-red-400"
+                } opacity-75`}
+              ></span>
+              <span
+                className={`relative inline-flex h-3 w-3 rounded-full ${
+                  pingStatus ? "bg-green-500" : "bg-red-500"
+                }`}
+              ></span>
             </span>
             <span className="text-sm text-gray-400">System Status</span>
           </div>
-          <div className="text-sm mb-4">Follow Us</div>
+          <div className="mb-4 text-sm">Follow Us</div>
           <div className="flex space-x-4">
             <Link
               href="https://x.com/onthepixelnet"
@@ -266,14 +294,14 @@ export default function Footer() {
             </Link>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t w-full border-slate-800 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm mb-4 md:mb-0">
+        <div className="mt-8 flex w-full flex-col items-center justify-between border-t border-slate-800 pt-8 md:flex-row">
+          <p className="mb-4 text-sm text-gray-400 md:mb-0">
             Copyright &copy; 2022-{new Date().getFullYear()} OnThePixel.net -
             All Rights Reserved. - Not affiliated with Mojang or Microsoft!
           </p>
           <Button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="bg-white text-black px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition-colors"
+            className="rounded-full bg-white px-6 py-2 font-semibold text-black transition-colors hover:bg-gray-200"
           >
             Back to Top
           </Button>
