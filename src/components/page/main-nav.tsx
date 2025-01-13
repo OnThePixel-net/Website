@@ -13,10 +13,10 @@ export function MainNav() {
       <Link
         href="/leaderboard"
         className={cn(
-          "text-sm font-medium transition-colors hover:text-primary hidden sm:inline-block",
+          "hidden text-sm font-medium transition-colors hover:text-primary sm:inline-block",
           pathname.startsWith("/leaderboard")
             ? "text-foreground"
-            : "text-foreground/60"
+            : "text-foreground/60",
         )}
       >
         Leaderboard
@@ -24,10 +24,10 @@ export function MainNav() {
       <Link
         href="/stats"
         className={cn(
-          "text-sm font-medium transition-colors hover:text-primary hidden sm:inline-block",
+          "hidden text-sm font-medium transition-colors hover:text-primary sm:inline-block",
           pathname.startsWith("/stats")
             ? "text-foreground"
-            : "text-foreground/60"
+            : "text-foreground/60",
         )}
       >
         Statistics
@@ -35,8 +35,8 @@ export function MainNav() {
       <Link
         href="/team"
         className={cn(
-          "text-sm font-medium transition-colors hover:text-primary hidden sm:inline-block",
-          pathname === "/team" ? "text-foreground" : "text-foreground/60"
+          "hidden text-sm font-medium transition-colors hover:text-primary sm:inline-block",
+          pathname === "/team" ? "text-foreground" : "text-foreground/60",
         )}
       >
         Team

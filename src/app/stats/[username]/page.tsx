@@ -59,10 +59,10 @@ const StatisticsPage: React.FC = () => {
   };
 
   return (
-    <section className="bg-gray-950 h-screen">
+    <section className="h-screen bg-gray-950">
       <TopPage />
       <div className="container mx-auto px-4 py-10">
-        <h1 className="text-2xl font-bold mb-5">STATISTICS FOR {username}</h1>
+        <h1 className="mb-5 text-2xl font-bold">STATISTICS FOR {username}</h1>
         <Input
           type="text"
           value={username}
@@ -74,7 +74,7 @@ const StatisticsPage: React.FC = () => {
         {stats && (
           <Card>
             <div className="flex flex-col lg:flex-row lg:items-center">
-              <div className="relative w-40 h-40 overflow-hidden rounded-lg shadow-lg bg-gray-600 my-4 ml-4 border-green-600">
+              <div className="relative my-4 ml-4 h-40 w-40 overflow-hidden rounded-lg border-green-600 bg-gray-600 shadow-lg">
                 <Image
                   src={`https://vzge.me/full/400/${username}.png`}
                   className="absolute left-0 right-0 m-auto translate-y-10 scale-110 bg-gray-600"
@@ -83,7 +83,7 @@ const StatisticsPage: React.FC = () => {
                   height={400}
                 />
               </div>
-              <div className="mt-4 lg:mt-0 lg:ml-4 ml-2">
+              <div className="ml-2 mt-4 lg:ml-4 lg:mt-0">
                 <p>
                   <strong>Rank:</strong> {stats.playerinfo.rank.id}
                 </p>

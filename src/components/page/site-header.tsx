@@ -21,7 +21,7 @@ export function SiteHeader() {
               <div
                 className={cn(
                   buttonVariants({ variant: "ghost" }),
-                  "hidden w-10 px-0 sm:inline-flex"
+                  "hidden w-10 px-0 sm:inline-flex",
                 )}
               >
                 <RiDiscordLine className="size-5" />
@@ -36,7 +36,7 @@ export function SiteHeader() {
               <div
                 className={cn(
                   buttonVariants({ variant: "ghost" }),
-                  "hidden w-10 px-0 sm:inline-flex"
+                  "hidden w-10 px-0 sm:inline-flex",
                 )}
               >
                 <Twitter className="size-4" />

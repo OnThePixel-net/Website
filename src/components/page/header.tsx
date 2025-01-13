@@ -11,12 +11,12 @@ export default function Header() {
   return (
     <div
       key="1"
-      className="relative min-h-screen flex flex-col items-center justify-center text-white"
+      className="relative flex min-h-screen flex-col items-center justify-center text-white"
     >
       <div className="absolute inset-0 -z-10">
         <Image
           alt="Background Image"
-          className="object-cover w-full h-full filter brightness-75"
+          className="h-full w-full object-cover brightness-75 filter"
           height="1080"
           src="/bg.png"
           width="1920"
@@ -38,7 +38,7 @@ export default function Header() {
           />
         </div>
         <h1
-          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4"
+          className="mb-4 text-4xl font-bold sm:text-5xl md:text-6xl"
           style={{
             color: "#fff",
             textShadow: "0 0 15px #fff",
@@ -49,18 +49,18 @@ export default function Header() {
         <p className="mb-8 text-center">Join now - Don&#39;t play alone!</p>
         <div className="flex space-x-4">
           <Link href="/leaderboard">
-            <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
+            <Button className="flex h-12 w-36 items-center bg-green-700 px-4 py-2 text-lg text-white transition-transform duration-500 hover:scale-105 sm:w-40 sm:px-6 sm:text-xl md:w-48 md:text-2xl">
               LEADERBOARD
             </Button>
           </Link>
           <Button
-            className="bg-green-700 px-4 py-2 size-12 rounded flex items-center"
+            className="flex size-12 items-center rounded bg-green-700 px-4 py-2"
             onClick={() => copyToClipboard("OnThePixel.net")}
           >
-            <FaCopy className="text-white size-20" />
+            <FaCopy className="size-20 text-white" />
           </Button>
           <Link href="https://discord.onthepixel.net">
-            <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
+            <Button className="flex h-12 w-36 items-center bg-green-700 px-4 py-2 text-lg text-white transition-transform duration-500 hover:scale-105 sm:w-40 sm:px-6 sm:text-xl md:w-48 md:text-2xl">
               DISCORD
             </Button>
           </Link>

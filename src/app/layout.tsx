@@ -19,11 +19,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-        <body className={`${inter.className} bg-gray-950 scroll-smooth`}>
-          <SiteHeader />
-          <main>{children}</main>
-          <Footer />
-        </body>
+      <body className={`${inter.className} scroll-smooth bg-gray-950`}>
+        <SiteHeader />
+        <main>{children}</main>
+        <Footer />
+      </body>
     </html>
   );
 }
