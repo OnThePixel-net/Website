@@ -4,9 +4,9 @@ import TopPage from "@/components/page/top";
 
 export default function Home() {
   return (
-    <div className="h-screen">
+    <section className="h-screen bg-gray-950">
       <TopPage />
       <Team />
-    </div>
+    </section>
   );
 }
