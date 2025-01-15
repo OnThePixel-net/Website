@@ -4,7 +4,7 @@ import TopPage from "@/components/page/top";
 
 export default function Home() {
   return (
-    <section className="h-screen bg-gray-950">
+    <section className="min-h-screen bg-gray-950">
       <TopPage />
       <Team />
     </section>
