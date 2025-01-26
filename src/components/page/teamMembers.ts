@@ -82,4 +82,10 @@ export const teamMembers: TeamMember[] = [
     minecraft_name: "Smart_PatchNote",
     role: "supporter",
   },
+  {
+    id: 12,
+    discord_name: "SpireEvent",
+    minecraft_name: "SpireEvent",
+    role: "supporter",
+  },
 ];
