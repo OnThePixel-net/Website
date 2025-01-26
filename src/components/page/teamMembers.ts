@@ -42,20 +42,50 @@ export const teamMembers: TeamMember[] = [
   },
   {
     id: 5,
+    discord_name: "jonasrjn",
+    minecraft_name: "jonasrjn",
+    role: "admin",
+  },
+  {
+    id: 6,
     discord_name: "gamixxhd",
     minecraft_name: "gamixxhd",
     role: "builder",
   },
   {
-    id: 6,
+    id: 7,
     discord_name: "themexot",
     minecraft_name: "themexot",
     role: "supporter",
   },
   {
-    id: 7,
+    id: 8,
     discord_name: "datenflieger",
     minecraft_name: "derdatenflieger",
     role: "developer",
+  },
+  {
+    id: 9,
+    discord_name: "Mercyoncrack",
+    minecraft_name: "o_o4",
+    role: "builder",
+  },
+  {
+    id: 10,
+    discord_name: "/home/leo",
+    minecraft_name: "Lele7663",
+    role: "builder",
+  },
+  {
+    id: 11,
+    discord_name: "Ausmister-PatchNote",
+    minecraft_name: "Smart_PatchNote",
+    role: "supporter",
+  },
+  {
+    id: 12,
+    discord_name: "SpireEvent",
+    minecraft_name: "SpireEvent",
+    role: "supporter",
   },
 ];
