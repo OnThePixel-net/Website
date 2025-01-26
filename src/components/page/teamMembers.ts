@@ -1,4 +1,3 @@
-// teamMembers.ts
 export interface TeamMember {
   id: number;
   discord_name: string;
@@ -34,12 +33,6 @@ export const teamMembers: TeamMember[] = [
     discord_name: "TinyBrickBoy",
     minecraft_name: "TinyBrickBoy",
     role: "owner",
-  },
-  {
-    id: 3,
-    discord_name: "lelaify_real",
-    minecraft_name: "bySnxwy",
-    role: "developer",
   },
   {
     id: 4,
