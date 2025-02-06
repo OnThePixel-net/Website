@@ -88,4 +88,10 @@ export const teamMembers: TeamMember[] = [
     minecraft_name: "SpireEvent",
     role: "supporter",
   },
+  {
+    id: 13,
+    discord_name: "CoinsAPI",
+    minecraft_name: "coinsapi",
+    role: "developer",
+  },
 ];
