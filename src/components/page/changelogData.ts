@@ -6,9 +6,9 @@ export interface ChangelogEntry {
 
 export const changelogs: ChangelogEntry[] = [
   {
-    title: "New Team Member",
-    date: "2024-11-28",
+    title: "🚀 Neue Informationen",
+    date: "2025-03-04",
     content:
-      "We are excited to welcome Datenflieger as our new Developer to our team!",
+      "🔍 Wir sind auf der Suche nach talentierten Bauern! Möchtest du Teil unseres Teams werden? Trete unserem Discord bei: [https://dc.otp.cx/](https://dc.otp.cx/)",
   },
 ];
