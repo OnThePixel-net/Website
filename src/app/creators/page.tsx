@@ -41,7 +41,7 @@ const creators: Creator[] = [
     id: 2,
     name: "Sanherib",
     minecraftName: "Sanherib",
-    description: "Ich bin ein kleiner (aber feiner) Twitch Streamer, und mache zudem auch Tiktok und Youtube! Ich hoffe ihr habt viel Spaß mit meinen Videos und auch mit dem, was in der Zukunft noch kommt :D",
+    description: "Yo ich bin Sahne! Ich streame daily(zurzeit nicht) Minecraft und anderes.",
     platforms: {
       twitch: "https://www.twitch.tv/sanheriblive",
       tiktok: "https://www.tiktok.com/@sanheribyt",
