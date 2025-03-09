@@ -22,13 +22,14 @@ interface Creator {
 const creators: Creator[] = [
   {
     id: 1,
-    name: "PixelMaster",
-    minecraftName: "PixelMaster",
+    name: "Loxxler",
+    minecraftName: "Loxxgamer",
     description: "Minecraft building tutorials and OnThePixel server showcases.",
     platforms: {
-      youtube: "https://youtube.com/@pixelmaster",
-      twitch: "https://twitch.tv/pixelmaster",
-      twitter: "https://x.com/pixelmaster",
+      twitch: "https://www.twitch.tv/loxxler",
+      youtube: "https://www.youtube.com/@Loxxler",
+      tiktok: "https://tiktok.com/@loxxler",
+      discord: "https://discord.gg/vRR9tamURT",
     }
   },
   {
@@ -87,7 +88,7 @@ const creators: Creator[] = [
 ];
 
 // Icons for social platforms
-import { FaYoutube, FaTwitch, FaTiktok, FaInstagram } from "react-icons/fa";
+import { FaYoutube, FaTwitch, FaTiktok, FaInstagram, FaDiscord } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
 export default function Creators() {
@@ -185,6 +186,18 @@ export default function Creators() {
                         aria-label={`${creator.name} Twitter`}
                       >
                         <FaXTwitter size={24} />
+                      </Link>
+                    )}
+                    
+                    {creator.platforms.discord && (
+                      <Link 
+                        href={creator.platforms.discord} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-blue-500 transition-colors"
+                        aria-label={`${creator.name} Discord`}
+                      >
+                        <FaDiscord size={24} />
                       </Link>
                     )}
                   </div>
