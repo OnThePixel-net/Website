@@ -71,7 +71,7 @@ const creators: Creator[] = [
     description: "Platzhalter, imagine ich hätte hier ne richtige Bio (hab ich nirgends).",
     platforms: {
       twitch: "https://www.twitch.tv/icebook_",
-      tiktok: "https://www.tiktok.com/@liveq16",
+      tiktok: "https://www.tiktok.com/@icebook6",
       discord: "https://discord.gg/hS7dXYuYAZ",
       website: "https://c.otp.cx/icebook"
     }
