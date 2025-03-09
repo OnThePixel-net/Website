@@ -66,6 +66,20 @@ const creators: Creator[] = [
   },
   {
     id: 4,
+    name: "PatchNote",
+    minecraftName: "Smart_PatchNote",
+    description: "Nett hier, aber waren sie schon mal Ausgemistet?",
+    platforms: {
+      youtube: "https://www.youtube.com/@El_PatchNote",
+      twitch: "https://www.twitch.tv/patchnote",
+      tiktok: "https://www.tiktok.com/@patchnoteyt",
+      twitter: "https://x.com/ElPatchNote",
+      discord: "https://discord.gg/cmM78zp8zn",
+      website: "https://cegunner.de"
+    }
+  },
+  {
+    id: 5,
     name: "IceBook",
     minecraftName: "icebook_",
     description: "",
@@ -77,7 +91,7 @@ const creators: Creator[] = [
     }
   },
   {
-    id: 5,
+    id: 6,
     name: "Schleim",
     minecraftName: "Schleim70",
     description: "Yoooo wassup? Bin Louis und spiele gerne Osu!, IdleOn und Minecraft :3",
