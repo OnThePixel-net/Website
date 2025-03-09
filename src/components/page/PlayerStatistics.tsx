@@ -158,19 +158,15 @@ export default function PlayerStatistics() {
       };
       
       try {
-        // Instead of random ranks, we'll fetch the actual rank from the API
-        // First we need to fetch the UUID of the player
-        // This is a simulation since we don't have the actual Mojang API call here
-        const uuid = `${Math.random().toString(36).substring(2, 15)}-${Math.random().toString(36).substring(2, 15)}-${Math.random().toString(36).substring(2, 15)}-${Math.random().toString(36).substring(2, 15)}`;
+        // In production, we'll use the player's name directly for the rank API call
+        // No need to fetch UUID separately - the API should handle that internally
         
-        dummyData.playerinfo.uuid = uuid;
+        // Make the API call using the player name
+        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${name}`);
+        const rankData: RankResponse = await rankResponse.json();
         
-        // In production, you would use the actual API:
-        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${uuid}`);
-        const rankData = await rankResponse.json();
-        
-        // For now, simulate the rank response
-        //
+        // Update the player UUID from the response
+        dummyData.playerinfo.uuid = rankData.uuid;
         
         // Update the player info with the rank data
         dummyData.playerinfo.rank = {
