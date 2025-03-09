@@ -119,6 +119,14 @@ export default function Footer() {
               </li>
               <li>
                 <Link
+                  href="/creators"
+                  className="text-gray-400 hover:text-green-500"
+                >  
+                  Creators
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/tntrun"
                   className="text-gray-400 hover:text-green-500"
                 >
