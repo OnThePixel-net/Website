@@ -61,7 +61,7 @@ export const creators: Creator[] = [
     id: 4,
     name: "PatchNote",
     minecraftName: "Smart_PatchNote",
-    description: "Nett hier, aber waren sie schon mal Ausgemistet?",
+    description: "Nett hier, aber wurden sie schon mal Ausgemistet?",
     platforms: {
       youtube: "https://www.youtube.com/@El_PatchNote",
       twitch: "https://www.twitch.tv/patchnote",
