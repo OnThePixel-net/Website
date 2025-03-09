@@ -65,6 +65,31 @@ export default function Leaderboards() {
           
           <div className="flex py-4">
             <div className="flex flex-col justify-center">
+              <Link href="/leaderboard/duels">
+                <Image
+                  src={"/placeholder.png"}
+                  alt={"Duels"}
+                  width={500}
+                  height={250}
+                  className="h-[200px] w-[400px] cursor-pointer rounded-xl border object-cover"
+                />
+              </Link>
+            </div>
+            <div className="ml-4">
+              <Link
+                href="/leaderboard/duels"
+                className="text-xl font-bold mt-4 text-green-200 underline"
+              >
+                Duels
+              </Link>
+              <p>
+                The Duels leaderboard ranks players by their wins, K/D ratio and win streaks.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex py-4">
+            <div className="flex flex-col justify-center">
               <Link href="/leaderboard/parkour">
                 <Image
                   src={"/parkour.png"}
