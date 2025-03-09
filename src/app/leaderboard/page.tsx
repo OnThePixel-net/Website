@@ -21,16 +21,18 @@ export default function Leaderboards() {
             <LeaderboardCard 
               title="Pixels"
               description="The Pixels leaderboard shows the richest players on the server."
-              link="/leaderboard/pixels"
-              enabled={true}
+              link="#"
+              enabled={false}
+              comingSoon={true}
             />
             
             {/* BedWars Leaderboard */}
             <LeaderboardCard 
               title="BedWars"
               description="Players ranked by score, kills, and deaths in BedWars matches."
-              link="/leaderboard/bedwars"
-              enabled={true}
+              link="#"
+              enabled={false}
+              comingSoon={true}
             />
             
             {/* Duels Leaderboard */}
@@ -45,8 +47,9 @@ export default function Leaderboards() {
             <LeaderboardCard 
               title="Parkour"
               description="Players ranked based on how far they've progressed in parkour courses."
-              link="/leaderboard/parkour"
-              enabled={true}
+              link="#"
+              enabled={false}
+              comingSoon={true}
             />
             
             {/* SkyWars Leaderboard - Disabled */}
