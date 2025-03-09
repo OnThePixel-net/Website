@@ -48,6 +48,21 @@ const creators: Creator[] = [
       discord: "https://discord.gg/XY79Zpy6V4",
       website: "https://Sanherib.de"
     }
+  },
+  {
+    id: 2,
+    name: "Sanherib",
+    minecraftName: "Sanherib",
+    description: "Yo ich bin Sahne! Ich streame daily(zurzeit nicht) Minecraft und anderes.",
+    platforms: {
+      twitch: "https://www.twitch.tv/ce_gunner",
+      youtube: "https://www.youtube.com/@CE_Gunner",
+      tiktok: "https://www.tiktok.com/@ce_gunner",
+      twitter: "https://x.com/ce_gunner",
+      instagram: "https://www.instagram.com/cegunner/",
+      discord: "https://discord.gg/eTfBJZKb9v",
+      website: "https://cegunner.de"
+    }
   }
 ];
 
