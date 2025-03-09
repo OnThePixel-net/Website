@@ -166,14 +166,11 @@ export default function PlayerStatistics() {
         dummyData.playerinfo.uuid = uuid;
         
         // In production, you would use the actual API:
-        // const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${uuid}`);
-        // const rankData = await rankResponse.json();
+        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${uuid}`);
+        const rankData = await rankResponse.json();
         
         // For now, simulate the rank response
-        const rankData: RankResponse = {
-          uuid: uuid,
-          rank: name.length > 5 ? "&6VIP+" : "&6MEMBER" // Similar to your example
-        };
+        //
         
         // Update the player info with the rank data
         dummyData.playerinfo.rank = {
