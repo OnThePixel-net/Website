@@ -57,12 +57,6 @@ interface RankResponse {
   rank: string;
 }
 
-interface PlaytimeResponse {
-  playtime: number;       // Playtime in seconds
-  first_joined: string;   // ISO date string
-  last_online: string;    // ISO date string
-}
-
 export default function PlayerStatistics() {
   const [username, setUsername] = useState<string>("");
   const [stats, setStats] = useState<PlayerStats | null>(null);
@@ -113,6 +107,20 @@ export default function PlayerStatistics() {
     return rankString.replace(/[&§][0-9a-fA-F]/g, '').trim();
   };
 
+  // Helper function to format playtime from seconds
+  const formatPlaytime = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    
+    if (hours >= 24) {
+      const days = Math.floor(hours / 24);
+      const remainingHours = hours % 24;
+      return `${days}d ${remainingHours}h ${minutes}m`;
+    }
+    
+    return `${hours}h ${minutes}m`;
+  };
+
   const fetchPlayerStats = async (name: string) => {
     if (!name) return;
     
@@ -120,12 +128,8 @@ export default function PlayerStatistics() {
     setError(null);
     
     try {
-      // In a real implementation, you would fetch from your API
-      // const response = await fetch(`https://api.onthepixel.net/stats/${name}`);
-      // const data = await response.json();
-      
-      // Initialize player data structure
-      let dummyData: PlayerStats = {
+      // Create initial player data structure
+      let playerData: PlayerStats = {
         playerinfo: {
           username: name,
           uuid: "00000000-0000-0000-0000-000000000000", // Will be updated with actual UUID
@@ -163,31 +167,31 @@ export default function PlayerStatistics() {
         }
       };
       
+      // Fetch playtime data from API
       try {
-        // Fetch player's rank information
-        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/name/${name}`);
+        const playtimeResponse = await fetch(`https://api.onthepixel.net/stats/playtime/${name}`);
+        const playtimeData = await playtimeResponse.json();
+        
+        // Update player data with playtime information
+        playerData.stats.playtime.total = playtimeData.playtime;
+        playerData.stats.playtime.pretty = formatPlaytime(playtimeData.playtime);
+        playerData.playerinfo.firstLogin = playtimeData.first_joined;
+        playerData.playerinfo.lastLogin = playtimeData.last_online;
+      } catch (playtimeError) {
+        console.error("Error fetching playtime data:", playtimeError);
+        // Keep default playtime data if fetch fails
+      }
+      
+      try {
+        // Make the API call using the player name to get rank
+        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${name}`);
         const rankData: RankResponse = await rankResponse.json();
         
         // Update the player UUID from the response
-        dummyData.playerinfo.uuid = rankData.uuid;
-        
-        // Fetch player's playtime information
-        const playtimeResponse = await fetch(`https://api.onthepixel.net/stats/playtime/${name}`);
-        const playtimeData: PlaytimeResponse = await playtimeResponse.json();
-        
-        // Format playtime (convert seconds to hours and minutes)
-        const totalSeconds = playtimeData.playtime;
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        
-        // Update player info with playtime data
-        dummyData.stats.playtime.total = totalSeconds;
-        dummyData.stats.playtime.pretty = `${hours}h ${minutes}m`;
-        dummyData.playerinfo.firstLogin = playtimeData.first_joined;
-        dummyData.playerinfo.lastLogin = playtimeData.last_online;
+        playerData.playerinfo.uuid = rankData.uuid;
         
         // Update the player info with the rank data
-        dummyData.playerinfo.rank = {
+        playerData.playerinfo.rank = {
           id: extractRankName(rankData.rank),
           color: parseColorCode(rankData.rank)
         };
@@ -200,7 +204,7 @@ export default function PlayerStatistics() {
         throw new Error("Player not found");
       }
       
-      setStats(dummyData);
+      setStats(playerData);
       
       // Update URL
       const newUrl = `/stats/${name}`;
