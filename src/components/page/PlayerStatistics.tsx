@@ -165,7 +165,7 @@ export default function PlayerStatistics() {
       
       try {
         // Fetch player's rank information
-        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${name}`);
+        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/name/${name}`);
         const rankData: RankResponse = await rankResponse.json();
         
         // Update the player UUID from the response
