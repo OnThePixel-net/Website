@@ -15,6 +15,8 @@ interface Creator {
     tiktok?: string;
     instagram?: string;
     twitter?: string;
+    discord?: string;
+    website?: string;
   };
 }
 
@@ -30,6 +32,7 @@ const creators: Creator[] = [
       youtube: "https://www.youtube.com/@Loxxler",
       tiktok: "https://tiktok.com/@loxxler",
       discord: "https://discord.gg/vRR9tamURT",
+      website: "https://loxxler.com"
     }
   },
   {
@@ -88,7 +91,7 @@ const creators: Creator[] = [
 ];
 
 // Icons for social platforms
-import { FaYoutube, FaTwitch, FaTiktok, FaInstagram, FaDiscord } from "react-icons/fa";
+import { FaYoutube, FaTwitch, FaTiktok, FaInstagram, FaDiscord, FaGlobe } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
 export default function Creators() {
@@ -198,6 +201,18 @@ export default function Creators() {
                         aria-label={`${creator.name} Discord`}
                       >
                         <FaDiscord size={24} />
+                      </Link>
+                    )}
+                    
+                    {creator.platforms.website && (
+                      <Link 
+                        href={creator.platforms.website} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-green-500 transition-colors"
+                        aria-label={`${creator.name} Website`}
+                      >
+                        <FaGlobe size={24} />
                       </Link>
                     )}
                   </div>
