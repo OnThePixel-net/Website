@@ -107,18 +107,25 @@ export default function PlayerStatistics() {
     return rankString.replace(/[&§][0-9a-fA-F]/g, '').trim();
   };
 
-  // Helper function to format playtime from seconds
-  const formatPlaytime = (seconds: number): string => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
+  // Helper function to format playtime from milliseconds
+  const formatPlaytime = (milliseconds: number): string => {
+    // Convert milliseconds to seconds, minutes, hours, and days
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
     
-    if (hours >= 24) {
-      const days = Math.floor(hours / 24);
-      const remainingHours = hours % 24;
-      return `${days}d ${remainingHours}h ${minutes}m`;
+    // Calculate remaining hours and minutes
+    const remainingHours = hours % 24;
+    const remainingMinutes = minutes % 60;
+    
+    if (days > 0) {
+      return `${days}d ${remainingHours}h ${remainingMinutes}m`;
+    } else if (hours > 0) {
+      return `${hours}h ${remainingMinutes}m`;
+    } else {
+      return `${minutes}m`;
     }
-    
-    return `${hours}h ${minutes}m`;
   };
 
   const fetchPlayerStats = async (name: string) => {
