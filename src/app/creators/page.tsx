@@ -26,7 +26,8 @@ const creators: Creator[] = [
     id: 1,
     name: "Loxxler",
     minecraftName: "Loxxgamer",
-    description: "Minecraft building tutorials and OnThePixel server showcases.",
+    description: "Ich bin ein kleiner (aber feiner) Twitch Streamer, und mache zudem auch Tiktok und Youtube! 
+Ich hoffe ihr habt viel Spaß mit meinen Videos und auch mit dem, was in der Zukunft noch kommt :D",
     platforms: {
       twitch: "https://www.twitch.tv/loxxler",
       youtube: "https://www.youtube.com/@Loxxler",
