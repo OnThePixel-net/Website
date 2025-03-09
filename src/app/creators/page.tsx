@@ -36,6 +36,18 @@ const creators: Creator[] = [
       discord: "https://discord.gg/vRR9tamURT",
       website: "https://loxxler.de"
     }
+  },
+  {
+    id: 2,
+    name: "Sanherib",
+    minecraftName: "Sanherib",
+    description: "Ich bin ein kleiner (aber feiner) Twitch Streamer, und mache zudem auch Tiktok und Youtube! Ich hoffe ihr habt viel Spaß mit meinen Videos und auch mit dem, was in der Zukunft noch kommt :D",
+    platforms: {
+      twitch: "https://www.twitch.tv/sanheriblive",
+      tiktok: "https://www.tiktok.com/@sanheribyt",
+      discord: "https://discord.gg/XY79Zpy6V4",
+      website: "https://Sanherib.de"
+    }
   }
 ];
 
