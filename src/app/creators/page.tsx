@@ -50,10 +50,10 @@ const creators: Creator[] = [
     }
   },
   {
-    id: 2,
-    name: "Sanherib",
-    minecraftName: "Sanherib",
-    description: "Yo ich bin Sahne! Ich streame daily(zurzeit nicht) Minecraft und anderes.",
+    id: 3,
+    name: "CE_Gunner",
+    minecraftName: "CE_Gunner",
+    description: "Platzhalter, imagine ich hätte hier ne richtige Bio (hab ich nirgends).",
     platforms: {
       twitch: "https://www.twitch.tv/ce_gunner",
       youtube: "https://www.youtube.com/@CE_Gunner",
