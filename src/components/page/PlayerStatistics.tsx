@@ -52,6 +52,11 @@ interface PlayerStats {
   };
 }
 
+interface RankResponse {
+  uuid: string;
+  rank: string;
+}
+
 export default function PlayerStatistics() {
   const [username, setUsername] = useState<string>("");
   const [stats, setStats] = useState<PlayerStats | null>(null);
@@ -66,6 +71,42 @@ export default function PlayerStatistics() {
     }
   }, []);
 
+  // Parse Minecraft rank color codes to Hex values
+  const parseColorCode = (colorCode: string): string => {
+    const colorMap: Record<string, string> = {
+      '0': '#000000', // Black
+      '1': '#0000AA', // Dark Blue
+      '2': '#00AA00', // Dark Green
+      '3': '#00AAAA', // Dark Aqua
+      '4': '#AA0000', // Dark Red
+      '5': '#AA00AA', // Dark Purple
+      '6': '#FFAA00', // Gold
+      '7': '#AAAAAA', // Gray
+      '8': '#555555', // Dark Gray
+      '9': '#5555FF', // Blue
+      'a': '#55FF55', // Green
+      'b': '#55FFFF', // Aqua
+      'c': '#FF5555', // Red
+      'd': '#FF55FF', // Light Purple
+      'e': '#FFFF55', // Yellow
+      'f': '#FFFFFF', // White
+    };
+
+    // If starts with & or § followed by a color code
+    if (colorCode && (colorCode.startsWith('&') || colorCode.startsWith('§')) && colorCode.length > 1) {
+      const code = colorCode.charAt(1).toLowerCase();
+      return colorMap[code] || '#FFFFFF';
+    }
+    
+    return '#FFFFFF'; // Default white
+  };
+
+  // Extract rank name from color-coded string
+  const extractRankName = (rankString: string): string => {
+    // Remove color codes (& or § followed by a character)
+    return rankString.replace(/[&§][0-9a-fA-F]/g, '').trim();
+  };
+
   const fetchPlayerStats = async (name: string) => {
     if (!name) return;
     
@@ -78,15 +119,15 @@ export default function PlayerStatistics() {
       // const data = await response.json();
       
       // For now, let's create dummy data
-      const dummyData: PlayerStats = {
+      let dummyData: PlayerStats = {
         playerinfo: {
           username: name,
-          uuid: "00000000-0000-0000-0000-000000000000",
+          uuid: "00000000-0000-0000-0000-000000000000", // Will be updated with actual UUID
           firstLogin: "2023-08-15",
           lastLogin: "2025-03-05",
           rank: {
-            id: name.length > 5 ? "VIP+" : "Member",
-            color: name.length > 5 ? "#55FF55" : "#AAAAAA"
+            id: "Member", // Will be updated with rank from API
+            color: "#AAAAAA"  // Will be updated with color from API
           }
         },
         stats: {
@@ -115,6 +156,34 @@ export default function PlayerStatistics() {
           }
         }
       };
+      
+      try {
+        // Instead of random ranks, we'll fetch the actual rank from the API
+        // First we need to fetch the UUID of the player
+        // This is a simulation since we don't have the actual Mojang API call here
+        const uuid = `${Math.random().toString(36).substring(2, 15)}-${Math.random().toString(36).substring(2, 15)}-${Math.random().toString(36).substring(2, 15)}-${Math.random().toString(36).substring(2, 15)}`;
+        
+        dummyData.playerinfo.uuid = uuid;
+        
+        // In production, you would use the actual API:
+        // const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${uuid}`);
+        // const rankData = await rankResponse.json();
+        
+        // For now, simulate the rank response
+        const rankData: RankResponse = {
+          uuid: uuid,
+          rank: name.length > 5 ? "&6VIP+" : "&6MEMBER" // Similar to your example
+        };
+        
+        // Update the player info with the rank data
+        dummyData.playerinfo.rank = {
+          id: extractRankName(rankData.rank),
+          color: parseColorCode(rankData.rank)
+        };
+      } catch (rankError) {
+        console.error("Error fetching rank data:", rankError);
+        // If rank fetch fails, keep the default rank
+      }
       
       if (name.toLowerCase() === 'error') {
         throw new Error("Player not found");
