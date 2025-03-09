@@ -41,6 +41,15 @@ export function MainNav() {
       >
         Team
       </Link>
+      <Link
+        href="/creators"
+        className={cn(
+          "hidden text-sm font-medium transition-colors hover:text-primary sm:inline-block",
+          pathname === "/creators" ? "text-foreground" : "text-foreground/60",
+        )}
+      >
+        Creators
+      </Link>
     </nav>
   );
 }
