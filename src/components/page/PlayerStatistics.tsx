@@ -57,6 +57,12 @@ interface RankResponse {
   rank: string;
 }
 
+interface PlaytimeResponse {
+  playtime: number;       // Playtime in seconds
+  first_joined: string;   // ISO date string
+  last_online: string;    // ISO date string
+}
+
 export default function PlayerStatistics() {
   const [username, setUsername] = useState<string>("");
   const [stats, setStats] = useState<PlayerStats | null>(null);
@@ -118,7 +124,7 @@ export default function PlayerStatistics() {
       // const response = await fetch(`https://api.onthepixel.net/stats/${name}`);
       // const data = await response.json();
       
-      // For now, let's create dummy data
+      // Initialize player data structure
       let dummyData: PlayerStats = {
         playerinfo: {
           username: name,
@@ -132,8 +138,8 @@ export default function PlayerStatistics() {
         },
         stats: {
           playtime: {
-            total: 12445,
-            pretty: "207h 25m"
+            total: 0,
+            pretty: "0h 0m"
           },
           balance: {
             pixels: 15000,
@@ -158,15 +164,27 @@ export default function PlayerStatistics() {
       };
       
       try {
-        // In production, we'll use the player's name directly for the rank API call
-        // No need to fetch UUID separately - the API should handle that internally
-        
-        // Make the API call using the player name
-        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/name/${name}`);
+        // Fetch player's rank information
+        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${name}`);
         const rankData: RankResponse = await rankResponse.json();
         
         // Update the player UUID from the response
         dummyData.playerinfo.uuid = rankData.uuid;
+        
+        // Fetch player's playtime information
+        const playtimeResponse = await fetch(`https://api.onthepixel.net/stats/playtime/${name}`);
+        const playtimeData: PlaytimeResponse = await playtimeResponse.json();
+        
+        // Format playtime (convert seconds to hours and minutes)
+        const totalSeconds = playtimeData.playtime;
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        
+        // Update player info with playtime data
+        dummyData.stats.playtime.total = totalSeconds;
+        dummyData.stats.playtime.pretty = `${hours}h ${minutes}m`;
+        dummyData.playerinfo.firstLogin = playtimeData.first_joined;
+        dummyData.playerinfo.lastLogin = playtimeData.last_online;
         
         // Update the player info with the rank data
         dummyData.playerinfo.rank = {
