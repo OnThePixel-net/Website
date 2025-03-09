@@ -68,7 +68,7 @@ const creators: Creator[] = [
     id: 4,
     name: "IceBook",
     minecraftName: "icebook_",
-    description: "Platzhalter, imagine ich hätte hier ne richtige Bio (hab ich nirgends).",
+    description: "",
     platforms: {
       twitch: "https://www.twitch.tv/icebook_",
       tiktok: "https://www.tiktok.com/@icebook6",
