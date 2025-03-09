@@ -74,8 +74,7 @@ const creators: Creator[] = [
       twitch: "https://www.twitch.tv/patchnote",
       tiktok: "https://www.tiktok.com/@patchnoteyt",
       twitter: "https://x.com/ElPatchNote",
-      discord: "https://discord.gg/cmM78zp8zn",
-      website: "https://cegunner.de"
+      discord: "https://discord.gg/cmM78zp8zn"
     }
   },
   {
