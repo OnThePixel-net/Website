@@ -1,7 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import TopPage from "@/components/page/top";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function Leaderboards() {
   return (
@@ -10,111 +11,98 @@ export default function Leaderboards() {
       <section className="bg-gray-950 pt-36">
         <div className="container mx-auto px-4 py-10">
           <h1 className="text-2xl font-bold mb-5">LEADERBOARDS</h1>
+          <p className="mb-8 text-gray-400">
+            Check out the top players across different game modes on OnThePixel.net. 
+            Compete with others and climb the rankings!
+          </p>
           
-          <div className="flex py-4">
-            <div className="flex flex-col justify-center">
-              <Link href="/leaderboard/pixels">
-                <Image
-                  src={"/placeholder.png"}
-                  alt={"Pixels"}
-                  width={500}
-                  height={250}
-                  className="h-[200px] w-[400px] cursor-pointer rounded-xl border object-cover"
-                />
-              </Link>
-            </div>
-            <div className="ml-4">
-              <Link
-                href="/leaderboard/pixels"
-                className="text-xl font-bold mt-4 text-green-200 underline"
-              >
-                Pixels
-              </Link>
-              <p>
-                This is the Leaderboard for the Pixels, the currency of
-                OnThePixel.net
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex py-4">
-            <div className="flex flex-col justify-center">
-              <Link href="/leaderboard/bedwars">
-                <Image
-                  src={"/bedwars.jpg"}
-                  alt={"BedWars"}
-                  width={500}
-                  height={250}
-                  className="h-[200px] w-[400px] cursor-pointer rounded-xl border object-cover"
-                />
-              </Link>
-            </div>
-            <div className="ml-4">
-              <Link
-                href="/leaderboard/bedwars"
-                className="text-xl font-bold mt-4 text-green-200 underline"
-              >
-                BedWars
-              </Link>
-              <p>
-                The Bedwars leaderboard ranks players by score, kills and
-                deaths.
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex py-4">
-            <div className="flex flex-col justify-center">
-              <Link href="/leaderboard/duels">
-                <Image
-                  src={"/placeholder.png"}
-                  alt={"Duels"}
-                  width={500}
-                  height={250}
-                  className="h-[200px] w-[400px] cursor-pointer rounded-xl border object-cover"
-                />
-              </Link>
-            </div>
-            <div className="ml-4">
-              <Link
-                href="/leaderboard/duels"
-                className="text-xl font-bold mt-4 text-green-200 underline"
-              >
-                Duels
-              </Link>
-              <p>
-                The Duels leaderboard ranks players by their wins, K/D ratio and win streaks.
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex py-4">
-            <div className="flex flex-col justify-center">
-              <Link href="/leaderboard/parkour">
-                <Image
-                  src={"/parkour.png"}
-                  alt={"Parkour"}
-                  width={500}
-                  height={250}
-                  className="h-[200px] w-[400px] cursor-pointer rounded-xl border object-cover"
-                />
-              </Link>
-            </div>
-            <div className="ml-4">
-              <Link
-                href="/leaderboard/parkour"
-                className="text-xl font-bold mt-4 text-green-200 underline"
-              >
-                Parkour
-              </Link>
-              <p>
-                The Parkour Leaderboard ranks based on how far players have
-                progressed on the course.
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Pixels Leaderboard */}
+            <LeaderboardCard 
+              title="Pixels"
+              description="The Pixels leaderboard shows the richest players on the server."
+              link="/leaderboard/pixels"
+              enabled={true}
+            />
+            
+            {/* BedWars Leaderboard */}
+            <LeaderboardCard 
+              title="BedWars"
+              description="Players ranked by score, kills, and deaths in BedWars matches."
+              link="/leaderboard/bedwars"
+              enabled={true}
+            />
+            
+            {/* Duels Leaderboard */}
+            <LeaderboardCard 
+              title="Duels"
+              description="The best duelists ranked by wins, K/D ratio and win streaks."
+              link="/leaderboard/duels"
+              enabled={true}
+            />
+            
+            {/* Parkour Leaderboard */}
+            <LeaderboardCard 
+              title="Parkour"
+              description="Players ranked based on how far they've progressed in parkour courses."
+              link="/leaderboard/parkour"
+              enabled={true}
+            />
+            
+            {/* SkyWars Leaderboard - Disabled */}
+            <LeaderboardCard 
+              title="SkyWars"
+              description="SkyWars leaderboards will be available soon!"
+              link="#"
+              enabled={false}
+              comingSoon={true}
+            />
           </div>
         </div>
       </section>
     </>
+  );
+}
+
+interface LeaderboardCardProps {
+  title: string;
+  description: string;
+  link: string;
+  enabled: boolean;
+  comingSoon?: boolean;
+}
+
+function LeaderboardCard({ title, description, link, enabled, comingSoon }: LeaderboardCardProps) {
+  const content = (
+    <Card className={`h-full border-gray-800 transition-all duration-300 ${enabled ? 'hover:border-green-500 hover:shadow-md hover:shadow-green-900/20' : 'opacity-70'}`}>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xl font-bold">{title}</h2>
+          {comingSoon && (
+            <Badge className="text-sm bg-amber-600 text-white border-none">Coming Soon</Badge>
+          )}
+          {!enabled && !comingSoon && (
+            <Badge className="text-sm bg-red-600 text-white border-none">Unavailable</Badge>
+          )}
+        </div>
+        <p className="text-gray-400">{description}</p>
+        
+        {enabled && (
+          <div className="mt-4 flex justify-end">
+            <span className="text-green-400 text-sm">View leaderboard →</span>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  if (!enabled) {
+    return content;
+  }
+
+  return (
+    <Link href={link} className="block h-full">
+      {content}
+    </Link>
   );
 }
