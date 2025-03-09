@@ -63,6 +63,18 @@ const creators: Creator[] = [
       discord: "https://discord.gg/eTfBJZKb9v",
       website: "https://cegunner.de"
     }
+  },
+  {
+    id: 4,
+    name: "IceBook",
+    minecraftName: "icebook_",
+    description: "Platzhalter, imagine ich hätte hier ne richtige Bio (hab ich nirgends).",
+    platforms: {
+      twitch: "https://www.twitch.tv/icebook_",
+      tiktok: "https://www.tiktok.com/@liveq16",
+      discord: "https://discord.gg/hS7dXYuYAZ",
+      website: "https://c.otp.cx/icebook"
+    }
   }
 ];
 
