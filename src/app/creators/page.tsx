@@ -75,6 +75,18 @@ const creators: Creator[] = [
       discord: "https://discord.gg/hS7dXYuYAZ",
       website: "https://c.otp.cx/icebook"
     }
+  },
+  {
+    id: 5,
+    name: "Schleim",
+    minecraftName: "Schleim70",
+    description: "Yoooo wassup? Bin Louis und spiele gerne Osu!, IdleOn und Minecraft :3",
+    platforms: {
+      twitch: "https://twitch.tv/Schleim70",
+      youtube: "https://youtube.com/@schleim70",
+      tiktok: "https://tiktok.com/@slimey_70",
+      website: "https://c.otp.cx/schleim"
+    }
   }
 ];
 
