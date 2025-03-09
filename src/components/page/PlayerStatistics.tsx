@@ -167,7 +167,7 @@ export default function PlayerStatistics() {
               type="text"
               value={username}
               onChange={handleInputChange}
-              placeholder="Enter username"
+              placeholder="Enter A Minecraft Username"
               className="w-full pl-10 bg-gray-800/50 border-gray-700"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
