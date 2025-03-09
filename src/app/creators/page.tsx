@@ -31,61 +31,10 @@ const creators: Creator[] = [
       twitch: "https://www.twitch.tv/loxxler",
       youtube: "https://www.youtube.com/@Loxxler",
       tiktok: "https://tiktok.com/@loxxler",
+      twitter: "https://x.com/Loxxler",
+      instagram: "https://www.instagram.com/loxxler/",
       discord: "https://discord.gg/vRR9tamURT",
-      website: "https://loxxler.com"
-    }
-  },
-  {
-    id: 2,
-    name: "TNTRunner",
-    minecraftName: "TNTRunner",
-    description: "TNT Run gameplay and strategies. Weekly OnThePixel competitions.",
-    platforms: {
-      youtube: "https://youtube.com/@tntrunner",
-      tiktok: "https://tiktok.com/@tntrunner",
-      instagram: "https://instagram.com/tntrunner",
-    }
-  },
-  {
-    id: 3,
-    name: "BridgingPro",
-    minecraftName: "BridgingPro",
-    description: "Professional bridging tutorials and competitions on OnThePixel.",
-    platforms: {
-      youtube: "https://youtube.com/@bridgingpro",
-      twitch: "https://twitch.tv/bridgingpro",
-    }
-  },
-  {
-    id: 4,
-    name: "PixelExplorer",
-    minecraftName: "PixelExplorer",
-    description: "Exploring all games and hidden features on the OnThePixel server.",
-    platforms: {
-      youtube: "https://youtube.com/@pixelexplorer",
-      twitter: "https://x.com/pixelexplorer",
-      instagram: "https://instagram.com/pixelexplorer",
-    }
-  },
-  {
-    id: 5,
-    name: "BedWarsLegend",
-    minecraftName: "BedWarsLegend",
-    description: "BedWars strategies and tournament coverage on OnThePixel.",
-    platforms: {
-      youtube: "https://youtube.com/@bedwarslegend",
-      twitch: "https://twitch.tv/bedwarslegend",
-      tiktok: "https://tiktok.com/@bedwarslegend",
-    }
-  },
-  {
-    id: 6,
-    name: "ParkourMaster",
-    minecraftName: "ParkourMaster",
-    description: "Speedrunning the parkour courses on OnThePixel with style.",
-    platforms: {
-      youtube: "https://youtube.com/@parkourmaster",
-      tiktok: "https://tiktok.com/@parkourmaster",
+      website: "https://loxxler.de"
     }
   }
 ];
