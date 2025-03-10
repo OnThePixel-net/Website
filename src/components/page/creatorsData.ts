@@ -84,6 +84,19 @@ export const creators: Creator[] = [
   },
   {
     id: 6,
+    name: "OscarrinoTV",
+    minecraftName: "OscarrinoTV",
+    description: "Immer schön Positiv Bleiben 😊",
+    platforms: {
+      twitch: "https://www.twitch.tv/oscarrinotv",
+      tiktok: "https://www.tiktok.com/@oscarrinotv",
+      youtube: "https://www.youtube.com/@OscarrinoTV",
+      instagram: "https://www.instagram.com/oscarrinotv/",
+      website: "https://oscarrinotv.de/"
+    }
+  },
+  {
+    id: 7,
     name: "Schleim",
     minecraftName: "Schleim70",
     description: "Yoooo wassup? Bin Louis und spiele gerne Osu!, IdleOn und Minecraft :3",
