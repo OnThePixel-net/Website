@@ -23,7 +23,7 @@ export default function Privacy() {
           <ul className="list-disc pl-6 mt-2 mb-4 space-y-2">
             <li>Minecraft username and UUID</li>
             <li>Discord ID and username (if you link your account)</li>
-            <li>IP addresses</li>
+            <li>IP addresses(for 30 days)</li>
             <li>Game statistics and in-game activity</li>
             <li>Chat messages sent within our server</li>
             <li>Website usage data and analytics</li>
