@@ -15,6 +15,9 @@ import {
 } from "@/components/ui/card";
 import { Balancer } from "react-wrap-balancer";
 
+// Note: We don't need to import the header and footer components
+// because they're already included in the RootLayout component (src/app/layout.tsx)
+
 export default function TNTRun() {
   const [copied, setCopied] = useState(false);
 
@@ -27,10 +30,8 @@ export default function TNTRun() {
   };
 
   return (
-    <div
-      key="1"
-      className="relative min-h-screen flex flex-col items-center justify-center text-white"
-    >
+    // The header is already included by the RootLayout component
+    <div className="relative py-16 min-h-screen flex flex-col items-center justify-center text-white">
       <div className="absolute inset-0 -z-10">
         <Image
           alt="Background Image"
@@ -38,13 +39,15 @@ export default function TNTRun() {
           height="1080"
           src="/tntrun.png"
           width="1920"
+          priority
         />
         <div className="absolute inset-0" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-950" />
       </div>
-      <main className="flex flex-col items-center">
+      
+      <main className="flex flex-col items-center z-10 w-full max-w-7xl mx-auto px-4">
         {/* Main Card */}
-        <Card className="p-4 aspect-video mx-8 bg-white/5 border-gray-800">
+        <Card className="p-4 aspect-video w-full max-w-3xl mx-auto bg-white/5 border-gray-800">
           <CardHeader className="text-center">
             <CardTitle
               className="text-4xl sm:text-5xl md:text-6xl font-bold"
@@ -87,7 +90,7 @@ export default function TNTRun() {
         </Card>
 
         {/* Game Info Section */}
-        <div className="mt-12 w-full max-w-5xl px-8">
+        <div className="mt-12 w-full max-w-5xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* How to Play */}
             <Card className="bg-white/5 border-gray-800 h-full">
@@ -135,19 +138,19 @@ export default function TNTRun() {
                 <ul className="space-y-3">
                   <li className="flex items-start">
                     <span className="bg-green-700 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">✓</span>
-                    <span>Multiple levels with increasing difficulty</span>
+                    <span>Daily quests with special rewards and challenges</span>
                   </li>
                   <li className="flex items-start">
                     <span className="bg-green-700 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">✓</span>
-                    <span>Special power-ups that give you temporary advantages</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="bg-green-700 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">✓</span>
-                    <span>Regular tournaments with exclusive rewards</span>
+                    <span>Unlock cosmetics to customize your character</span>
                   </li>
                   <li className="flex items-start">
                     <span className="bg-green-700 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">✓</span>
                     <span>Global leaderboards to compete with players worldwide</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="bg-green-700 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">✓</span>
+                    <span>Earn Pixels currency to spend in the server shop</span>
                   </li>
                 </ul>
               </CardContent>
@@ -155,7 +158,7 @@ export default function TNTRun() {
           </div>
 
           {/* Call to Action */}
-          <div className="mt-12 p-6 bg-white/10 rounded-lg border-l-4 border-green-500">
+          <div className="mt-12 p-6 bg-white/10 rounded-lg border-l-4 border-green-500 mb-12">
             <h2 
               className="text-lg font-bold text-green-500" 
               style={{ color: "#00de6d", textShadow: "0 0 10px #00de6d" }}
@@ -163,7 +166,7 @@ export default function TNTRun() {
               Join the Action Today!
             </h2>
             <p className="mt-2">
-              Ready to test your skills in TNT Run? Connect to our server using the IP "play.tntrun.de" and join thousands of players already enjoying this exciting mini-game!
+              Ready to test your skills in TNT Run? Connect to our server using the IP "play.tntrun.de" and start earning Pixels, completing daily quests, and climbing the leaderboards!
             </p>
             <div className="mt-4">
               <Button
@@ -176,6 +179,7 @@ export default function TNTRun() {
           </div>
         </div>
       </main>
+      {/* The footer is already included by the RootLayout component */}
     </div>
   );
 }
