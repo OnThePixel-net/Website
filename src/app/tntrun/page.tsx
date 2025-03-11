@@ -67,25 +67,28 @@ export default function TNTRun() {
               Race against time as the floor crumbles beneath your feet!
             </Balancer>
           </h2>
-          <CardFooter className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              onClick={() => copyToClipboard("play.tntrun.de")}
-              className="mx-auto bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500"
-            >
-              <FaCopy className="text-white size-6 mr-2" /> 
-              <span>{copied ? "Copied!" : "Copy IP"}</span>
-            </Button>
-            <Link 
-              href="https://discord.com/invite/Dpx3eK9t3z" 
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+          <CardFooter className="mt-8 flex justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center w-full">
               <Button
-                className="mx-auto bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500"
+                onClick={() => copyToClipboard("play.tntrun.de")}
+                className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center justify-center w-full sm:w-48 h-12 hover:scale-105 transition-transform duration-500"
               >
-                <FaDiscord className="text-white size-6 mr-2" /> <span>Discord</span>
+                <FaCopy className="text-white size-6 mr-2" /> 
+                <span>{copied ? "Copied!" : "Copy IP"}</span>
               </Button>
-            </Link>
+              <Link 
+                href="https://discord.com/invite/Dpx3eK9t3z" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto"
+              >
+                <Button
+                  className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center justify-center w-full sm:w-48 h-12 hover:scale-105 transition-transform duration-500"
+                >
+                  <FaDiscord className="text-white size-6 mr-2" /> <span>Discord</span>
+                </Button>
+              </Link>
+            </div>
           </CardFooter>
         </Card>
 
@@ -168,10 +171,10 @@ export default function TNTRun() {
             <p className="mt-2">
               Ready to test your skills in TNT Run? Connect to our server using the IP "play.tntrun.de" and start earning Pixels, completing daily quests, and climbing the leaderboards!
             </p>
-            <div className="mt-4">
+            <div className="mt-4 flex justify-center">
               <Button
                 onClick={() => copyToClipboard("play.tntrun.de")}
-                className="inline-flex items-center px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-600 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 bg-green-700 text-white rounded-md hover:bg-green-600 transition-colors text-lg w-full sm:w-auto"
               >
                 <FaCopy className="mr-2" /> {copied ? "IP Copied!" : "Copy Server IP"}
               </Button>
