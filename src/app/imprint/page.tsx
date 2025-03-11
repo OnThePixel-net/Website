@@ -59,6 +59,31 @@ export default function ImprintEnglish() {
               https://x.com/onthepixelnet
             </a>
           </p>
+          <p className="mt-2">
+            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
+              *.otp.cx
+            </a>
+          </p>
+          <p className="mt-2">
+            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
+              *.onthepixel.net
+            </a>
+          </p>
+          <p className="mt-2">
+            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
+              *.onthepixel.dev
+            </a>
+          </p>
+          <p className="mt-2">
+            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
+              *.tntrun.de
+            </a>
+          </p>
+          <p className="mt-2">
+            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
+              *.buildffa.net
+            </a>
+          </p>
           
           <h2 className="text-xl font-semibold mt-8 mb-4">Liability and Copyright Notices</h2>
           <p>
