@@ -17,7 +17,7 @@ export default function Footer() {
   });
   
   useEffect(() => {
-    fetch("https://uptime.fastasfuck.net/api/status-page/heartbeat/onthepixel")
+    fetch("https://status.onthepixel.net/api/status-page/heartbeat/onthepixel")
       .then((response) => response.json())
       .then((data) => {
         // Check if we have the expected data structure
