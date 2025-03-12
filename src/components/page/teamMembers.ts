@@ -10,6 +10,7 @@ export const roleOrder = [
   "admin",
   "developer",
   "builder",
+  "socialmanager",
   "supporter",
 ];
 
@@ -19,6 +20,8 @@ export const roleColors: { [key: string]: string } = {
   developer: "#5ac2de",
   builder: "#00de6d",
   supporter: "#a1101a",
+  socialmanager: "#2581d6",
+
 };
 
 export const teamMembers: TeamMember[] = [
@@ -48,8 +51,8 @@ export const teamMembers: TeamMember[] = [
   },
   {
     id: 6,
-    discord_name: "gamixxhd",
-    minecraft_name: "gamixxhd",
+    discord_name: "Pixel Kolya",
+    minecraft_name: "PixelKolya",
     role: "builder",
   },
   {
@@ -60,7 +63,7 @@ export const teamMembers: TeamMember[] = [
   },
   {
     id: 8,
-    discord_name: "datenflieger",
+    discord_name: "Datenflieger",
     minecraft_name: "derdatenflieger",
     role: "admin",
   },
@@ -78,15 +81,15 @@ export const teamMembers: TeamMember[] = [
   },
   {
     id: 11,
-    discord_name: "Ausmister-PatchNote",
+    discord_name: "Ausmister PatchNote",
     minecraft_name: "Smart_PatchNote",
     role: "supporter",
   },
   {
     id: 12,
-    discord_name: "SpireEvent",
+    discord_name: "Spire Event",
     minecraft_name: "SpireEvent",
-    role: "supporter",
+    role: "socialmanager",
   },
   {
     id: 13,
