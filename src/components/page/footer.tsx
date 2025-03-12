@@ -11,17 +11,47 @@ import {
 } from "@tabler/icons-react";
 
 export default function Footer() {
-  const [pingStatus, setPingStatus] = useState(true);
+  const [systemStatus, setSystemStatus] = useState({
+    status: true,
+    partialOutage: false
+  });
+  
   useEffect(() => {
-    fetch("https://api.mcsrvstat.us/2/onthepixel.net")
+    fetch("https://uptime.fastasfuck.net/api/status-page/heartbeat/onthepixel")
       .then((response) => response.json())
       .then((data) => {
-        setPingStatus(data.debug.ping);
+        // Überprüfen wir die Uptime-Daten
+        const uptimeList = data.uptimeList;
+        const heartbeatList = data.heartbeatList;
+        
+        // Prüfen auf Teilausfälle oder komplette Ausfälle
+        let hasFailure = false;
+        let allFailed = true;
+        
+        // Überprüfen der Uptime-Werte
+        for (const [system, uptime] of Object.entries(uptimeList)) {
+          if (uptime < 1) {
+            hasFailure = true;
+          }
+          if (uptime > 0) {
+            allFailed = false;
+          }
+        }
+        
+        setSystemStatus({
+          status: !allFailed, // system ist online, wenn nicht alle ausgefallen sind
+          partialOutage: hasFailure && !allFailed // Teilausfall, wenn einige, aber nicht alle ausgefallen sind
+        });
       })
       .catch((error) => {
-        console.error("Error fetching ping status:", error);
+        console.error("Error fetching system status:", error);
+        setSystemStatus({
+          status: false,
+          partialOutage: false
+        });
       });
   }, []);
+  
   return (
     <footer className="px-4 py-12 md:px-6">
       <div className="container mx-auto">
@@ -48,17 +78,29 @@ export default function Footer() {
                 <span className="relative mr-2 flex h-3 w-3">
                   <span
                     className={`absolute inline-flex h-full w-full animate-ping rounded-full ${
-                      pingStatus ? "bg-green-400" : "bg-red-400"
+                      systemStatus.status 
+                        ? systemStatus.partialOutage 
+                          ? "bg-yellow-400" 
+                          : "bg-green-400" 
+                        : "bg-red-400"
                     } opacity-75`}
                   ></span>
                   <span
                     className={`relative inline-flex h-3 w-3 rounded-full ${
-                      pingStatus ? "bg-green-500" : "bg-red-500"
+                      systemStatus.status 
+                        ? systemStatus.partialOutage 
+                          ? "bg-yellow-500" 
+                          : "bg-green-500" 
+                        : "bg-red-500"
                     }`}
                   ></span>
                 </span>
                 <span className="text-sm text-gray-400 group-hover:text-gray-300">
-                  System Status
+                  {systemStatus.status 
+                    ? systemStatus.partialOutage 
+                      ? "Partial Outage" 
+                      : "All Systems Operational" 
+                    : "System Outage"}
                 </span>
               </div>
             </Link>
@@ -255,16 +297,30 @@ export default function Footer() {
             <span className="relative mr-2 flex h-3 w-3">
               <span
                 className={`absolute inline-flex h-full w-full animate-ping rounded-full ${
-                  pingStatus ? "bg-green-400" : "bg-red-400"
+                  systemStatus.status 
+                    ? systemStatus.partialOutage 
+                      ? "bg-yellow-400" 
+                      : "bg-green-400" 
+                    : "bg-red-400"
                 } opacity-75`}
               ></span>
               <span
                 className={`relative inline-flex h-3 w-3 rounded-full ${
-                  pingStatus ? "bg-green-500" : "bg-red-500"
+                  systemStatus.status 
+                    ? systemStatus.partialOutage 
+                      ? "bg-yellow-500" 
+                      : "bg-green-500" 
+                    : "bg-red-500"
                 }`}
               ></span>
             </span>
-            <span className="text-sm text-gray-400">System Status</span>
+            <span className="text-sm text-gray-400">
+              {systemStatus.status 
+                ? systemStatus.partialOutage 
+                  ? "Partial Outage" 
+                  : "All Systems Operational" 
+                : "System Outage"}
+            </span>
           </div>
           <div className="mb-4 text-sm">Follow Us</div>
           <div className="flex space-x-4">
