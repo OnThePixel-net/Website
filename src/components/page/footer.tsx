@@ -17,56 +17,33 @@ export default function Footer() {
   });
   
   useEffect(() => {
-    fetch("https://status.onthepixel.net/api/status-page/heartbeat/onthepixel")
+    fetch("https://statusapi.onthepixel.workers.dev")
       .then((response) => response.json())
       .then((data) => {
-        // Check if we have the expected data structure
-        if (!data.heartbeatList) {
-          console.error("Unexpected API response format:", data);
+        // Set status directly based on the API response
+        if (data.status === "All servers are online") {
+          setSystemStatus({
+            status: true,
+            partialOutage: false
+          });
+        } else if (data.status === "Partially down") {
+          setSystemStatus({
+            status: true,
+            partialOutage: true
+          });
+        } else if (data.status === "All servers are offline") {
           setSystemStatus({
             status: false,
             partialOutage: false
           });
-          return;
-        }
-        
-        // Prüfen auf Teilausfälle oder komplette Ausfälle anhand der letzten Heartbeats
-        let hasFailure = false;
-        let allFailed = true;
-        let serviceCount = 0;
-        
-        // Für jeden Service den letzten Heartbeat checken
-        for (const serviceId in data.heartbeatList) {
-          serviceCount++;
-          const heartbeats = data.heartbeatList[serviceId];
-          
-          // Nur prüfen, wenn es Heartbeats gibt
-          if (heartbeats && heartbeats.length > 0) {
-            // Den letzten Heartbeat nehmen
-            const lastHeartbeat = heartbeats[heartbeats.length - 1];
-            
-            // Status prüfen (0 = ausgefallen, 1 = online)
-            if (lastHeartbeat.status === 0) {
-              hasFailure = true;
-            } else {
-              allFailed = false;
-            }
-          }
-        }
-        
-        // Wenn keine Services vorhanden sind, gehen wir vom Schlimmsten aus
-        if (serviceCount === 0) {
+        } else {
+          // Fallback for unknown status values
+          console.warn("Unknown status:", data.status);
           setSystemStatus({
             status: false,
             partialOutage: false
           });
-          return;
         }
-        
-        setSystemStatus({
-          status: !allFailed, // system ist online, wenn nicht alle ausgefallen sind
-          partialOutage: hasFailure && !allFailed // Teilausfall, wenn einige, aber nicht alle ausgefallen sind
-        });
       })
       .catch((error) => {
         console.error("Error fetching system status:", error);
