@@ -20,22 +20,47 @@ export default function Footer() {
     fetch("https://uptime.fastasfuck.net/api/status-page/heartbeat/onthepixel")
       .then((response) => response.json())
       .then((data) => {
-        // Überprüfen wir die Uptime-Daten
-        const uptimeList = data.uptimeList;
-        const heartbeatList = data.heartbeatList;
+        // Check if we have the expected data structure
+        if (!data.heartbeatList) {
+          console.error("Unexpected API response format:", data);
+          setSystemStatus({
+            status: false,
+            partialOutage: false
+          });
+          return;
+        }
         
-        // Prüfen auf Teilausfälle oder komplette Ausfälle
+        // Prüfen auf Teilausfälle oder komplette Ausfälle anhand der letzten Heartbeats
         let hasFailure = false;
         let allFailed = true;
+        let serviceCount = 0;
         
-        // Überprüfen der Uptime-Werte
-        for (const [system, uptime] of Object.entries(uptimeList)) {
-          if (uptime < 1) {
-            hasFailure = true;
+        // Für jeden Service den letzten Heartbeat checken
+        for (const serviceId in data.heartbeatList) {
+          serviceCount++;
+          const heartbeats = data.heartbeatList[serviceId];
+          
+          // Nur prüfen, wenn es Heartbeats gibt
+          if (heartbeats && heartbeats.length > 0) {
+            // Den letzten Heartbeat nehmen
+            const lastHeartbeat = heartbeats[heartbeats.length - 1];
+            
+            // Status prüfen (0 = ausgefallen, 1 = online)
+            if (lastHeartbeat.status === 0) {
+              hasFailure = true;
+            } else {
+              allFailed = false;
+            }
           }
-          if (uptime > 0) {
-            allFailed = false;
-          }
+        }
+        
+        // Wenn keine Services vorhanden sind, gehen wir vom Schlimmsten aus
+        if (serviceCount === 0) {
+          setSystemStatus({
+            status: false,
+            partialOutage: false
+          });
+          return;
         }
         
         setSystemStatus({
