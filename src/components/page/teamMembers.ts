@@ -62,7 +62,7 @@ export const teamMembers: TeamMember[] = [
     id: 8,
     discord_name: "datenflieger",
     minecraft_name: "derdatenflieger",
-    role: "developer",
+    role: "admin",
   },
   {
     id: 9,
