@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   IconBrandX,
   IconBrandDiscord,
@@ -16,14 +16,19 @@ export default function Footer() {
     partialOutage: false
   });
   
+  // Use a ref to track whether the API has responded
+  const hasApiResponded = useRef(false);
+  
   useEffect(() => {
-    // Add proper fetch options to handle CORS issues
+    let isMounted = true; // Flag to prevent state updates after component unmount
+    
+    // Fetch the status
     fetch("https://statusapi.onthepixel.workers.dev", {
       method: 'GET',
-      mode: 'cors', // Explicitly request CORS mode
       headers: {
         'Accept': 'application/json'
-      }
+      },
+      cache: 'no-store' // Prevent caching to always get fresh data
     })
       .then((response) => {
         if (!response.ok) {
@@ -32,6 +37,11 @@ export default function Footer() {
         return response.json();
       })
       .then((data) => {
+        // Only update state if component is still mounted
+        if (!isMounted) return;
+        
+        console.log("Status API response:", data); // Log the response for debugging
+        
         // Set status directly based on the API response
         if (data.status === "All servers are online") {
           setSystemStatus({
@@ -56,27 +66,25 @@ export default function Footer() {
             partialOutage: false
           });
         }
+        
+        // Mark that we've received a response
+        hasApiResponded.current = true;
       })
       .catch((error) => {
+        if (!isMounted) return;
+        
         console.error("Error fetching system status:", error);
-        // Don't show an error state to users, just default to "All Systems Operational"
-        setSystemStatus({
-          status: true,
-          partialOutage: false
-        });
+        // Don't change the status display on error
+        
+        // Still mark as responded so we don't override with default values
+        hasApiResponded.current = true;
       });
-      
-    // Set a timeout to handle cases where the API might be completely unreachable
-    const timeoutId = setTimeout(() => {
-      setSystemStatus({
-        status: true,
-        partialOutage: false
-      });
-    }, 5000); // 5 seconds timeout
     
-    // Clean up the timeout when component unmounts or effect runs again
-    return () => clearTimeout(timeoutId);
-  }, []);
+    // Cleanup function to prevent memory leaks and state updates after unmount
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array ensures this only runs once at mount
   
   return (
     <footer className="px-4 py-12 md:px-6">
