@@ -62,35 +62,29 @@ export default function Privacy() {
             and enforce our policies.
           </p>
           
-          <h2 className="text-xl font-semibold mt-8 mb-4">6. Cookies and Tracking Technologies</h2>
+          <h2 className="text-xl font-semibold mt-8 mb-4">6. Third-Party Services</h2>
           <p>
-            Our website uses cookies and similar tracking technologies to collect information about your browsing activities. 
-            You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not 
-            accept cookies, you may not be able to use some portions of our website.
-          </p>
-          
-          <h2 className="text-xl font-semibold mt-8 mb-4">7. Third-Party Services</h2>
-          <p>
-            We may use third-party services such as Google Analytics, Discord, and other services to help us operate our services and 
+            We may use third-party services such as Vercel Analytics, Discord, and other services to help us operate our services and 
             website. These services may collect information sent by your browser as part of their operations. These third parties have 
             their own privacy policies addressing how they use such information.
           </p>
           
-          <h3 className="text-lg font-semibold mt-4 mb-2">7.1. Google Analytics</h3>
+          <h3 className="text-lg font-semibold mt-4 mb-2">6.1. Vercel Analytics</h3>
           <p>
-            We use Google Analytics to analyze the use of our website. Google Analytics gathers information about website use by means of cookies. 
-            The information gathered is used to create reports about the use of our website. Google's privacy policy is available at: 
-            <a href="https://www.google.com/policies/privacy/" className="text-green-400 hover:text-green-300"> https://www.google.com/policies/privacy/</a>
+            We use Vercel Analytics to analyze the use of our website. Vercel Analytics gathers anonymous information about website use to help 
+            us understand how visitors interact with our site. This information is used to create reports about the use of our website. 
+            Vercel's privacy policy is available at: 
+            <a href="https://vercel.com/legal/privacy-policy" className="text-green-400 hover:text-green-300"> https://vercel.com/legal/privacy-policy</a>
           </p>
           
-          <h2 className="text-xl font-semibold mt-8 mb-4">8. Data Security</h2>
+          <h2 className="text-xl font-semibold mt-8 mb-4">7. Data Security</h2>
           <p>
             We implement appropriate technical and organizational measures to protect your personal data against unauthorized or 
             unlawful processing, accidental loss, destruction, or damage. However, please note that no method of transmission over 
             the Internet or method of electronic storage is 100% secure.
           </p>
           
-          <h2 className="text-xl font-semibold mt-8 mb-4">9. Your Rights</h2>
+          <h2 className="text-xl font-semibold mt-8 mb-4">8. Your Rights</h2>
           <p>
             Depending on your location, you may have the following rights regarding your personal data:
           </p>
@@ -103,20 +97,20 @@ export default function Privacy() {
             <li>The right to withdraw consent</li>
           </ul>
           
-          <h2 className="text-xl font-semibold mt-8 mb-4">10. Children's Privacy</h2>
+          <h2 className="text-xl font-semibold mt-8 mb-4">9. Children's Privacy</h2>
           <p>
             Our services are not directed to individuals under the age of 13, or the applicable age of digital consent in your country. 
             If we become aware that we have collected personal data from children without verification of parental consent, 
             we take steps to remove that information from our servers.
           </p>
           
-          <h2 className="text-xl font-semibold mt-8 mb-4">11. Changes to This Privacy Policy</h2>
+          <h2 className="text-xl font-semibold mt-8 mb-4">10. Changes to This Privacy Policy</h2>
           <p>
             We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page 
             and updating the "Last Updated" date. You are advised to review this Privacy Policy periodically for any changes.
           </p>
           
-          <h2 className="text-xl font-semibold mt-8 mb-4">12. Contact Us</h2>
+          <h2 className="text-xl font-semibold mt-8 mb-4">11. Contact Us</h2>
           <p>
             If you have any questions about this Privacy Policy, please contact us at:
           </p>
@@ -127,7 +121,7 @@ export default function Privacy() {
             Discord: <a href="https://discord.com/invite/Dpx3eK9t3z" className="text-green-400 hover:text-green-300">https://discord.com/invite/Dpx3eK9t3z</a>
           </p>
           
-          <p className="mt-8 text-gray-400">Last Updated: March 11, 2025</p>
+          <p className="mt-8 text-gray-400">Last Updated: March 13, 2025</p>
         </div>
       </section>
     </>
