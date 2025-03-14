@@ -36,10 +36,19 @@ export default function DuelsLeaderboard() {
     try {
       // In production
       const response = await fetch("https://api.onthepixel.net/leaderbords/duels/wins");
-      const data: ApiResponse = await response.json();
+      const data = await response.json();
       
-      setLeaderboard(data.data);
-      setTitle(data.title);
+      // Check if data is an empty array (no players)
+      if (Array.isArray(data) && data.length === 0) {
+        setLeaderboard([]);
+      } else if (data && data.data) {
+        // Normal response with data
+        setLeaderboard(data.data);
+        if (data.title) setTitle(data.title);
+      } else {
+        // Unexpected response format
+        setLeaderboard([]);
+      }
       setError(null);
     } catch (err) {
       console.error("Error fetching leaderboard:", err);
