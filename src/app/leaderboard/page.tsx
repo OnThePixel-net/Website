@@ -21,8 +21,8 @@ export default function Leaderboards() {
             <LeaderboardCard 
               title="Pixels"
               description="The Pixels leaderboard shows the richest players on the server."
-              link="#"
-              enabled={false}
+              link="/leaderboard/pixels"
+              enabled={true}
               comingSoon={true}
             />
             

@@ -36,28 +36,26 @@ export default function DuelsLeaderboard() {
     try {
       // In production
       const response = await fetch("https://api.onthepixel.net/leaderbords/duels/wins");
-      const data: ApiResponse = await response.json();
+      const data = await response.json();
       
-      setLeaderboard(data.data);
-      setTitle(data.title);
+      // Check if data is an empty array (no players)
+      if (Array.isArray(data) && data.length === 0) {
+        setLeaderboard([]);
+      } else if (data && data.data) {
+        // Normal response with data
+        setLeaderboard(data.data);
+        if (data.title) setTitle(data.title);
+      } else {
+        // Unexpected response format
+        setLeaderboard([]);
+      }
       setError(null);
     } catch (err) {
       console.error("Error fetching leaderboard:", err);
       setError("Failed to load leaderboard data. Please try again later.");
       
       // Fallback data for development
-      setLeaderboard([
-        {
-          rank: 1,
-          uuid: "81e09c19-540b-4e01-9c57-40eb456e1e7e",
-          name: "No Conection",
-          wins: 0,
-          losses: 0,
-          total_games: 0,
-          win_rate: "1000.00%",
-          kd_ratio: "∞"
-        }
-      ]);
+      setLeaderboard([]);
     } finally {
       setLoading(false);
     }
