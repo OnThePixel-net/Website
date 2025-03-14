@@ -46,18 +46,7 @@ export default function DuelsLeaderboard() {
       setError("Failed to load leaderboard data. Please try again later.");
       
       // Fallback data for development
-      setLeaderboard([
-        {
-          rank: 1,
-          uuid: "81e09c19-540b-4e01-9c57-40eb456e1e7e",
-          name: "No Conection",
-          wins: 0,
-          losses: 0,
-          total_games: 0,
-          win_rate: "1000.00%",
-          kd_ratio: "∞"
-        }
-      ]);
+      setLeaderboard([]);
     } finally {
       setLoading(false);
     }
