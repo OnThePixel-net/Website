@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import CookieSettingsButton from "@/components/cookie-settings-button";
 import { useEffect, useState, useRef } from "react";
 import {
   IconBrandX,
@@ -396,6 +397,7 @@ export default function Footer() {
           <p className="mb-4 text-sm text-gray-400 md:mb-0">
             Copyright &copy; 2022-{new Date().getFullYear()} OnThePixel.net -
             All Rights Reserved. - Not affiliated with Mojang or Microsoft!
+            <CookieSettingsButton />
           </p>
           <Button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
