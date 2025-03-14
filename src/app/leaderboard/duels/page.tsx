@@ -39,15 +39,9 @@ export default function DuelsLeaderboard() {
       const data = await response.json();
       
       if (data.error) {
-        // Handle the specific error case from the API
-        if (data.error === "Keine Spielerdaten gefunden") {
-          // When API explicitly tells us there are no players
-          setLeaderboard([]);
-          setError(null);
-        } else {
-          // Handle other API errors
-          setError(data.error);
-        }
+        // Set the error from the API
+        setError(data.error);
+        setLeaderboard([]);
       } else {
         // Normal success case
         setLeaderboard(data.data);
@@ -57,8 +51,6 @@ export default function DuelsLeaderboard() {
     } catch (err) {
       console.error("Error fetching leaderboard:", err);
       setError("Failed to load leaderboard data. Please try again later.");
-      
-      // Fallback data for development
       setLeaderboard([]);
     } finally {
       setLoading(false);
@@ -85,7 +77,7 @@ export default function DuelsLeaderboard() {
                 <div className="flex justify-center items-center h-64">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
                 </div>
-              ) : error ? (
+              ) : error && error !== "Keine Spielerdaten gefunden" ? (
                 <div className="text-center text-red-500 p-4">{error}</div>
               ) : (
                 <div className="overflow-x-auto">
