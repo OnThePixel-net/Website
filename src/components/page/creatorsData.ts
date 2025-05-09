@@ -58,19 +58,6 @@ export const creators: Creator[] = [
     }
   },
   {
-    id: 4,
-    name: "PatchNote",
-    minecraftName: "Smart_PatchNote",
-    description: "Nett hier, aber wurden sie schon mal Ausgemistet?",
-    platforms: {
-      youtube: "https://www.youtube.com/@El_PatchNote",
-      twitch: "https://www.twitch.tv/patchnote",
-      tiktok: "https://www.tiktok.com/@patchnoteyt",
-      twitter: "https://x.com/ElPatchNote",
-      discord: "https://discord.gg/cmM78zp8zn"
-    }
-  },
-  {
     id: 5,
     name: "IceBook",
     minecraftName: "icebook_",
