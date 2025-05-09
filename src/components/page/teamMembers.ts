@@ -56,45 +56,9 @@ export const teamMembers: TeamMember[] = [
     role: "builder",
   },
   {
-    id: 7,
-    discord_name: "themexot",
-    minecraft_name: "themexot",
-    role: "supporter",
-  },
-  {
-    id: 8,
-    discord_name: "Datenflieger",
-    minecraft_name: "derdatenflieger",
-    role: "admin",
-  },
-  {
-    id: 9,
-    discord_name: "Mercyoncrack",
-    minecraft_name: "o_o4",
-    role: "builder",
-  },
-  {
-    id: 10,
-    discord_name: "/home/leo",
-    minecraft_name: "Lele7663",
-    role: "developer",
-  },
-  {
-    id: 11,
-    discord_name: "Ausmister PatchNote",
-    minecraft_name: "Smart_PatchNote",
-    role: "supporter",
-  },
-  {
     id: 12,
     discord_name: "Spire Event",
     minecraft_name: "SpireEvent",
     role: "socialmanager",
-  },
-  {
-    id: 13,
-    discord_name: "CoinsAPI",
-    minecraft_name: "coinsapi",
-    role: "developer",
   },
 ];
