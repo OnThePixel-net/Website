@@ -153,7 +153,7 @@ export default function Page() {
             </p>
             <div className="mt-4">
               <span className="inline-block bg-gray-800 rounded-md px-3 py-1 text-sm font-mono text-green-400">
-                play.onthepixel.net
+                play.buildffa.net
               </span>
             </div>
           </div>
