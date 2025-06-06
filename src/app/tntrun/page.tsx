@@ -50,7 +50,7 @@ export default function Page() {
           {/* Game Stats */}
           <div className="bg-white/10 rounded-lg p-6 mb-8">
             <h2 className="text-xl font-bold mb-4">Game Information</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-400">16</div>
                 <div className="text-sm text-gray-400">Max Players</div>
@@ -60,12 +60,8 @@ export default function Page() {
                 <div className="text-sm text-gray-400">Round Length</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-400">24/7</div>
-                <div className="text-sm text-gray-400">Available</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-400">∞</div>
-                <div className="text-sm text-gray-400">Rounds/Day</div>
+                <div className="text-2xl font-bold text-purple-400">3-6</div>
+                <div className="text-sm text-gray-400">Layers</div>
               </div>
             </div>
           </div>
