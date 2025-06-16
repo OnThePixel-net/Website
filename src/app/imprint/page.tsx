@@ -84,7 +84,21 @@ export default function ImprintEnglish() {
               *.buildffa.net
             </a>
           </p>
-          
+          <p className="mt-2">
+            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
+              *.mcwith.me
+            </a>
+          </p>
+          <p className="mt-2">
+            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
+              *.norizz.de
+            </a>
+          </p>
+          <p className="mt-2">
+            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
+              *.norizz.de
+            </a>
+          </p>
           <h2 className="text-xl font-semibold mt-8 mb-4">Liability and Copyright Notices</h2>
           <p>
             <strong>Disclaimer:</strong> The contents of this online offering have been created carefully and according to our current 
