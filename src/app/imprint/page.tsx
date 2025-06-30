@@ -60,42 +60,27 @@ export default function ImprintEnglish() {
             </a>
           </p>
           <p className="mt-2">
-            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
-              *.otp.cx
-            </a>
+            <span className="text-green-400">*.otp.cx</span>
           </p>
           <p className="mt-2">
-            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
-              *.onthepixel.net
-            </a>
+            <span className="text-green-400">*.onthepixel.net</span>
           </p>
           <p className="mt-2">
-            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
-              *.onthepixel.dev
-            </a>
+            <span className="text-green-400">*.onthepixel.dev</span>
           </p>
           <p className="mt-2">
-            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
-              *.tntrun.de
-            </a>
+            <span className="text-green-400">*.tntrun.de</span>
           </p>
           <p className="mt-2">
-            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
-              *.buildffa.net
-            </a>
+            <span className="text-green-400">*.buildffa.net</span>
           </p>
           <p className="mt-2">
-            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
-              *.mcwith.me
-            </a>
+            <span className="text-green-400">*.mcwith.me</span>
           </p>
           <p className="mt-2">
-            <a href="" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
-              *.norizz.de
-            </a>
+            <span className="text-green-400">*.norizz.de</span>
           </p>
         
-          </p>
           <h2 className="text-xl font-semibold mt-8 mb-4">Liability and Copyright Notices</h2>
           <p>
             <strong>Disclaimer:</strong> The contents of this online offering have been created carefully and according to our current 
