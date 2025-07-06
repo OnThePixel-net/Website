@@ -46,7 +46,7 @@ export default function Leaderboards() {
             
             {/* Parkour Leaderboard */}
             <LeaderboardCard 
-              title="Parkour"
+              title="TNTRun"
               description="Players ranked based on how far they've progressed in parkour courses."
               link="#"
               enabled={false}
@@ -55,7 +55,7 @@ export default function Leaderboards() {
             
             {/* SkyWars Leaderboard - Disabled */}
             <LeaderboardCard 
-              title="SkyWars"
+              title="BuildFFA"
               description="SkyWars leaderboards will be available soon!"
               link="#"
               enabled={false}
