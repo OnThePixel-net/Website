@@ -45,10 +45,21 @@ export default function LeaderboardComponent({
       const response = await fetch(`https://api.onthepixel.net/${endpoint}`);
       const data = await response.json();
       
+      let playersData = [];
+      
+      // Handle different API response structures
+      if (Array.isArray(data)) {
+        // Direct array (like pixels API)
+        playersData = data;
+      } else if (data && data.data && Array.isArray(data.data)) {
+        // Object with data property (like duels API)
+        playersData = data.data;
+      }
+      
       // Transform data to LeaderboardItem format
-      const transformedData = data.map((item: any, index: number) => ({
+      const transformedData = playersData.map((item: any, index: number) => ({
         position: item.rank || (index + 1),
-        username: item.name || item.player_name || item.username || `Player${index + 1},
+        username: item.name || item.player_name || item.username || `Player${index + 1}`,
         score: 0, // Remove automatic score handling
         stats: statColumns.reduce((acc, column) => {
           acc[column.key] = item[column.key] || 0;
