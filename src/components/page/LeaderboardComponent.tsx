@@ -139,7 +139,12 @@ export default function LeaderboardComponent({
                             {item.username.slice(0, 2)}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="font-medium">{item.username}</span>
+                        <a 
+                          href={`https://onthepixel.net/stats/${item.username}`}
+                          className="font-medium text-white hover:text-green-400 transition-colors underline decoration-transparent hover:decoration-current"
+                        >
+                          {item.username}
+                        </a>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right font-medium text-green-400">
