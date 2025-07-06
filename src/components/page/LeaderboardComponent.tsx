@@ -86,9 +86,6 @@ export default function LeaderboardComponent({
                 <tr className="border-b border-gray-800">
                   <th className="px-4 py-2 text-left">#</th>
                   <th className="px-4 py-2 text-left">Player</th>
-                                          <th className="px-4 py-2 text-right">
-                          {endpoint === "leaderbords/pixels" ? "Pixels" : "Score"}
-                        </th>
                   {statColumns.map((column) => (
                     <th key={column.key} className="px-4 py-2 text-right">
                       {column.label}
@@ -97,75 +94,75 @@ export default function LeaderboardComponent({
                 </tr>
               </thead>
               <tbody>
-                      {leaderboard.length > 0 ? (
-                        leaderboard.map((item) => (
-                          <tr
-                            key={item.position}
-                            className="border-b border-gray-800 hover:bg-white/5 transition-colors"
+                {leaderboard.length > 0 ? (
+                  leaderboard.map((item) => (
+                    <tr
+                      key={item.position}
+                      className="border-b border-gray-800 hover:bg-white/5 transition-colors"
+                    >
+                      <td className="px-4 py-3">
+                        {item.position <= 3 ? (
+                          <Badge
+                            variant={
+                              item.position === 1
+                                ? "default"
+                                : item.position === 2
+                                ? "secondary"
+                                : "outline"
+                            }
+                            className={
+                              item.position === 1
+                                ? "bg-yellow-500 text-black"
+                                : item.position === 2
+                                ? "bg-gray-300 text-black"
+                                : "bg-amber-700 text-white"
+                            }
                           >
-                            <td className="px-4 py-3">
-                              {item.position <= 3 ? (
-                                <Badge
-                                  variant={
-                                    item.position === 1
-                                      ? "default"
-                                      : item.position === 2
-                                      ? "secondary"
-                                      : "outline"
-                                  }
-                                  className={
-                                    item.position === 1
-                                      ? "bg-yellow-500 text-black"
-                                      : item.position === 2
-                                      ? "bg-gray-300 text-black"
-                                      : "bg-amber-700 text-white"
-                                  }
-                                >
-                                  {item.position}
-                                </Badge>
-                              ) : (
-                                item.position
-                              )}
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2">
-                                <Avatar className="h-8 w-8">
-                                  <AvatarImage
-                                    src={`https://minotar.net/helm/${item.username}`}
-                                    alt={item.username}
-                                  />
-                                  <AvatarFallback>
-                                    {item.username.slice(0, 2)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <a 
-                                  href={`https://onthepixel.net/stats/${item.username}`}
-                                  className="font-medium text-white hover:text-green-400 transition-colors underline decoration-transparent hover:decoration-current"
-                                >
-                                  {item.username}
-                                </a>
-                              </div>
-                            </td>
-                            {statColumns.map((column) => (
-                              <td
-                                key={column.key}
-                                className="px-4 py-3 text-right"
-                              >
-                                {item.stats[column.key]}
-                              </td>
-                            ))}
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td
-                            colSpan={2 + statColumns.length}
-                            className="px-4 py-8 text-center text-gray-400"
+                            {item.position}
+                          </Badge>
+                        ) : (
+                          item.position
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage
+                              src={`https://minotar.net/helm/${item.username}`}
+                              alt={item.username}
+                            />
+                            <AvatarFallback>
+                              {item.username.slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <a 
+                            href={`https://onthepixel.net/stats/${item.username}`}
+                            className="font-medium text-white hover:text-green-400 transition-colors underline decoration-transparent hover:decoration-current"
                           >
-                            No players found.
-                          </td>
-                        </tr>
-                      )}
+                            {item.username}
+                          </a>
+                        </div>
+                      </td>
+                      {statColumns.map((column) => (
+                        <td
+                          key={column.key}
+                          className="px-4 py-3 text-right"
+                        >
+                          {item.stats[column.key]}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={2 + statColumns.length}
+                      className="px-4 py-8 text-center text-gray-400"
+                    >
+                      No players found.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
