@@ -18,7 +18,10 @@ export default function PixelsLeaderboard() {
             title="Top 10 Pixel Rankings"
             description="The richest players on OnThePixel.net ranked by their total Pixels."
             endpoint="leaderbords/pixels"
-            statColumns={[]}
+            statColumns={[
+              { key: "kills", label: "Kills" },
+              { key: "deaths", label: "Deaths" }
+            ]}
           />
         </div>
       </section>
