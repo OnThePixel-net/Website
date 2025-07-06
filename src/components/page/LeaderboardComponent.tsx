@@ -35,6 +35,7 @@ export default function LeaderboardComponent({
 
   useEffect(() => {
     fetchLeaderboard();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchLeaderboard = async () => {
@@ -44,77 +45,22 @@ export default function LeaderboardComponent({
       const response = await fetch(`https://api.onthepixel.net/${endpoint}`);
       const data = await response.json();
       
-      // Check if this is the pixels endpoint (different data structure)
-      if (endpoint === "leaderbords/pixels") {
-        // Transform pixels API data to LeaderboardItem format
-        const transformedData = data.map((player: any, index: number) => ({
-          position: index + 1,
-          username: player.player_name,
-          score: player.balance,
-          stats: statColumns.reduce((acc, column) => {
-            acc[column.key] = 0; // Pixels endpoint doesn't have additional stats
-            return acc;
-          }, {} as { [key: string]: number | string }),
-        }));
-        setLeaderboard(transformedData);
-      } else {
-        // For other endpoints, generate dummy data (BedWars, etc.)
-        const dummyData = Array.from({ length: 10 }, (_, i) => ({
-          position: i + 1,
-          username: `Player${i + 1}`,
-          score: Math.floor(10000 / (i + 1)),
-          stats: statColumns.reduce((acc, column) => {
-            acc[column.key] = 
-              column.key === "kdr" 
-                ? (Math.random() * 3 + 0.5).toFixed(2) 
-                : column.key === "winRate" 
-                  ? `${Math.floor(Math.random() * 100)}%` 
-                  : Math.floor(Math.random() * 1000);
-            return acc;
-          }, {} as { [key: string]: number | string }),
-        }));
-        setLeaderboard(dummyData);
-      }
+      // Transform data to LeaderboardItem format
+      const transformedData = data.map((item: any, index: number) => ({
+        position: index + 1,
+        username: item.player_name || item.username || `Player${index + 1}`,
+        score: 0, // Remove automatic score handling
+        stats: statColumns.reduce((acc, column) => {
+          acc[column.key] = item[column.key] || 0;
+          return acc;
+        }, {} as { [key: string]: number | string }),
+      }));
       
+      setLeaderboard(transformedData);
       setError(null);
     } catch (err) {
       console.error("Error fetching leaderboard:", err);
       setError("Failed to load leaderboard data. Please try again later.");
-      
-      // Fallback data
-      if (endpoint === "leaderbords/pixels") {
-        // Pixels fallback data (current real data as of latest API call)
-        const fallbackPixelsData = [
-          { position: 1, username: "TinyBrickBoy", score: 270, stats: {} },
-          { position: 2, username: "DerDatenflieger", score: 255, stats: {} },
-          { position: 3, username: "Perverser_Perser", score: 165, stats: {} },
-          { position: 4, username: "CE_Gunner", score: 135, stats: {} },
-          { position: 5, username: "Icebook_", score: 135, stats: {} },
-          { position: 6, username: "daddy5g1rl", score: 105, stats: {} },
-          { position: 7, username: "jonasrjn", score: 30, stats: {} },
-          { position: 8, username: "Schleim70", score: 30, stats: {} },
-          { position: 9, username: "Fludon", score: 15, stats: {} },
-          { position: 10, username: "JaPe2010", score: 15, stats: {} }
-        ];
-        setLeaderboard(fallbackPixelsData);
-      } else {
-        // Other leaderboards fallback data
-        const dummyData = Array.from({ length: 10 }, (_, i) => ({
-          position: i + 1,
-          username: `Player${i + 1}`,
-          score: Math.floor(10000 / (i + 1)),
-          stats: statColumns.reduce((acc, column) => {
-            acc[column.key] = 
-              column.key === "kdr" 
-                ? (Math.random() * 3 + 0.5).toFixed(2) 
-                : column.key === "winRate" 
-                  ? `${Math.floor(Math.random() * 100)}%` 
-                  : Math.floor(Math.random() * 1000);
-            return acc;
-          }, {} as { [key: string]: number | string }),
-        }));
-        setLeaderboard(dummyData);
-      }
     } finally {
       setLoading(false);
     }
@@ -151,64 +97,75 @@ export default function LeaderboardComponent({
                 </tr>
               </thead>
               <tbody>
-                {leaderboard.map((item) => (
-                  <tr
-                    key={item.position}
-                    className="border-b border-gray-800 hover:bg-white/5 transition-colors"
-                  >
-                    <td className="px-4 py-3">
-                      {item.position <= 3 ? (
-                        <Badge
-                          variant={
-                            item.position === 1
-                              ? "default"
-                              : item.position === 2
-                              ? "secondary"
-                              : "outline"
-                          }
-                          className={
-                            item.position === 1
-                              ? "bg-yellow-500 text-black"
-                              : item.position === 2
-                              ? "bg-gray-300 text-black"
-                              : "bg-amber-700 text-white"
-                          }
-                        >
-                          {item.position}
-                        </Badge>
+                      {leaderboard.length > 0 ? (
+                        leaderboard.map((item) => (
+                          <tr
+                            key={item.position}
+                            className="border-b border-gray-800 hover:bg-white/5 transition-colors"
+                          >
+                            <td className="px-4 py-3">
+                              {item.position <= 3 ? (
+                                <Badge
+                                  variant={
+                                    item.position === 1
+                                      ? "default"
+                                      : item.position === 2
+                                      ? "secondary"
+                                      : "outline"
+                                  }
+                                  className={
+                                    item.position === 1
+                                      ? "bg-yellow-500 text-black"
+                                      : item.position === 2
+                                      ? "bg-gray-300 text-black"
+                                      : "bg-amber-700 text-white"
+                                  }
+                                >
+                                  {item.position}
+                                </Badge>
+                              ) : (
+                                item.position
+                              )}
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarImage
+                                    src={`https://minotar.net/helm/${item.username}`}
+                                    alt={item.username}
+                                  />
+                                  <AvatarFallback>
+                                    {item.username.slice(0, 2)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <a 
+                                  href={`https://onthepixel.net/stats/${item.username}`}
+                                  className="font-medium text-white hover:text-green-400 transition-colors underline decoration-transparent hover:decoration-current"
+                                >
+                                  {item.username}
+                                </a>
+                              </div>
+                            </td>
+                            {statColumns.map((column) => (
+                              <td
+                                key={column.key}
+                                className="px-4 py-3 text-right"
+                              >
+                                {item.stats[column.key]}
+                              </td>
+                            ))}
+                          </tr>
+                        ))
                       ) : (
-                        item.position
+                        <tr>
+                          <td
+                            colSpan={2 + statColumns.length}
+                            className="px-4 py-8 text-center text-gray-400"
+                          >
+                            No players found.
+                          </td>
+                        </tr>
                       )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage
-                            src={`https://minotar.net/helm/${item.username}`}
-                            alt={item.username}
-                          />
-                          <AvatarFallback>
-                            {item.username.slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <a 
-                          href={`https://onthepixel.net/stats/${item.username}`}
-                          className="font-medium text-white hover:text-green-400 transition-colors underline decoration-transparent hover:decoration-current"
-                        >
-                          {item.username}
-                        </a>
-                      </div>
-                    </td>
-                    {statColumns.map((column) => (
-                      <td
-                        key={column.key}
-                        className="px-4 py-3 text-right"
-                      >
-                        {item.stats[column.key]}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
               </tbody>
             </table>
           </div>
