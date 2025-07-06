@@ -19,7 +19,7 @@ export default function PixelsLeaderboard() {
             description="The richest players on OnThePixel.net ranked by their total Pixels."
             endpoint="leaderbords/pixels"
             statColumns={[
-              { key: "balance", label: "Balance" }
+              { key: "balance", label: "Pixels" }
             ]}
           />
         </div>
