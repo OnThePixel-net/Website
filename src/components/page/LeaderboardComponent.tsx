@@ -47,8 +47,8 @@ export default function LeaderboardComponent({
       
       // Transform data to LeaderboardItem format
       const transformedData = data.map((item: any, index: number) => ({
-        position: index + 1,
-        username: item.player_name || item.username || `Player${index + 1}`,
+        position: item.rank || (index + 1),
+        username: item.name || item.player_name || item.username || `Player${index + 1},
         score: 0, // Remove automatic score handling
         stats: statColumns.reduce((acc, column) => {
           acc[column.key] = item[column.key] || 0;
