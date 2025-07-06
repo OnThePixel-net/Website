@@ -19,11 +19,7 @@ export default function BWLeaderboard() {
             description="Players are ranked based on their overall performance in BedWars matches."
             endpoint="leaderboard/bedwars"
             statColumns={[
-              { key: "kills", label: "Kills" },
-              { key: "deaths", label: "Deaths" },
-              { key: "kdr", label: "K/D Ratio" },
-              { key: "bedsDestroyed", label: "Beds" },
-              { key: "winRate", label: "Win Rate" }
+              { key: "balance", label: "Balance" }
             ]}
           />
         </div>
