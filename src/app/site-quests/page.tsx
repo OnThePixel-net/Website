@@ -24,7 +24,7 @@ const projects: Project[] = [
     description: "Reverse proxy and DDoS protection for Minecraft servers. Keep your server online 24/7 with blazing fast connections.",
     status: "completed",
     category: "Security",
-    icon: <Zap className="h-6 w-6" />,
+    icon: <Shield className="h-6 w-6" />,
     technologies: ["DDoS Protection", "Global Proxy Network", "Open Source"],
     link: "https://fastasfuck.net"
   },
@@ -34,7 +34,7 @@ const projects: Project[] = [
     description: "Steyon is a Minecraft development team specializing in custom server solutions, plugins for the Minecraft community.",
     status: "in-progress",
     category: "Development",
-    icon: <Users className="h-6 w-6" />,
+    icon: <Code className="h-6 w-6" />,
     technologies: ["Node.js", "Java", "PostgreSQL", "Docker", "MariaDB"],
   },
   {
@@ -43,7 +43,7 @@ const projects: Project[] = [
     description: "An open source and free Minecraft status monitoring service. Check server availability and performance in real-time.",
     status: "in-progress",
     category: "Infrastructure",
-    icon: <Users className="h-6 w-6" />,
+    icon: <Zap className="h-6 w-6" />,
     technologies: ["API", "Node.js", "Open Source", "Free"],
     link: "https://McStatus.eu"
   },
@@ -53,7 +53,7 @@ const projects: Project[] = [
     description: "An open source and free Minecraft world hosting solution. Share your worlds seamlessly with friends and communities.",
     status: "planned",
     category: "Infrastructure",
-    icon: <Users className="h-6 w-6" />,
+    icon: <Globe className="h-6 w-6" />,
     technologies: ["Minecraft", "Go", "Open Source", "Free"],
     link: "https://mcwith.me"
   }
