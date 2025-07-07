@@ -182,7 +182,7 @@ export default function SiteQuests() {
                 </Button>
               </Link>
               <Link 
-                href="https://github.com/onthepixel" 
+                href="https://github.com/onthepixel-net" 
                 target="_blank" 
                 rel="noopener noreferrer"
               >
