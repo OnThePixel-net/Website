@@ -20,18 +20,18 @@ interface Project {
 const projects: Project[] = [
   {
     id: 1,
-    name: "FatsAsFuck",
-    description: "Reverse Proxy & DDoS Protection for Minecraft Servers. Stay online 24/7 with blazing fast connections.",
+    name: "FastAsFuck",
+    description: "Reverse proxy and DDoS protection for Minecraft servers. Keep your server online 24/7 with blazing fast connections.",
     status: "completed",
     category: "Security",
     icon: <Zap className="h-6 w-6" />,
-    technologies: ["DDOS Protection", "Global Proxy Network", "Open Source"],
+    technologies: ["DDoS Protection", "Global Proxy Network", "Open Source"],
     link: "https://fastasfuck.net"
   },
   {
     id: 2,
     name: "Steyon",
-    description: "Steyon is thge developer team behint OnThePixel.net.",
+    description: "Steyon is a Minecraft development team specializing in custom server solutions, plugins for the Minecraft community.",
     status: "in-progress",
     category: "Development",
     icon: <Users className="h-6 w-6" />,
@@ -40,11 +40,22 @@ const projects: Project[] = [
   {
     id: 3,
     name: "McStatus.eu",
-    description: "A Open Source and Free minecraft status page.",
+    description: "An open source and free Minecraft status monitoring service. Check server availability and performance in real-time.",
     status: "in-progress",
     category: "Infrastructure",
     icon: <Users className="h-6 w-6" />,
     technologies: ["API", "Node.js", "Open Source", "Free"],
+    link: "https://McStatus.eu"
+  },
+  {
+    id: 4,
+    name: "McWith.me",
+    description: "An open source and free Minecraft world hosting solution. Share your worlds seamlessly with friends and communities.",
+    status: "planned",
+    category: "Infrastructure",
+    icon: <Users className="h-6 w-6" />,
+    technologies: ["Minecraft", "Go", "Open Source", "Free"],
+    link: "https://mcwith.me"
   }
 ];
 
