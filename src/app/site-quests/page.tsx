@@ -142,7 +142,7 @@ export default function SiteQuests() {
                     </div>
                   )}
                   
-                  {project.link && project.status === "completed" && (
+                  {project.link && (
                     <div className="mt-4">
                       <Link href={project.link} target="_blank" rel="noopener noreferrer">
                         <Button 
