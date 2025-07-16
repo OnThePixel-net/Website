@@ -56,7 +56,7 @@ export default function Leaderboards() {
             {/* SkyWars Leaderboard - Disabled */}
             <LeaderboardCard 
               title="BuildFFA"
-              description="SkyWars leaderboards will be available soon!"
+              description="The top BuildFFA players. Build, fight, and dominate the arena!"
               link="/leaderboard/buildffa"
               enabled={true}
               comingSoon={true}
