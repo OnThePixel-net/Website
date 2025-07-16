@@ -17,7 +17,7 @@ export default function BuildFFALeaderboard() {
           <LeaderboardComponent 
             title="BuildFFA Champions"
             description="Players are ranked based on their kills, deaths, and overall performance in BuildFFA matches."
-            endpoint="leaderboards/Buildffa"
+            endpoint="leaderbords/Buildffa"
             statColumns={[
               { key: "statsAllKills", label: "Kills" },
               { key: "statsAllDeaths", label: "Deaths" }
