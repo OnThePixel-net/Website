@@ -11,7 +11,7 @@ import {
   CardDescription 
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Sword, Trophy, Target, Zap } from "lucide-react";
+import { Search, Sword, Trophy, Target, Zap, Hammer, Bomb } from "lucide-react";
 
 // Define types for our stats
 interface PlayerStats {
@@ -43,10 +43,31 @@ interface PlayerStats {
       winRate: number;
       gamesPlayed: number;
     };
-    parkour: {
-      completions: number;
-      bestTime: string;
-      checkpoint: number;
+    duels: {
+      wins: number;
+      losses: number;
+      kills: number;
+      deaths: number;
+      kdr: number;
+      winRate: number;
+      gamesPlayed: number;
+    };
+    tntrun: {
+      wins: number;
+      losses: number;
+      gamesPlayed: number;
+      winRate: number;
+      timeSurvived: number;
+    };
+    buildffa: {
+      wins: number;
+      losses: number;
+      kills: number;
+      deaths: number;
+      kdr: number;
+      winRate: number;
+      gamesPlayed: number;
+      buildsCompleted: number;
     };
   };
 }
@@ -75,10 +96,28 @@ interface BedwarsResponse {
   games_played?: number;
 }
 
-interface ParkourResponse {
-  completions?: number;
-  best_time?: string;
-  checkpoint?: number;
+interface DuelsResponse {
+  wins?: number;
+  losses?: number;
+  kills?: number;
+  deaths?: number;
+  games_played?: number;
+}
+
+interface TNTRunResponse {
+  wins?: number;
+  losses?: number;
+  games_played?: number;
+  time_survived?: number;
+}
+
+interface BuildFFAResponse {
+  wins?: number;
+  losses?: number;
+  kills?: number;
+  deaths?: number;
+  games_played?: number;
+  builds_completed?: number;
 }
 
 export default function PlayerStatistics() {
@@ -158,26 +197,16 @@ export default function PlayerStatistics() {
   };
 
   // Format time in seconds to readable format
-  const formatTime = (timeString: string | undefined): string => {
-    if (!timeString) return '0s';
+  const formatTime = (timeInSeconds: number | undefined): string => {
+    if (!timeInSeconds || timeInSeconds === 0) return '0s';
     
-    try {
-      const seconds = parseFloat(timeString);
-      if (isNaN(seconds)) return '0s';
-      
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = Math.floor(seconds % 60);
-      const milliseconds = Math.floor((seconds % 1) * 1000);
-      
-      if (minutes > 0) {
-        return `${minutes}m ${remainingSeconds}s`;
-      } else if (remainingSeconds > 0) {
-        return `${remainingSeconds}.${milliseconds.toString().padStart(3, '0')}s`;
-      } else {
-        return `${milliseconds}ms`;
-      }
-    } catch {
-      return '0s';
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    
+    if (minutes > 0) {
+      return `${minutes}m ${seconds}s`;
+    } else {
+      return `${seconds}s`;
     }
   };
 
@@ -246,10 +275,31 @@ export default function PlayerStatistics() {
             winRate: 0,
             gamesPlayed: 0
           },
-          parkour: {
-            completions: 0,
-            bestTime: "0s",
-            checkpoint: 0
+          duels: {
+            wins: 0,
+            losses: 0,
+            kills: 0,
+            deaths: 0,
+            kdr: 0,
+            winRate: 0,
+            gamesPlayed: 0
+          },
+          tntrun: {
+            wins: 0,
+            losses: 0,
+            gamesPlayed: 0,
+            winRate: 0,
+            timeSurvived: 0
+          },
+          buildffa: {
+            wins: 0,
+            losses: 0,
+            kills: 0,
+            deaths: 0,
+            kdr: 0,
+            winRate: 0,
+            gamesPlayed: 0,
+            buildsCompleted: 0
           }
         }
       };
@@ -327,21 +377,82 @@ export default function PlayerStatistics() {
         // Keep default bedwars values
       }
 
-      // Fetch Parkour stats
+      // Fetch Duels stats
       try {
-        const parkourResponse = await fetch(`https://api.onthepixel.net/stats/parkour/${name}`);
-        if (parkourResponse.ok) {
-          const parkourData: ParkourResponse = await parkourResponse.json();
+        const duelsResponse = await fetch(`https://api.onthepixel.net/stats/duels/${name}`);
+        if (duelsResponse.ok) {
+          const duelsData: DuelsResponse = await duelsResponse.json();
           
-          playerData.stats.parkour = {
-            completions: parkourData?.completions ?? 0,
-            bestTime: formatTime(parkourData?.best_time),
-            checkpoint: parkourData?.checkpoint ?? 0
+          const wins = duelsData?.wins ?? 0;
+          const losses = duelsData?.losses ?? 0;
+          const kills = duelsData?.kills ?? 0;
+          const deaths = duelsData?.deaths ?? 0;
+          const gamesPlayed = duelsData?.games_played ?? (wins + losses);
+          
+          playerData.stats.duels = {
+            wins,
+            losses,
+            kills,
+            deaths,
+            kdr: calculateKDR(kills, deaths),
+            winRate: calculateWinRate(wins, gamesPlayed),
+            gamesPlayed
           };
         }
-      } catch (parkourError) {
-        console.error("Error fetching parkour data:", parkourError);
-        // Keep default parkour values
+      } catch (duelsError) {
+        console.error("Error fetching duels data:", duelsError);
+        // Keep default duels values
+      }
+
+      // Fetch TNTRun stats
+      try {
+        const tntrunResponse = await fetch(`https://api.onthepixel.net/stats/tntrun/${name}`);
+        if (tntrunResponse.ok) {
+          const tntrunData: TNTRunResponse = await tntrunResponse.json();
+          
+          const wins = tntrunData?.wins ?? 0;
+          const losses = tntrunData?.losses ?? 0;
+          const gamesPlayed = tntrunData?.games_played ?? (wins + losses);
+          
+          playerData.stats.tntrun = {
+            wins,
+            losses,
+            gamesPlayed,
+            winRate: calculateWinRate(wins, gamesPlayed),
+            timeSurvived: tntrunData?.time_survived ?? 0
+          };
+        }
+      } catch (tntrunError) {
+        console.error("Error fetching tntrun data:", tntrunError);
+        // Keep default tntrun values
+      }
+
+      // Fetch BuildFFA stats
+      try {
+        const buildffaResponse = await fetch(`https://api.onthepixel.net/stats/buildffa/${name}`);
+        if (buildffaResponse.ok) {
+          const buildffaData: BuildFFAResponse = await buildffaResponse.json();
+          
+          const wins = buildffaData?.wins ?? 0;
+          const losses = buildffaData?.losses ?? 0;
+          const kills = buildffaData?.kills ?? 0;
+          const deaths = buildffaData?.deaths ?? 0;
+          const gamesPlayed = buildffaData?.games_played ?? (wins + losses);
+          
+          playerData.stats.buildffa = {
+            wins,
+            losses,
+            kills,
+            deaths,
+            kdr: calculateKDR(kills, deaths),
+            winRate: calculateWinRate(wins, gamesPlayed),
+            gamesPlayed,
+            buildsCompleted: buildffaData?.builds_completed ?? 0
+          };
+        }
+      } catch (buildffaError) {
+        console.error("Error fetching buildffa data:", buildffaError);
+        // Keep default buildffa values
       }
       
       // Special test case
@@ -481,17 +592,17 @@ export default function PlayerStatistics() {
             </CardContent>
           </Card>
 
-          {/* Gamemode Stats */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Gamemode Stats Grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             {/* Bedwars Stats */}
             <Card className="bg-gray-900/50 border-gray-800">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-red-400">
                   <Sword className="h-5 w-5" />
-                  Bedwars
+                  BedWars
                 </CardTitle>
                 <CardDescription>
-                  Combat and strategy statistics
+                  Bed destruction and combat statistics
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -532,47 +643,133 @@ export default function PlayerStatistics() {
               </CardContent>
             </Card>
 
-            {/* Parkour Stats */}
+            {/* Duels Stats */}
             <Card className="bg-gray-900/50 border-gray-800">
               <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-blue-400">
+                <CardTitle className="flex items-center gap-2 text-purple-400">
                   <Zap className="h-5 w-5" />
-                  Parkour
+                  Duels
                 </CardTitle>
                 <CardDescription>
-                  Movement and precision statistics
+                  1v1 combat and skill statistics
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <StatItem 
-                  label="Completions" 
-                  value={stats.stats.parkour.completions.toLocaleString()} 
+                  label="Wins" 
+                  value={stats.stats.duels.wins.toLocaleString()} 
                   icon={<Trophy className="h-4 w-4 text-yellow-400" />}
                 />
                 <StatItem 
-                  label="Best Time" 
-                  value={stats.stats.parkour.bestTime} 
+                  label="Losses" 
+                  value={stats.stats.duels.losses.toLocaleString()} 
                 />
                 <StatItem 
-                  label="Current Checkpoint" 
-                  value={stats.stats.parkour.checkpoint.toLocaleString()} 
+                  label="Win Rate" 
+                  value={`${stats.stats.duels.winRate}%`} 
                 />
-                <div className="p-3 bg-gray-800/30 rounded-lg">
-                  <div className="text-center">
-                    <p className="text-gray-400 text-sm mb-1">Completion Status</p>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="bg-blue-400 h-2 rounded-full transition-all duration-300" 
-                        style={{ 
-                          width: `${Math.min((stats.stats.parkour.checkpoint / 100) * 100, 100)}%` 
-                        }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {stats.stats.parkour.checkpoint}/100 checkpoints
-                    </p>
-                  </div>
-                </div>
+                <StatItem 
+                  label="Kills" 
+                  value={stats.stats.duels.kills.toLocaleString()} 
+                  icon={<Target className="h-4 w-4 text-red-400" />}
+                />
+                <StatItem 
+                  label="Deaths" 
+                  value={stats.stats.duels.deaths.toLocaleString()} 
+                />
+                <StatItem 
+                  label="K/D Ratio" 
+                  value={stats.stats.duels.kdr} 
+                />
+                <StatItem 
+                  label="Games Played" 
+                  value={stats.stats.duels.gamesPlayed.toLocaleString()} 
+                />
+              </CardContent>
+            </Card>
+
+            {/* TNTRun Stats */}
+            <Card className="bg-gray-900/50 border-gray-800">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-orange-400">
+                  <Bomb className="h-5 w-5" />
+                  TNTRun
+                </CardTitle>
+                <CardDescription>
+                  Survival and endurance statistics
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <StatItem 
+                  label="Wins" 
+                  value={stats.stats.tntrun.wins.toLocaleString()} 
+                  icon={<Trophy className="h-4 w-4 text-yellow-400" />}
+                />
+                <StatItem 
+                  label="Losses" 
+                  value={stats.stats.tntrun.losses.toLocaleString()} 
+                />
+                <StatItem 
+                  label="Win Rate" 
+                  value={`${stats.stats.tntrun.winRate}%`} 
+                />
+                <StatItem 
+                  label="Games Played" 
+                  value={stats.stats.tntrun.gamesPlayed.toLocaleString()} 
+                />
+                <StatItem 
+                  label="Total Time Survived" 
+                  value={formatTime(stats.stats.tntrun.timeSurvived)} 
+                />
+              </CardContent>
+            </Card>
+
+            {/* BuildFFA Stats */}
+            <Card className="bg-gray-900/50 border-gray-800">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-green-400">
+                  <Hammer className="h-5 w-5" />
+                  BuildFFA
+                </CardTitle>
+                <CardDescription>
+                  Building and combat statistics
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <StatItem 
+                  label="Wins" 
+                  value={stats.stats.buildffa.wins.toLocaleString()} 
+                  icon={<Trophy className="h-4 w-4 text-yellow-400" />}
+                />
+                <StatItem 
+                  label="Losses" 
+                  value={stats.stats.buildffa.losses.toLocaleString()} 
+                />
+                <StatItem 
+                  label="Win Rate" 
+                  value={`${stats.stats.buildffa.winRate}%`} 
+                />
+                <StatItem 
+                  label="Kills" 
+                  value={stats.stats.buildffa.kills.toLocaleString()} 
+                  icon={<Target className="h-4 w-4 text-red-400" />}
+                />
+                <StatItem 
+                  label="Deaths" 
+                  value={stats.stats.buildffa.deaths.toLocaleString()} 
+                />
+                <StatItem 
+                  label="K/D Ratio" 
+                  value={stats.stats.buildffa.kdr} 
+                />
+                <StatItem 
+                  label="Builds Completed" 
+                  value={stats.stats.buildffa.buildsCompleted.toLocaleString()} 
+                />
+                <StatItem 
+                  label="Games Played" 
+                  value={stats.stats.buildffa.gamesPlayed.toLocaleString()} 
+                />
               </CardContent>
             </Card>
           </div>
