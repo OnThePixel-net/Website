@@ -52,8 +52,18 @@ interface PlayerStats {
 }
 
 interface RankResponse {
-  uuid: string;
-  rank: string;
+  uuid?: string;
+  rank?: string;
+}
+
+interface PixelResponse {
+  balance?: number;
+}
+
+interface PlaytimeResponse {
+  playtime?: number;
+  first_joined?: string;
+  last_online?: string;
 }
 
 export default function PlayerStatistics() {
@@ -71,7 +81,9 @@ export default function PlayerStatistics() {
   }, []);
 
   // Parse Minecraft rank color codes to Hex values
-  const parseColorCode = (colorCode: string): string => {
+  const parseColorCode = (colorCode: string | undefined): string => {
+    if (!colorCode) return '#FFFFFF';
+    
     const colorMap: Record<string, string> = {
       '0': '#000000', // Black
       '1': '#0000AA', // Dark Blue
@@ -101,13 +113,16 @@ export default function PlayerStatistics() {
   };
 
   // Extract rank name from color-coded string
-  const extractRankName = (rankString: string): string => {
+  const extractRankName = (rankString: string | undefined): string => {
+    if (!rankString) return 'Member';
     // Remove color codes (& or § followed by a character)
-    return rankString.replace(/[&§][0-9a-fA-F]/g, '').trim();
+    return rankString.replace(/[&§][0-9a-fA-F]/g, '').trim() || 'Member';
   };
 
   // Helper function to format playtime from milliseconds
-  const formatPlaytime = (milliseconds: number): string => {
+  const formatPlaytime = (milliseconds: number | undefined): string => {
+    if (!milliseconds || milliseconds === 0) return '0m';
+    
     // Convert milliseconds to seconds, minutes, hours, and days
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -127,6 +142,22 @@ export default function PlayerStatistics() {
     }
   };
 
+  // Safe date formatter
+  const safeFormatDate = (dateString: string | undefined): string => {
+    if (!dateString) return 'Unknown';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Unknown';
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    } catch {
+      return 'Unknown';
+    }
+  };
+
   const fetchPlayerStats = async (name: string) => {
     if (!name) return;
     
@@ -134,89 +165,90 @@ export default function PlayerStatistics() {
     setError(null);
     
     try {
-      // Create initial player data structure
+      // Create initial player data structure with safe defaults
       let playerData: PlayerStats = {
         playerinfo: {
           username: name,
-          uuid: "00000000-0000-0000-0000-000000000000", // Will be updated with actual UUID
-          firstLogin: "2023-08-15",
-          lastLogin: "2025-03-05",
+          uuid: "00000000-0000-0000-0000-000000000000",
+          firstLogin: "",
+          lastLogin: "",
           rank: {
-            id: "Member", // Will be updated with rank from API
-            color: "#AAAAAA"  // Will be updated with color from API
+            id: "Member",
+            color: "#AAAAAA"
           }
         },
         stats: {
           playtime: {
             total: 0,
-            pretty: "0h 0m"
+            pretty: "0m"
           },
           balance: {
             pixels: 0
           },
           bedwars: {
-            wins: 47,
-            losses: 53,
-            kills: 182,
-            deaths: 165,
-            bedsDestroyed: 35,
-            kdr: 1.1,
-            winRate: 47,
-            gamesPlayed: 100
+            wins: 0,
+            losses: 0,
+            kills: 0,
+            deaths: 0,
+            bedsDestroyed: 0,
+            kdr: 0,
+            winRate: 0,
+            gamesPlayed: 0
           },
           parkour: {
-            completions: 8,
-            bestTime: "1m 45s",
-            checkpoint: 12
+            completions: 0,
+            bestTime: "0s",
+            checkpoint: 0
           }
         }
       };
       
-      // Fetch playtime data from API
+      // Fetch pixels data from API with safe handling
       try {
         const pixelResponse = await fetch(`https://api.onthepixel.net/stats/pixel/${name}`);
-        const pixelData = await pixelResponse.json();
-        
-        // Update player data with playtime information
-        playerData.stats.balance.pixels = pixelData.balance;
+        if (pixelResponse.ok) {
+          const pixelData: PixelResponse = await pixelResponse.json();
+          playerData.stats.balance.pixels = pixelData?.balance ?? 0;
+        }
       } catch (pixelError) {
         console.error("Error fetching pixels data:", pixelError);
-        // Keep default playtime data if fetch fails
+        playerData.stats.balance.pixels = 0;
       }
 
-      // Fetch playtime data from API
+      // Fetch playtime data from API with safe handling
       try {
         const playtimeResponse = await fetch(`https://api.onthepixel.net/stats/playtime/${name}`);
-        const playtimeData = await playtimeResponse.json();
-        
-        // Update player data with playtime information
-        playerData.stats.playtime.total = playtimeData.playtime;
-        playerData.stats.playtime.pretty = formatPlaytime(playtimeData.playtime);
-        playerData.playerinfo.firstLogin = playtimeData.first_joined;
-        playerData.playerinfo.lastLogin = playtimeData.last_online;
+        if (playtimeResponse.ok) {
+          const playtimeData: PlaytimeResponse = await playtimeResponse.json();
+          
+          playerData.stats.playtime.total = playtimeData?.playtime ?? 0;
+          playerData.stats.playtime.pretty = formatPlaytime(playtimeData?.playtime);
+          playerData.playerinfo.firstLogin = playtimeData?.first_joined ?? "";
+          playerData.playerinfo.lastLogin = playtimeData?.last_online ?? "";
+        }
       } catch (playtimeError) {
         console.error("Error fetching playtime data:", playtimeError);
-        // Keep default playtime data if fetch fails
+        // Keep default values (already set to safe defaults)
       }
       
+      // Fetch rank data with safe handling
       try {
-        // Make the API call using the player name to get rank
         const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${name}`);
-        const rankData: RankResponse = await rankResponse.json();
-        
-        // Update the player UUID from the response
-        playerData.playerinfo.uuid = rankData.uuid;
-        
-        // Update the player info with the rank data
-        playerData.playerinfo.rank = {
-          id: extractRankName(rankData.rank),
-          color: parseColorCode(rankData.rank)
-        };
+        if (rankResponse.ok) {
+          const rankData: RankResponse = await rankResponse.json();
+          
+          playerData.playerinfo.uuid = rankData?.uuid ?? "00000000-0000-0000-0000-000000000000";
+          playerData.playerinfo.rank = {
+            id: extractRankName(rankData?.rank),
+            color: parseColorCode(rankData?.rank)
+          };
+        }
       } catch (rankError) {
         console.error("Error fetching rank data:", rankError);
-        // If rank fetch fails, keep the default rank
+        // Keep default rank values
       }
       
+      // Special test case
       if (name.toLowerCase() === 'error') {
         throw new Error("Player not found");
       }
@@ -245,14 +277,9 @@ export default function PlayerStatistics() {
     fetchPlayerStats(username);
   };
 
-  // Format dates to be more readable
+  // Format dates to be more readable with safe handling
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    return safeFormatDate(dateString);
   };
 
   return (
