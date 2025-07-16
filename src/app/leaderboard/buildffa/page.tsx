@@ -11,7 +11,7 @@ export default function BuildFFALeaderboard() {
         <div className="container mx-auto px-4 py-10">
           <h1 className="text-2xl font-bold mb-5">BUILDFFA LEADERBOARD</h1>
           <p className="mb-8 text-gray-400">
-            The top BuildFFA players on OnThePixel.net. Build, fight, and dominate the arena!
+            The top BuildFFA players. Build, fight, and dominate the arena!
           </p>
           
           <LeaderboardComponent 
