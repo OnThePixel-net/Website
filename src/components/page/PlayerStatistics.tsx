@@ -177,12 +177,12 @@ export default function PlayerStatistics() {
       // Fetch playtime data from API
       try {
         const pixelResponse = await fetch(`https://api.onthepixel.net/stats/pixel/${name}`);
-        const pixelData = await playtimeResponse.json();
+        const pixelData = await pixelResponse.json();
         
         // Update player data with playtime information
-        playerData.stats.balance.pixels = playtimeData.balance;
-      } catch (playtimeError) {
-        console.error("Error fetching playtime data:", playtimeError);
+        playerData.stats.balance.pixels = pixelData.balance;
+      } catch (pixelError) {
+        console.error("Error fetching pixels data:", pixelError);
         // Keep default playtime data if fetch fails
       }
 
