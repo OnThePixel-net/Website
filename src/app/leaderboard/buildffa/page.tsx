@@ -3,7 +3,7 @@ import React from "react";
 import TopPage from "@/components/page/top";
 import LeaderboardComponent from "@/components/page/LeaderboardComponent";
 
-export default function ParkourLeaderboard() {
+export default function BuildFFALeaderboard() {
   return (
     <div className="min-h-screen bg-gray-950">
       <TopPage />
@@ -11,13 +11,13 @@ export default function ParkourLeaderboard() {
         <div className="container mx-auto px-4 py-10">
           <h1 className="text-2xl font-bold mb-5">BUILDFFA LEADERBOARD</h1>
           <p className="mb-8 text-gray-400">
-            The fastest parkour runners on OnThePixel.net. Challenge yourself to beat these records!
+            The top BuildFFA players on OnThePixel.net. Build, fight, and dominate the arena!
           </p>
           
           <LeaderboardComponent 
-            title="Parkour Masters"
-            description="Players are ranked based on their completion time and course difficulty."
-            endpoint="leaderbords/Buildffa"
+            title="BuildFFA Champions"
+            description="Players are ranked based on their kills, deaths, and overall performance in BuildFFA matches."
+            endpoint="leaderboards/Buildffa"
             statColumns={[
               { key: "statsAllKills", label: "Kills" },
               { key: "statsAllDeaths", label: "Deaths" }
