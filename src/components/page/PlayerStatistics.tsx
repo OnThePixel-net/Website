@@ -176,6 +176,18 @@ export default function PlayerStatistics() {
       
       // Fetch playtime data from API
       try {
+        const pixelResponse = await fetch(`https://api.onthepixel.net/stats/pixel/${name}`);
+        const pixelData = await playtimeResponse.json();
+        
+        // Update player data with playtime information
+        playerData.stats.balance.pixels = playtimeData.balance;
+      } catch (playtimeError) {
+        console.error("Error fetching playtime data:", playtimeError);
+        // Keep default playtime data if fetch fails
+      }
+
+      // Fetch playtime data from API
+      try {
         const playtimeResponse = await fetch(`https://api.onthepixel.net/stats/playtime/${name}`);
         const playtimeData = await playtimeResponse.json();
         
