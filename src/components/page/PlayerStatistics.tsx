@@ -32,7 +32,6 @@ interface PlayerStats {
     };
     balance: {
       pixels: number;
-      shards: number;
     };
     bedwars: {
       wins: number;
@@ -153,8 +152,7 @@ export default function PlayerStatistics() {
             pretty: "0h 0m"
           },
           balance: {
-            pixels: 15000,
-            shards: 320
+            pixels: 0
           },
           bedwars: {
             wins: 47,
@@ -340,8 +338,6 @@ export default function PlayerStatistics() {
                       <p className="text-gray-400">Balance</p>
                       <p className="font-medium">
                         <span className="text-green-400">{stats.stats.balance.pixels.toLocaleString()}</span> pixels
-                        {" • "}
-                        <span className="text-purple-400">{stats.stats.balance.shards.toLocaleString()}</span> shards
                       </p>
                     </div>
                   </div>
