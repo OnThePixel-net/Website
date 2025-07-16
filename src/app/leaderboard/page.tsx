@@ -57,8 +57,8 @@ export default function Leaderboards() {
             <LeaderboardCard 
               title="BuildFFA"
               description="SkyWars leaderboards will be available soon!"
-              link="#"
-              enabled={false}
+              link="/leaderboard/buildffa"
+              enabled={true}
               comingSoon={true}
             />
           </div>
