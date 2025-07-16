@@ -11,7 +11,7 @@ import {
   CardDescription 
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
+import { Search, Sword, Trophy, Target, Zap } from "lucide-react";
 
 // Define types for our stats
 interface PlayerStats {
@@ -64,6 +64,21 @@ interface PlaytimeResponse {
   playtime?: number;
   first_joined?: string;
   last_online?: string;
+}
+
+interface BedwarsResponse {
+  wins?: number;
+  losses?: number;
+  kills?: number;
+  deaths?: number;
+  beds_destroyed?: number;
+  games_played?: number;
+}
+
+interface ParkourResponse {
+  completions?: number;
+  best_time?: string;
+  checkpoint?: number;
 }
 
 export default function PlayerStatistics() {
@@ -140,6 +155,42 @@ export default function PlayerStatistics() {
     } else {
       return `${minutes}m`;
     }
+  };
+
+  // Format time in seconds to readable format
+  const formatTime = (timeString: string | undefined): string => {
+    if (!timeString) return '0s';
+    
+    try {
+      const seconds = parseFloat(timeString);
+      if (isNaN(seconds)) return '0s';
+      
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60);
+      const milliseconds = Math.floor((seconds % 1) * 1000);
+      
+      if (minutes > 0) {
+        return `${minutes}m ${remainingSeconds}s`;
+      } else if (remainingSeconds > 0) {
+        return `${remainingSeconds}.${milliseconds.toString().padStart(3, '0')}s`;
+      } else {
+        return `${milliseconds}ms`;
+      }
+    } catch {
+      return '0s';
+    }
+  };
+
+  // Calculate K/D ratio
+  const calculateKDR = (kills: number, deaths: number): number => {
+    if (deaths === 0) return kills;
+    return Math.round((kills / deaths) * 100) / 100;
+  };
+
+  // Calculate win rate
+  const calculateWinRate = (wins: number, games: number): number => {
+    if (games === 0) return 0;
+    return Math.round((wins / games) * 100);
   };
 
   // Safe date formatter
@@ -247,6 +298,51 @@ export default function PlayerStatistics() {
         console.error("Error fetching rank data:", rankError);
         // Keep default rank values
       }
+
+      // Fetch Bedwars stats
+      try {
+        const bedwarsResponse = await fetch(`https://api.onthepixel.net/stats/bedwars/${name}`);
+        if (bedwarsResponse.ok) {
+          const bedwarsData: BedwarsResponse = await bedwarsResponse.json();
+          
+          const wins = bedwarsData?.wins ?? 0;
+          const losses = bedwarsData?.losses ?? 0;
+          const kills = bedwarsData?.kills ?? 0;
+          const deaths = bedwarsData?.deaths ?? 0;
+          const gamesPlayed = bedwarsData?.games_played ?? (wins + losses);
+          
+          playerData.stats.bedwars = {
+            wins,
+            losses,
+            kills,
+            deaths,
+            bedsDestroyed: bedwarsData?.beds_destroyed ?? 0,
+            kdr: calculateKDR(kills, deaths),
+            winRate: calculateWinRate(wins, gamesPlayed),
+            gamesPlayed
+          };
+        }
+      } catch (bedwarsError) {
+        console.error("Error fetching bedwars data:", bedwarsError);
+        // Keep default bedwars values
+      }
+
+      // Fetch Parkour stats
+      try {
+        const parkourResponse = await fetch(`https://api.onthepixel.net/stats/parkour/${name}`);
+        if (parkourResponse.ok) {
+          const parkourData: ParkourResponse = await parkourResponse.json();
+          
+          playerData.stats.parkour = {
+            completions: parkourData?.completions ?? 0,
+            bestTime: formatTime(parkourData?.best_time),
+            checkpoint: parkourData?.checkpoint ?? 0
+          };
+        }
+      } catch (parkourError) {
+        console.error("Error fetching parkour data:", parkourError);
+        // Keep default parkour values
+      }
       
       // Special test case
       if (name.toLowerCase() === 'error') {
@@ -281,6 +377,17 @@ export default function PlayerStatistics() {
   const formatDate = (dateString: string) => {
     return safeFormatDate(dateString);
   };
+
+  // Stat item component for cleaner code
+  const StatItem = ({ label, value, icon }: { label: string; value: string | number; icon?: React.ReactNode }) => (
+    <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
+      <div className="flex items-center gap-2">
+        {icon}
+        <span className="text-gray-400">{label}</span>
+      </div>
+      <span className="font-semibold text-white">{value}</span>
+    </div>
+  );
 
   return (
     <div className="container mx-auto px-4 py-10">
@@ -324,6 +431,7 @@ export default function PlayerStatistics() {
       
       {stats && (
         <>
+          {/* Player Info Card */}
           <Card className="bg-gray-900/50 border-gray-800 mb-6">
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-center gap-6">
@@ -372,6 +480,102 @@ export default function PlayerStatistics() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Gamemode Stats */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Bedwars Stats */}
+            <Card className="bg-gray-900/50 border-gray-800">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-red-400">
+                  <Sword className="h-5 w-5" />
+                  Bedwars
+                </CardTitle>
+                <CardDescription>
+                  Combat and strategy statistics
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <StatItem 
+                  label="Wins" 
+                  value={stats.stats.bedwars.wins.toLocaleString()} 
+                  icon={<Trophy className="h-4 w-4 text-yellow-400" />}
+                />
+                <StatItem 
+                  label="Losses" 
+                  value={stats.stats.bedwars.losses.toLocaleString()} 
+                />
+                <StatItem 
+                  label="Win Rate" 
+                  value={`${stats.stats.bedwars.winRate}%`} 
+                />
+                <StatItem 
+                  label="Kills" 
+                  value={stats.stats.bedwars.kills.toLocaleString()} 
+                  icon={<Target className="h-4 w-4 text-red-400" />}
+                />
+                <StatItem 
+                  label="Deaths" 
+                  value={stats.stats.bedwars.deaths.toLocaleString()} 
+                />
+                <StatItem 
+                  label="K/D Ratio" 
+                  value={stats.stats.bedwars.kdr} 
+                />
+                <StatItem 
+                  label="Beds Destroyed" 
+                  value={stats.stats.bedwars.bedsDestroyed.toLocaleString()} 
+                />
+                <StatItem 
+                  label="Games Played" 
+                  value={stats.stats.bedwars.gamesPlayed.toLocaleString()} 
+                />
+              </CardContent>
+            </Card>
+
+            {/* Parkour Stats */}
+            <Card className="bg-gray-900/50 border-gray-800">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-blue-400">
+                  <Zap className="h-5 w-5" />
+                  Parkour
+                </CardTitle>
+                <CardDescription>
+                  Movement and precision statistics
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <StatItem 
+                  label="Completions" 
+                  value={stats.stats.parkour.completions.toLocaleString()} 
+                  icon={<Trophy className="h-4 w-4 text-yellow-400" />}
+                />
+                <StatItem 
+                  label="Best Time" 
+                  value={stats.stats.parkour.bestTime} 
+                />
+                <StatItem 
+                  label="Current Checkpoint" 
+                  value={stats.stats.parkour.checkpoint.toLocaleString()} 
+                />
+                <div className="p-3 bg-gray-800/30 rounded-lg">
+                  <div className="text-center">
+                    <p className="text-gray-400 text-sm mb-1">Completion Status</p>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div 
+                        className="bg-blue-400 h-2 rounded-full transition-all duration-300" 
+                        style={{ 
+                          width: `${Math.min((stats.stats.parkour.checkpoint / 100) * 100, 100)}%` 
+                        }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {stats.stats.parkour.checkpoint}/100 checkpoints
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </>
       )}
     </div>
