@@ -22,7 +22,6 @@ export default function DuelsLeaderboard() {
               { key: "wins", label: "Wins" },
               { key: "losses", label: "Losses" },
               { key: "total_games", label: "Total Games" },
-              { key: "win_rate", label: "Win Rate" },
               { key: "kd_ratio", label: "K/D Ratio" }
             ]}
           />
