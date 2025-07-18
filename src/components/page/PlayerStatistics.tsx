@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, Sword, Trophy, Target, Zap, Hammer, Bomb, Clock } from "lucide-react";
 
 // Define types for our stats
@@ -79,6 +79,12 @@ export default function PlayerStatistics() {
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-load demo player on component mount
+  useEffect(() => {
+    // You can set a default username here for testing
+    // fetchPlayerStats("Notch");
+  }, []);
 
   // Parse Minecraft rank color codes to Hex values
   const parseColorCode = (colorCode: string | undefined): string => {
@@ -165,7 +171,11 @@ export default function PlayerStatistics() {
   };
 
   const fetchPlayerStats = async (name: string) => {
-    if (!name) return;
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setError("Please enter a valid username");
+      return;
+    }
     
     setLoading(true);
     setError(null);
@@ -174,7 +184,7 @@ export default function PlayerStatistics() {
       // Create initial player data structure with safe defaults
       let playerData: PlayerStats = {
         playerinfo: {
-          username: name,
+          username: trimmedName,
           uuid: "00000000-0000-0000-0000-000000000000",
           firstLogin: "",
           lastLogin: "",
@@ -215,7 +225,7 @@ export default function PlayerStatistics() {
       
       // Fetch pixels data from API with safe handling
       try {
-        const pixelResponse = await fetch(`https://api.onthepixel.net/stats/pixel/${name}`);
+        const pixelResponse = await fetch(`https://api.onthepixel.net/stats/pixel/${trimmedName}`);
         if (pixelResponse.ok) {
           const pixelData: PixelResponse = await pixelResponse.json();
           playerData.stats.balance.pixels = pixelData?.balance ?? 0;
@@ -227,7 +237,7 @@ export default function PlayerStatistics() {
 
       // Fetch playtime data from API with safe handling
       try {
-        const playtimeResponse = await fetch(`https://api.onthepixel.net/stats/playtime/${name}`);
+        const playtimeResponse = await fetch(`https://api.onthepixel.net/stats/playtime/${trimmedName}`);
         if (playtimeResponse.ok) {
           const playtimeData: PlaytimeResponse = await playtimeResponse.json();
           
@@ -243,7 +253,7 @@ export default function PlayerStatistics() {
       
       // Fetch rank data with safe handling
       try {
-        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${name}`);
+        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${trimmedName}`);
         if (rankResponse.ok) {
           const rankData: RankResponse = await rankResponse.json();
           
@@ -260,7 +270,7 @@ export default function PlayerStatistics() {
 
       // Fetch Minigames stats (Duels and BuildFFA)
       try {
-        const minigamesResponse = await fetch(`https://api.onthepixel.net/stats/minigames/${name}`);
+        const minigamesResponse = await fetch(`https://api.onthepixel.net/stats/minigames/${trimmedName}`);
         if (minigamesResponse.ok) {
           const minigamesData: MinigamesResponse = await minigamesResponse.json();
           
@@ -300,7 +310,7 @@ export default function PlayerStatistics() {
       }
       
       // Special test case
-      if (name.toLowerCase() === 'error') {
+      if (trimmedName.toLowerCase() === 'error') {
         throw new Error("Player not found");
       }
       
@@ -317,6 +327,8 @@ export default function PlayerStatistics() {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
+    // Clear error when user starts typing
+    if (error) setError(null);
   };
 
 
@@ -373,16 +385,24 @@ export default function PlayerStatistics() {
                 type="text"
                 value={username}
                 onChange={handleInputChange}
-                onKeyPress={(e) => e.key === 'Enter' && fetchPlayerStats(username)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && username.trim()) {
+                    fetchPlayerStats(username.trim());
+                  }
+                }}
                 placeholder="Enter A Minecraft Username"
                 className="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             </div>
             <button 
-              onClick={() => fetchPlayerStats(username)}
+              onClick={() => {
+                if (username.trim()) {
+                  fetchPlayerStats(username.trim());
+                }
+              }}
               className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading || !username}
+              disabled={loading || !username.trim()}
             >
               {loading ? (
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
