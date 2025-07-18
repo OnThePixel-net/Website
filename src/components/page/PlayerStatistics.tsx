@@ -42,7 +42,6 @@ interface PlayerStats {
       kills: number;
       deaths: number;
       kdr: number;
-      winRate: number;
       gamesPlayed: number;
     };
     tntrun: {
@@ -54,7 +53,6 @@ interface PlayerStats {
       kills: number;
       deaths: number;
       kdr: number;
-      winRate: number;
       gamesPlayed: number;
       buildsCompleted: number;
     };
@@ -232,7 +230,6 @@ export default function PlayerStatistics() {
             kills: 0,
             deaths: 0,
             kdr: 0,
-            winRate: 0,
             gamesPlayed: 0
           },
           tntrun: {
@@ -244,7 +241,6 @@ export default function PlayerStatistics() {
             kills: 0,
             deaths: 0,
             kdr: 0,
-            winRate: 0,
             gamesPlayed: 0,
             buildsCompleted: 0
           }
@@ -315,7 +311,6 @@ export default function PlayerStatistics() {
               kills: 0, // Not provided in API
               deaths: 0, // Not provided in API
               kdr: duelsKDR,
-              winRate: calculateWinRate(duelsWins, duelsGames),
               gamesPlayed: duelsGames
             };
           }
@@ -332,9 +327,6 @@ export default function PlayerStatistics() {
               kills: buildffaKills,
               deaths: buildffaDeaths,
               kdr: buildffaKDR,
-              winRate: 0, // Cannot calculate without wins/games
-              gamesPlayed: 0, // Not provided in API
-              buildsCompleted: 0 // Not provided in API
             };
           }
         }
@@ -531,10 +523,6 @@ export default function PlayerStatistics() {
                 <StatItem 
                   label="Losses" 
                   value={stats.stats.duels.losses.toLocaleString()} 
-                />
-                <StatItem 
-                  label="Win Rate" 
-                  value={`${stats.stats.duels.winRate}%`} 
                 />
                 <StatItem 
                   label="K/D Ratio" 
