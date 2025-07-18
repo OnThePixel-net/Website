@@ -20,7 +20,8 @@ export default function BuildFFALeaderboard() {
             endpoint="leaderbords/Buildffa"
             statColumns={[
               { key: "statsAllKills", label: "Kills" },
-              { key: "statsAllDeaths", label: "Deaths" }
+              { key: "statsAllDeaths", label: "Deaths" },
+              { key: "kd", label: "K/D Ratio" }
             ]}
           />
         </div>
