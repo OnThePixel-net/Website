@@ -80,10 +80,32 @@ export default function PlayerStatistics() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Auto-load demo player on component mount
   useEffect(() => {
-    // You can set a default username here for testing
-    // fetchPlayerStats("Notch");
+    // In einer echten Next.js App würde das die URL parsen
+    // Für Demo-Zwecke können wir einen Standard-Username setzen
+    // oder window.location.pathname verwenden falls verfügbar
+    
+    const checkForUsername = () => {
+      try {
+        const pathname = window.location.pathname;
+        const storedUsername = pathname.split("/").pop();
+        if (storedUsername && storedUsername !== "stats" && storedUsername !== "") {
+          setUsername(storedUsername);
+          fetchPlayerStats(storedUsername);
+          return;
+        }
+      } catch (error) {
+        // Falls window.location nicht verfügbar ist, ignorieren
+        console.log("URL parsing not available in this environment");
+      }
+      
+      // Demo: Auto-load einen Beispiel-Username für die Artifact-Umgebung
+      const demoUsername = "TinyBrickBoy";
+      setUsername(demoUsername);
+      fetchPlayerStats(demoUsername);
+    };
+    
+    checkForUsername();
   }, []);
 
   // Parse Minecraft rank color codes to Hex values
@@ -171,11 +193,7 @@ export default function PlayerStatistics() {
   };
 
   const fetchPlayerStats = async (name: string) => {
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      setError("Please enter a valid username");
-      return;
-    }
+    if (!name) return;
     
     setLoading(true);
     setError(null);
@@ -184,7 +202,7 @@ export default function PlayerStatistics() {
       // Create initial player data structure with safe defaults
       let playerData: PlayerStats = {
         playerinfo: {
-          username: trimmedName,
+          username: name,
           uuid: "00000000-0000-0000-0000-000000000000",
           firstLogin: "",
           lastLogin: "",
@@ -225,7 +243,7 @@ export default function PlayerStatistics() {
       
       // Fetch pixels data from API with safe handling
       try {
-        const pixelResponse = await fetch(`https://api.onthepixel.net/stats/pixel/${trimmedName}`);
+        const pixelResponse = await fetch(`https://api.onthepixel.net/stats/pixel/${name}`);
         if (pixelResponse.ok) {
           const pixelData: PixelResponse = await pixelResponse.json();
           playerData.stats.balance.pixels = pixelData?.balance ?? 0;
@@ -237,7 +255,7 @@ export default function PlayerStatistics() {
 
       // Fetch playtime data from API with safe handling
       try {
-        const playtimeResponse = await fetch(`https://api.onthepixel.net/stats/playtime/${trimmedName}`);
+        const playtimeResponse = await fetch(`https://api.onthepixel.net/stats/playtime/${name}`);
         if (playtimeResponse.ok) {
           const playtimeData: PlaytimeResponse = await playtimeResponse.json();
           
@@ -253,7 +271,7 @@ export default function PlayerStatistics() {
       
       // Fetch rank data with safe handling
       try {
-        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${trimmedName}`);
+        const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${name}`);
         if (rankResponse.ok) {
           const rankData: RankResponse = await rankResponse.json();
           
@@ -270,7 +288,7 @@ export default function PlayerStatistics() {
 
       // Fetch Minigames stats (Duels and BuildFFA)
       try {
-        const minigamesResponse = await fetch(`https://api.onthepixel.net/stats/minigames/${trimmedName}`);
+        const minigamesResponse = await fetch(`https://api.onthepixel.net/stats/minigames/${name}`);
         if (minigamesResponse.ok) {
           const minigamesData: MinigamesResponse = await minigamesResponse.json();
           
@@ -310,11 +328,20 @@ export default function PlayerStatistics() {
       }
       
       // Special test case
-      if (trimmedName.toLowerCase() === 'error') {
+      if (name.toLowerCase() === 'error') {
         throw new Error("Player not found");
       }
       
       setStats(playerData);
+      
+      // Update URL
+      try {
+        const newUrl = `/stats/${name}`;
+        window.history.pushState({ path: newUrl }, "", newUrl);
+      } catch (error) {
+        // Falls history API nicht verfügbar ist, ignorieren
+        console.log("History API not available in this environment");
+      }
       
     } catch (error) {
       console.error("Error fetching player data:", error);
@@ -327,8 +354,6 @@ export default function PlayerStatistics() {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
-    // Clear error when user starts typing
-    if (error) setError(null);
   };
 
 
@@ -385,24 +410,16 @@ export default function PlayerStatistics() {
                 type="text"
                 value={username}
                 onChange={handleInputChange}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && username.trim()) {
-                    fetchPlayerStats(username.trim());
-                  }
-                }}
+                onKeyPress={(e) => e.key === 'Enter' && fetchPlayerStats(username)}
                 placeholder="Enter A Minecraft Username"
                 className="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             </div>
             <button 
-              onClick={() => {
-                if (username.trim()) {
-                  fetchPlayerStats(username.trim());
-                }
-              }}
+              onClick={() => fetchPlayerStats(username)}
               className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading || !username.trim()}
+              disabled={loading || !username}
             >
               {loading ? (
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
