@@ -1,16 +1,4 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription 
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import React, { useState } from "react";
 import { Search, Sword, Trophy, Target, Zap, Hammer, Bomb, Clock } from "lucide-react";
 
 // Define types for our stats
@@ -48,13 +36,9 @@ interface PlayerStats {
       comingSoon: boolean;
     };
     buildffa: {
-      wins: number;
-      losses: number;
       kills: number;
       deaths: number;
       kdr: number;
-      gamesPlayed: number;
-      buildsCompleted: number;
     };
   };
 }
@@ -95,14 +79,6 @@ export default function PlayerStatistics() {
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const storedUsername = window.location.pathname.split("/").pop();
-    if (storedUsername && storedUsername !== "stats") {
-      setUsername(storedUsername);
-      fetchPlayerStats(storedUsername);
-    }
-  }, []);
 
   // Parse Minecraft rank color codes to Hex values
   const parseColorCode = (colorCode: string | undefined): string => {
@@ -172,12 +148,6 @@ export default function PlayerStatistics() {
     return Math.round((kills / deaths) * 100) / 100;
   };
 
-  // Calculate win rate
-  const calculateWinRate = (wins: number, games: number): number => {
-    if (games === 0) return 0;
-    return Math.round((wins / games) * 100);
-  };
-
   // Safe date formatter
   const safeFormatDate = (dateString: string | undefined): string => {
     if (!dateString) return 'Unknown';
@@ -236,13 +206,9 @@ export default function PlayerStatistics() {
             comingSoon: true
           },
           buildffa: {
-            wins: 0,
-            losses: 0,
             kills: 0,
             deaths: 0,
-            kdr: 0,
-            gamesPlayed: 0,
-            buildsCompleted: 0
+            kdr: 0
           }
         }
       };
@@ -322,11 +288,9 @@ export default function PlayerStatistics() {
             const buildffaKDR = minigamesData.buildffa.KD_Ratio ? parseFloat(minigamesData.buildffa.KD_Ratio) : calculateKDR(buildffaKills, buildffaDeaths);
             
             playerData.stats.buildffa = {
-              wins: 0, // Not provided in API
-              losses: 0, // Not provided in API
               kills: buildffaKills,
               deaths: buildffaDeaths,
-              kdr: buildffaKDR,
+              kdr: buildffaKDR
             };
           }
         }
@@ -342,10 +306,6 @@ export default function PlayerStatistics() {
       
       setStats(playerData);
       
-      // Update URL
-      const newUrl = `/stats/${name}`;
-      window.history.pushState({ path: newUrl }, "", newUrl);
-      
     } catch (error) {
       console.error("Error fetching player data:", error);
       setError("Player not found or an error occurred.");
@@ -359,10 +319,7 @@ export default function PlayerStatistics() {
     setUsername(event.target.value);
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    fetchPlayerStats(username);
-  };
+
 
   // Format dates to be more readable with safe handling
   const formatDate = (dateString: string) => {
@@ -382,91 +339,90 @@ export default function PlayerStatistics() {
 
   // Coming Soon component
   const ComingSoonCard = ({ title, icon, color }: { title: string; icon: React.ReactNode; color: string }) => (
-    <Card className="bg-gray-900/50 border-gray-800">
-      <CardHeader className="pb-4">
-        <CardTitle className={`flex items-center gap-2 ${color}`}>
+    <div className="bg-gray-900/50 border border-gray-800 rounded-lg">
+      <div className="p-6 pb-4">
+        <div className={`flex items-center gap-2 text-xl font-bold ${color} mb-2`}>
           {icon}
           {title}
-        </CardTitle>
-        <CardDescription>
+        </div>
+        <p className="text-gray-400">
           Statistics coming soon
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex items-center justify-center py-12">
+        </p>
+      </div>
+      <div className="p-6 flex items-center justify-center py-12">
         <div className="text-center">
           <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-400 text-lg font-medium">Coming Soon</p>
           <p className="text-gray-500 text-sm mt-2">Statistics will be available in a future update</p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <h1 className="text-2xl font-bold mb-5">
-        {stats ? `STATISTICS FOR ${stats.playerinfo.username}` : 'PLAYER STATISTICS'}
-      </h1>
-      
-      <form onSubmit={handleSubmit} className="mb-8">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Input
-              type="text"
-              value={username}
-              onChange={handleInputChange}
-              placeholder="Enter A Minecraft Username"
-              className="w-full pl-10 bg-gray-800/50 border-gray-700"
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+    <div className="min-h-screen bg-gray-950 text-white">
+      <div className="container mx-auto px-4 py-10">
+        <h1 className="text-2xl font-bold mb-5">
+          {stats ? `STATISTICS FOR ${stats.playerinfo.username}` : 'PLAYER STATISTICS'}
+        </h1>
+        
+        <div className="mb-8">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={username}
+                onChange={handleInputChange}
+                onKeyPress={(e) => e.key === 'Enter' && fetchPlayerStats(username)}
+                placeholder="Enter A Minecraft Username"
+                className="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            </div>
+            <button 
+              onClick={() => fetchPlayerStats(username)}
+              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading || !username}
+            >
+              {loading ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                "Search"
+              )}
+            </button>
           </div>
-          <Button 
-            type="submit"
-            className="bg-green-600 hover:bg-green-700"
-            disabled={loading || !username}
-          >
-            {loading ? (
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            ) : (
-              "Search"
-            )}
-          </Button>
         </div>
-      </form>
-      
-      {error && (
-        <Card className="mb-6 border-red-500/30 bg-red-950/10">
-          <CardContent className="pt-6">
+        
+        {error && (
+          <div className="mb-6 border border-red-500/30 bg-red-950/10 rounded-lg p-6">
             <p className="text-red-400">{error}</p>
-          </CardContent>
-        </Card>
-      )}
-      
-      {stats && (
-        <>
-          {/* Player Info Card */}
-          <Card className="bg-gray-900/50 border-gray-800 mb-6">
-            <CardContent className="p-6">
+          </div>
+        )}
+        
+        {stats && (
+          <>
+            {/* Player Info Card */}
+            <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6 mb-6">
               <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-                <div className="relative h-40 w-40 overflow-hidden rounded-lg border-green-600 bg-gray-600 shadow-lg">
-                  <Image
+                <div className="relative h-40 w-40 overflow-hidden rounded-lg border-2 border-green-600 bg-gray-600 shadow-lg">
+                  <img
                     src={`https://vzge.me/full/400/${stats.playerinfo.username}.png`}
                     className="absolute left-0 right-0 m-auto translate-y-10 scale-110 bg-gray-600"
                     alt={stats.playerinfo.username}
-                    width={400}
-                    height={400}
+                    width="400"
+                    height="400"
                   />
                 </div>
                 
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <h2 className="text-2xl font-bold">{stats.playerinfo.username}</h2>
-                    <Badge 
+                    <span 
                       style={{backgroundColor: stats.playerinfo.rank.color}}
-                      className="text-black"
+                      className="px-2 py-1 rounded text-black text-sm font-medium"
                     >
                       {stats.playerinfo.rank.id}
-                    </Badge>
+                    </span>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -491,87 +447,87 @@ export default function PlayerStatistics() {
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Gamemode Stats Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {/* Bedwars Stats - Coming Soon */}
-            <ComingSoonCard 
-              title="BedWars"
-              icon={<Sword className="h-5 w-5" />}
-              color="text-red-400"
-            />
+            {/* Gamemode Stats Grid */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              {/* Bedwars Stats - Coming Soon */}
+              <ComingSoonCard 
+                title="BedWars"
+                icon={<Sword className="h-5 w-5" />}
+                color="text-red-400"
+              />
 
-            {/* Duels Stats */}
-            <Card className="bg-gray-900/50 border-gray-800">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-purple-400">
-                  <Zap className="h-5 w-5" />
-                  Duels
-                </CardTitle>
-                <CardDescription>
-                  1v1 combat and skill statistics
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <StatItem 
-                  label="Wins" 
-                  value={stats.stats.duels.wins.toLocaleString()} 
-                  icon={<Trophy className="h-4 w-4 text-yellow-400" />}
-                />
-                <StatItem 
-                  label="Losses" 
-                  value={stats.stats.duels.losses.toLocaleString()} 
-                />
-                <StatItem 
-                  label="K/D Ratio" 
-                  value={stats.stats.duels.kdr} 
-                />
-                <StatItem 
-                  label="Games Played" 
-                  value={stats.stats.duels.gamesPlayed.toLocaleString()} 
-                />
-              </CardContent>
-            </Card>
+              {/* Duels Stats */}
+              <div className="bg-gray-900/50 border border-gray-800 rounded-lg">
+                <div className="p-6 pb-4">
+                  <div className="flex items-center gap-2 text-xl font-bold text-purple-400 mb-2">
+                    <Zap className="h-5 w-5" />
+                    Duels
+                  </div>
+                  <p className="text-gray-400">
+                    1v1 combat and skill statistics
+                  </p>
+                </div>
+                <div className="p-6 space-y-3">
+                  <StatItem 
+                    label="Wins" 
+                    value={stats.stats.duels.wins.toLocaleString()} 
+                    icon={<Trophy className="h-4 w-4 text-yellow-400" />}
+                  />
+                  <StatItem 
+                    label="Losses" 
+                    value={stats.stats.duels.losses.toLocaleString()} 
+                  />
+                  <StatItem 
+                    label="K/D Ratio" 
+                    value={stats.stats.duels.kdr} 
+                  />
+                  <StatItem 
+                    label="Games Played" 
+                    value={stats.stats.duels.gamesPlayed.toLocaleString()} 
+                  />
+                </div>
+              </div>
 
-            {/* TNTRun Stats - Coming Soon */}
-            <ComingSoonCard 
-              title="TNTRun"
-              icon={<Bomb className="h-5 w-5" />}
-              color="text-orange-400"
-            />
+              {/* TNTRun Stats - Coming Soon */}
+              <ComingSoonCard 
+                title="TNTRun"
+                icon={<Bomb className="h-5 w-5" />}
+                color="text-orange-400"
+              />
 
-            {/* BuildFFA Stats */}
-            <Card className="bg-gray-900/50 border-gray-800">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-green-400">
-                  <Hammer className="h-5 w-5" />
-                  BuildFFA
-                </CardTitle>
-                <CardDescription>
-                  Building and combat statistics
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <StatItem 
-                  label="Kills" 
-                  value={stats.stats.buildffa.kills.toLocaleString()} 
-                  icon={<Target className="h-4 w-4 text-red-400" />}
-                />
-                <StatItem 
-                  label="Deaths" 
-                  value={stats.stats.buildffa.deaths.toLocaleString()} 
-                />
-                <StatItem 
-                  label="K/D Ratio" 
-                  value={stats.stats.buildffa.kdr} 
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </>
-      )}
+              {/* BuildFFA Stats */}
+              <div className="bg-gray-900/50 border border-gray-800 rounded-lg">
+                <div className="p-6 pb-4">
+                  <div className="flex items-center gap-2 text-xl font-bold text-green-400 mb-2">
+                    <Hammer className="h-5 w-5" />
+                    BuildFFA
+                  </div>
+                  <p className="text-gray-400">
+                    Building and combat statistics
+                  </p>
+                </div>
+                <div className="p-6 space-y-3">
+                  <StatItem 
+                    label="Kills" 
+                    value={stats.stats.buildffa.kills.toLocaleString()} 
+                    icon={<Target className="h-4 w-4 text-red-400" />}
+                  />
+                  <StatItem 
+                    label="Deaths" 
+                    value={stats.stats.buildffa.deaths.toLocaleString()} 
+                  />
+                  <StatItem 
+                    label="K/D Ratio" 
+                    value={stats.stats.buildffa.kdr} 
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
