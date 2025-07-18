@@ -81,28 +81,19 @@ export default function PlayerStatistics() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // In einer echten Next.js App würde das die URL parsen
-    // Für Demo-Zwecke können wir einen Standard-Username setzen
-    // oder window.location.pathname verwenden falls verfügbar
-    
+    // Nur laden wenn Username in URL gefunden wird
     const checkForUsername = () => {
       try {
         const pathname = window.location.pathname;
         const storedUsername = pathname.split("/").pop();
-        if (storedUsername && storedUsername !== "stats" && storedUsername !== "") {
+        if (storedUsername && storedUsername !== "stats" && storedUsername !== "" && storedUsername.length > 0) {
           setUsername(storedUsername);
           fetchPlayerStats(storedUsername);
-          return;
         }
       } catch (error) {
         // Falls window.location nicht verfügbar ist, ignorieren
         console.log("URL parsing not available in this environment");
       }
-      
-      // Demo: Auto-load einen Beispiel-Username für die Artifact-Umgebung
-      const demoUsername = "TinyBrickBoy";
-      setUsername(demoUsername);
-      fetchPlayerStats(demoUsername);
     };
     
     checkForUsername();
