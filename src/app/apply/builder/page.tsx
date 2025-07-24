@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import TopPage from "@/components/page/top";
 
 // Types für verschiedene Fragetypen
 type QuestionType = 'text' | 'textarea' | 'select' | 'multiselect' | 'scale';
@@ -264,56 +263,52 @@ export default function BuilderApplicationPage() {
 
   if (isSubmitted) {
     return (
-      <>
-        <TopPage />
-        <section className="bg-gray-950 pt-36 min-h-screen">
-          <div className="container mx-auto px-4 py-20">
-            <div className="max-w-2xl mx-auto text-center">
-              <div className="mb-8">
-                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h1 className="text-3xl font-bold text-white mb-4">Application Submitted!</h1>
-                <p className="text-gray-400 mb-8">
-                  Thank you for applying to be a Builder at OnThePixel.net! We've received your application 
-                  and will review it carefully. You can expect to hear back from us within 3-5 business days.
-                </p>
-                <div className="space-y-4">
-                  <Link href="/apply" className="inline-block px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
-                    View Other Positions
-                  </Link>
-                  <br />
-                  <Link href="/" className="inline-block px-8 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors border border-gray-700">
-                    Back to Home
-                  </Link>
-                </div>
+      <section className="bg-gray-950 min-h-screen">
+        <div className="container mx-auto px-4 py-20">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="mb-8">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h1 className="text-3xl font-bold text-white mb-4">Application Submitted!</h1>
+              <p className="text-gray-400 mb-8">
+                Thank you for applying to be a Builder at OnThePixel.net! We've received your application 
+                and will review it carefully. You can expect to hear back from us within 3-5 business days.
+              </p>
+              <div className="space-y-4">
+                <Link href="/apply" className="inline-block px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                  View Other Positions
+                </Link>
+                <br />
+                <Link href="/" className="inline-block px-8 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors border border-gray-700">
+                  Back to Home
+                </Link>
               </div>
             </div>
           </div>
-        </section>
-      </>
+        </div>
+      </section>
     );
   }
 
   return (
-    <>
-      <section className="bg-gray-950 pt-36 min-h-screen">
-        <div className="container mx-auto px-4 py-10">
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-8">
-              <div className="mb-4">
-                <Link href="/apply" className="text-green-400 hover:text-green-300 text-sm">
-                  ← Back to Applications
-                </Link>
-              </div>
-              <h1 className="text-3xl font-bold text-white mb-4">
-                Builder Application
-              </h1>
-              <p className="text-gray-400 text-lg">
-                Join our creative team and help build amazing worlds and game modes for OnThePixel.net!
-              </p>
+    <section className="bg-gray-950 min-h-screen">
+      <div className="container mx-auto px-4 py-10">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="mb-4">
+              <Link href="/apply" className="text-green-400 hover:text-green-300 text-sm">
+                ← Back to Applications
+              </Link>
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-4">
+              Builder Application
+            </h1>
+            <p className="text-gray-400 text-lg">
+              Join our creative team and help build amazing worlds and game modes for OnThePixel.net!
+            </p>
               
               {/* Progress Bar */}
               <div className="mt-6">
@@ -385,6 +380,5 @@ export default function BuilderApplicationPage() {
           </div>
         </div>
       </section>
-    </>
-  );
+    );
 }
