@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 // Types für verschiedene Fragetypen
 type QuestionType = 'text' | 'textarea' | 'select' | 'multiselect' | 'scale';
@@ -128,6 +129,10 @@ export default function BuilderApplicationPage() {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
   
   const questionsPerStep = 4;
   const totalSteps = Math.ceil(builderQuestions.length / questionsPerStep);
@@ -143,6 +148,60 @@ export default function BuilderApplicationPage() {
       ...prev,
       [questionId]: value
     }));
+    // Clear error when user starts typing
+    if (submitError) {
+      setSubmitError(null);
+    }
+  };
+
+  const validateCurrentStep = () => {
+    const currentQuestions = getCurrentStepQuestions();
+    const missingFields: string[] = [];
+
+    currentQuestions.forEach(question => {
+      if (question.required) {
+        const value = formData[question.id];
+        if (!value || (Array.isArray(value) && value.length === 0) || value === '') {
+          missingFields.push(question.title);
+        }
+      }
+    });
+
+    return missingFields;
+  };
+
+  const validateAllFields = () => {
+    const missingFields: string[] = [];
+
+    builderQuestions.forEach(question => {
+      if (question.required) {
+        const value = formData[question.id];
+        if (!value || (Array.isArray(value) && value.length === 0) || value === '') {
+          missingFields.push(question.title);
+        }
+      }
+    });
+
+    return missingFields;
+  };
+
+  const onCaptchaLoad = () => {
+    console.log('hCaptcha loaded');
+  };
+
+  const onCaptchaVerify = (token: string) => {
+    setCaptchaToken(token);
+    setSubmitError(null);
+  };
+
+  const onCaptchaExpire = () => {
+    setCaptchaToken(null);
+    setSubmitError('Captcha expired. Please solve it again.');
+  };
+
+  const onCaptchaError = () => {
+    setCaptchaToken(null);
+    setSubmitError('Captcha error. Please try again.');
   };
 
   const renderQuestion = (question: Question) => {
@@ -245,20 +304,82 @@ export default function BuilderApplicationPage() {
   };
 
   const nextStep = () => {
+    const missingFields = validateCurrentStep();
+    
+    if (missingFields.length > 0) {
+      setSubmitError(`Please fill out the following required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+    
     if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1);
+      setSubmitError(null);
     }
   };
 
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
+      setSubmitError(null);
     }
   };
 
-  const handleSubmit = () => {
-    console.log('Builder application submitted:', formData);
-    setIsSubmitted(true);
+  const handleSubmit = async () => {
+    const missingFields = validateAllFields();
+    
+    if (missingFields.length > 0) {
+      setSubmitError(`Please fill out the following required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    if (!captchaToken) {
+      setSubmitError('Please complete the captcha verification.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // API Call to submit application
+      const response = await fetch('https://api.onthepixel.net/apply/builder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          position: 'Builder',
+          applicationData: formData,
+          captchaToken: captchaToken,
+          submittedAt: new Date().toISOString(),
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Server error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Application submitted successfully:', result);
+      
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      setSubmitError(
+        error instanceof Error 
+          ? error.message 
+          : 'Failed to submit application. Please try again.'
+      );
+      
+      // Reset captcha on error
+      setCaptchaToken(null);
+      if (captchaRef.current) {
+        captchaRef.current.resetCaptcha();
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -341,14 +462,51 @@ export default function BuilderApplicationPage() {
                   <div key={question.id} className="space-y-3">
                     <label className="block text-white font-medium text-lg">
                       {question.title}
-                      {question.required && <span className="text-red-400 ml-1">*</span>}
+                      {question.required && <span className="text-red-400 ml-1" title="Required field">*</span>}
                     </label>
                     {question.description && (
                       <p className="text-sm text-gray-400 -mt-1">{question.description}</p>
                     )}
-                    {renderQuestion(question)}
+                    <div className={`${question.required && (!formData[question.id] || (Array.isArray(formData[question.id]) && formData[question.id].length === 0)) ? 'ring-1 ring-red-500/50 rounded-lg' : ''}`}>
+                      {renderQuestion(question)}
+                    </div>
                   </div>
                 ))}
+
+                {/* Show hCaptcha on the last step */}
+                {currentStep === totalSteps - 1 && (
+                  <div className="space-y-3">
+                    <label className="block text-white font-medium text-lg">
+                      Security Verification
+                      <span className="text-red-400 ml-1" title="Required field">*</span>
+                    </label>
+                    <p className="text-sm text-gray-400 -mt-1">
+                      Please complete the captcha to verify you're human
+                    </p>
+                    <div className="flex justify-center">
+                      <HCaptcha
+                        ref={captchaRef}
+                        sitekey="90d0f166-7370-42a6-8836-8f3c9af8615a"
+                        onLoad={onCaptchaLoad}
+                        onVerify={onCaptchaVerify}
+                        onError={onCaptchaError}
+                        onExpire={onCaptchaExpire}
+                        theme="dark"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {submitError && (
+                  <div className="bg-red-900/20 border border-red-700 rounded-lg p-4">
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p className="text-red-400 text-sm">{submitError}</p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex justify-between pt-8">
                   <button
@@ -360,12 +518,26 @@ export default function BuilderApplicationPage() {
                   </button>
                   
                   {currentStep === totalSteps - 1 ? (
-                    <button
-                      onClick={handleSubmit}
-                      className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-                    >
-                      Submit Application
-                    </button>
+                    <div className="text-center">
+                      {!captchaToken && (
+                        <p className="text-sm text-gray-400 mb-3">
+                          Please complete the captcha above to submit your application
+                        </p>
+                      )}
+                      <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting || !captchaToken}
+                        className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center mx-auto"
+                      >
+                        {isSubmitting && (
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                        )}
+                        {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                      </button>
+                    </div>
                   ) : (
                     <button
                       onClick={nextStep}
