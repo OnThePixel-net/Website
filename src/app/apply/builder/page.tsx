@@ -82,14 +82,7 @@ const builderQuestions: Question[] = [
     required: false,
     options: ["WorldEdit", "VoxelSniper", "Axiom", "WorldPainter", "MCEdit", "Litematica"]
   },
-  {
-    id: "building_styles",
-    type: "multiselect",
-    title: "Preferred Building Styles",
-    description: "What styles do you enjoy building most?",
-    required: true,
-    options: ["Medieval", "Modern", "Fantasy", "Sci-Fi", "Steampunk", "Oriental", "Rustic", "PvP Maps", "Minigame Arenas"]
-  },
+
   {
     id: "portfolio",
     type: "textarea",
@@ -164,7 +157,7 @@ export default function BuilderApplicationPage() {
             value={value}
             onChange={(e) => handleInputChange(question.id, e.target.value)}
             placeholder={question.placeholder}
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none text-white"
+            className="w-full p-3 bg-gray-950 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none text-white placeholder-gray-500"
             required={question.required}
           />
         );
@@ -176,7 +169,7 @@ export default function BuilderApplicationPage() {
             onChange={(e) => handleInputChange(question.id, e.target.value)}
             placeholder={question.placeholder}
             rows={4}
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none text-white resize-vertical"
+            className="w-full p-3 bg-gray-950 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none text-white resize-vertical placeholder-gray-500"
             required={question.required}
           />
         );
@@ -186,12 +179,12 @@ export default function BuilderApplicationPage() {
           <select
             value={value}
             onChange={(e) => handleInputChange(question.id, e.target.value)}
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none text-white"
+            className="w-full p-3 bg-gray-950 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none text-white"
             required={question.required}
           >
-            <option value="">Select an option...</option>
+            <option value="" className="bg-gray-950">Select an option...</option>
             {question.options?.map((option, index) => (
-              <option key={index} value={option} className="bg-gray-900">
+              <option key={index} value={option} className="bg-gray-950">
                 {option}
               </option>
             ))}
@@ -214,7 +207,7 @@ export default function BuilderApplicationPage() {
                       handleInputChange(question.id, currentArray.filter(item => item !== option));
                     }
                   }}
-                  className="w-4 h-4 text-green-500 bg-gray-900 border-gray-700 rounded focus:ring-green-500"
+                  className="w-4 h-4 text-green-500 bg-gray-950 border-gray-700 rounded focus:ring-green-500 focus:ring-2"
                 />
                 <span className="text-gray-300">{option}</span>
               </label>
@@ -288,11 +281,11 @@ export default function BuilderApplicationPage() {
                   and will review it carefully. You can expect to hear back from us within 3-5 business days.
                 </p>
                 <div className="space-y-4">
-                  <Link href="/apply" className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                  <Link href="/apply" className="inline-block px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
                     View Other Positions
                   </Link>
                   <br />
-                  <Link href="/" className="inline-block px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                  <Link href="/" className="inline-block px-8 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors border border-gray-700">
                     Back to Home
                   </Link>
                 </div>
@@ -316,10 +309,10 @@ export default function BuilderApplicationPage() {
                   ← Back to Applications
                 </Link>
               </div>
-              <h1 className="text-3xl font-bold text-white mb-2">
+              <h1 className="text-3xl font-bold text-white mb-4">
                 Builder Application
               </h1>
-              <p className="text-gray-400">
+              <p className="text-gray-400 text-lg">
                 Join our creative team and help build amazing worlds and game modes for OnThePixel.net!
               </p>
               
@@ -340,34 +333,34 @@ export default function BuilderApplicationPage() {
               </div>
             </div>
 
-            <Card className="border-gray-800 bg-gray-900">
-              <CardHeader>
-                <CardTitle className="text-white">
+            <Card className="border-gray-800 bg-gray-950">
+              <CardHeader className="border-b border-gray-800">
+                <CardTitle className="text-white text-xl">
                   Application Form
-                  <Badge className="ml-2 bg-green-600">
+                  <Badge className="ml-2 bg-green-600 hover:bg-green-700">
                     {currentStep + 1}/{totalSteps}
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 p-8">
                 {getCurrentStepQuestions().map((question) => (
-                  <div key={question.id} className="space-y-2">
-                    <label className="block text-white font-medium">
+                  <div key={question.id} className="space-y-3">
+                    <label className="block text-white font-medium text-lg">
                       {question.title}
                       {question.required && <span className="text-red-400 ml-1">*</span>}
                     </label>
                     {question.description && (
-                      <p className="text-sm text-gray-400">{question.description}</p>
+                      <p className="text-sm text-gray-400 -mt-1">{question.description}</p>
                     )}
                     {renderQuestion(question)}
                   </div>
                 ))}
 
-                <div className="flex justify-between pt-6">
+                <div className="flex justify-between pt-8">
                   <button
                     onClick={prevStep}
                     disabled={currentStep === 0}
-                    className="px-6 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
+                    className="px-8 py-3 bg-gray-800 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors border border-gray-700"
                   >
                     Previous
                   </button>
@@ -375,14 +368,14 @@ export default function BuilderApplicationPage() {
                   {currentStep === totalSteps - 1 ? (
                     <button
                       onClick={handleSubmit}
-                      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
                     >
                       Submit Application
                     </button>
                   ) : (
                     <button
                       onClick={nextStep}
-                      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
                     >
                       Next
                     </button>
