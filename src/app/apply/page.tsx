@@ -37,14 +37,14 @@ export default function ApplyPage() {
               requirements={["Java programming", "Paper knowledge", "1+ years experience"]}
             />
             
-            {/* Community Manager Position */}
+            {/* Supporter Position */}
             <PositionCard 
-              title="Community Manager"
-              description="Manage our social media presence and engage with our community across different platforms."
-              link="/apply/community"
+              title="Supporter"
+              description="Handle player support tickets, investigate reports, and help resolve conflicts. First point of contact for player assistance."
+              link="/apply/supporter"
               enabled={false}
               urgent={false}
-              requirements={["Social media experience", "Content creation", "Community engagement"]}
+              requirements={["Excellent communication", "Problem-solving skills", "Available during peak hours", "Fluent in German & English"]}
             />
           </div>
         </div>
