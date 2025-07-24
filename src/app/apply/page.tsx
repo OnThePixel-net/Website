@@ -23,7 +23,7 @@ export default function ApplyPage() {
               description="Create stunning worlds and game maps for our Minecraft server. Experience with WorldEdit and Voxel tools preferred."
               link="/apply/builder"
               enabled={true}
-              urgent={false}
+              urgent={true}
               requirements={["WorldEdit experience", "Creative building skills", "Portfolio required"]}
             />
             
@@ -32,39 +32,9 @@ export default function ApplyPage() {
               title="Java Developer"
               description="Develop plugins and features for our Minecraft server. Experience with Spigot/Paper and Java required."
               link="/apply/developer"
-              enabled={true}
-              urgent={true}
-              requirements={["Java programming", "Spigot/Paper knowledge", "3+ years experience"]}
-            />
-            
-            {/* Web Developer Position */}
-            <PositionCard 
-              title="Web Developer"
-              description="Help us build and maintain our website and web applications. React/Next.js knowledge required."
-              link="/apply/webdev"
-              enabled={true}
-              urgent={false}
-              requirements={["React/Next.js", "TypeScript", "Full-stack experience"]}
-            />
-            
-            {/* Moderator Position */}
-            <PositionCard 
-              title="Moderator"
-              description="Help maintain a positive gaming environment and assist players with their questions and issues."
-              link="/apply/moderator"
-              enabled={true}
-              urgent={false}
-              requirements={["Good communication", "Available 20+ hours/week", "Mature attitude"]}
-            />
-            
-            {/* Game Designer Position */}
-            <PositionCard 
-              title="Game Designer"
-              description="Design new game modes and improve existing ones. Create balanced and fun gameplay experiences."
-              link="#"
               enabled={false}
               urgent={false}
-              requirements={["Game design experience", "Understanding of PvP mechanics", "Creative thinking"]}
+              requirements={["Java programming", "Paper knowledge", "1+ years experience"]}
             />
             
             {/* Community Manager Position */}
@@ -72,7 +42,7 @@ export default function ApplyPage() {
               title="Community Manager"
               description="Manage our social media presence and engage with our community across different platforms."
               link="/apply/community"
-              enabled={true}
+              enabled={false}
               urgent={false}
               requirements={["Social media experience", "Content creation", "Community engagement"]}
             />
