@@ -265,7 +265,7 @@ export default function BuilderApplicationPage() {
   if (isSubmitted) {
     return (
       <>
-        <TopPage />
+        
         <section className="bg-gray-950 pt-36 min-h-screen">
           <div className="container mx-auto px-4 py-20">
             <div className="max-w-2xl mx-auto text-center">
@@ -299,7 +299,6 @@ export default function BuilderApplicationPage() {
 
   return (
     <>
-      <TopPage />
       <section className="bg-gray-950 pt-36 min-h-screen">
         <div className="container mx-auto px-4 py-10">
           <div className="max-w-2xl mx-auto">
