@@ -1,0 +1,373 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+
+// Types für verschiedene Fragetypen
+type QuestionType = 'text' | 'textarea' | 'select' | 'multiselect' | 'file' | 'scale';
+
+interface Question {
+  id: string;
+  type: QuestionType;
+  title: string;
+  description?: string;
+  placeholder?: string;
+  required: boolean;
+  options?: string[];
+  min?: number;
+  max?: number;
+}
+
+interface ApplicationFormConfig {
+  position: string;
+  description: string;
+  questions: Question[];
+}
+
+// Builder-spezifische Konfiguration
+const builderFormConfig: ApplicationFormConfig = {
+  position: "Builder",
+  description: "Join our creative team and help build amazing worlds and game modes for OnThePixel.net!",
+  questions: [
+    {
+      id: "name",
+      type: "text",
+      title: "Full Name",
+      placeholder: "Your real name",
+      required: true
+    },
+    {
+      id: "age",
+      type: "text",
+      title: "Age",
+      placeholder: "Your age",
+      required: true
+    },
+    {
+      id: "minecraft_username",
+      type: "text",
+      title: "Minecraft Username",
+      placeholder: "Your current Minecraft IGN",
+      required: true
+    },
+    {
+      id: "discord",
+      type: "text",
+      title: "Discord Username",
+      placeholder: "username#1234",
+      required: true
+    },
+    {
+      id: "timezone",
+      type: "select",
+      title: "Timezone",
+      required: true,
+      options: ["GMT-8 (PST)", "GMT-5 (EST)", "GMT+0 (UTC)", "GMT+1 (CET)", "GMT+2 (EET)", "Other"]
+    },
+    {
+      id: "experience",
+      type: "scale",
+      title: "Building Experience",
+      description: "Rate your overall Minecraft building experience",
+      required: true,
+      min: 1,
+      max: 10
+    },
+    {
+      id: "worldedit_experience",
+      type: "select",
+      title: "WorldEdit Experience",
+      required: true,
+      options: ["No experience", "Basic commands", "Intermediate", "Advanced", "Expert"]
+    },
+    {
+      id: "tools",
+      type: "multiselect",
+      title: "Building Tools Experience",
+      description: "Select all tools you have experience with",
+      required: false,
+      options: ["WorldEdit", "VoxelSniper", "Axiom", "WorldPainter", "MCEdit", "Litematica"]
+    },
+    {
+      id: "building_styles",
+      type: "multiselect",
+      title: "Preferred Building Styles",
+      description: "What styles do you enjoy building most?",
+      required: true,
+      options: ["Medieval", "Modern", "Fantasy", "Sci-Fi", "Steampunk", "Oriental", "Rustic", "PvP Maps", "Minigame Arenas"]
+    },
+    {
+      id: "portfolio",
+      type: "textarea",
+      title: "Portfolio Links",
+      description: "Share links to your builds (Screenshots, PMC, etc.)",
+      placeholder: "https://www.planetminecraft.com/member/yourname/\nhttps://imgur.com/gallery/yourbuilds",
+      required: true
+    },
+    {
+      id: "availability",
+      type: "textarea",
+      title: "Availability",
+      description: "When are you typically available to build?",
+      placeholder: "Monday-Friday: 6-10 PM CET\nWeekends: Flexible",
+      required: true
+    },
+    {
+      id: "motivation",
+      type: "textarea",
+      title: "Why do you want to join our team?",
+      description: "Tell us about your motivation and what you hope to contribute",
+      placeholder: "I'm passionate about creating unique gaming experiences...",
+      required: true
+    },
+    {
+      id: "biggest_project",
+      type: "textarea",
+      title: "Describe your biggest building project",
+      description: "What was the most challenging or impressive build you've completed?",
+      placeholder: "My biggest project was a medieval castle that took 3 months...",
+      required: true
+    },
+    {
+      id: "team_experience",
+      type: "select",
+      title: "Team Building Experience",
+      description: "Have you worked with other builders before?",
+      required: true,
+      options: ["No team experience", "Small projects with friends", "Server building team", "Multiple server teams", "Lead builder experience"]
+    }
+  ]
+};
+
+export default function ApplicationForm() {
+  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [currentStep, setCurrentStep] = useState(0);
+  
+  const questionsPerStep = 4;
+  const totalSteps = Math.ceil(builderFormConfig.questions.length / questionsPerStep);
+  
+  const getCurrentStepQuestions = () => {
+    const start = currentStep * questionsPerStep;
+    const end = start + questionsPerStep;
+    return builderFormConfig.questions.slice(start, end);
+  };
+
+  const handleInputChange = (questionId: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [questionId]: value
+    }));
+  };
+
+  const renderQuestion = (question: Question) => {
+    const value = formData[question.id] || '';
+
+    switch (question.type) {
+      case 'text':
+        return (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => handleInputChange(question.id, e.target.value)}
+            placeholder={question.placeholder}
+            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none text-white"
+            required={question.required}
+          />
+        );
+
+      case 'textarea':
+        return (
+          <textarea
+            value={value}
+            onChange={(e) => handleInputChange(question.id, e.target.value)}
+            placeholder={question.placeholder}
+            rows={4}
+            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none text-white resize-vertical"
+            required={question.required}
+          />
+        );
+
+      case 'select':
+        return (
+          <select
+            value={value}
+            onChange={(e) => handleInputChange(question.id, e.target.value)}
+            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none text-white"
+            required={question.required}
+          >
+            <option value="">Select an option...</option>
+            {question.options?.map((option, index) => (
+              <option key={index} value={option} className="bg-gray-900">
+                {option}
+              </option>
+            ))}
+          </select>
+        );
+
+      case 'multiselect':
+        return (
+          <div className="space-y-2">
+            {question.options?.map((option, index) => (
+              <label key={index} className="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={Array.isArray(value) && value.includes(option)}
+                  onChange={(e) => {
+                    const currentArray = Array.isArray(value) ? value : [];
+                    if (e.target.checked) {
+                      handleInputChange(question.id, [...currentArray, option]);
+                    } else {
+                      handleInputChange(question.id, currentArray.filter(item => item !== option));
+                    }
+                  }}
+                  className="w-4 h-4 text-green-500 bg-gray-900 border-gray-700 rounded focus:ring-green-500"
+                />
+                <span className="text-gray-300">{option}</span>
+              </label>
+            ))}
+          </div>
+        );
+
+      case 'scale':
+        return (
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm text-gray-400">
+              <span>{question.min} - Beginner</span>
+              <span>{question.max} - Expert</span>
+            </div>
+            <input
+              type="range"
+              min={question.min}
+              max={question.max}
+              value={value || question.min}
+              onChange={(e) => handleInputChange(question.id, parseInt(e.target.value))}
+              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              required={question.required}
+            />
+            <div className="text-center">
+              <span className="text-green-400 font-semibold">{value || question.min}/{question.max}</span>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const nextStep = () => {
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleSubmit = () => {
+    console.log('Form submitted:', formData);
+    alert('Application submitted successfully! We will review your application and get back to you soon.');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-950 py-12 px-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Apply for {builderFormConfig.position}
+          </h1>
+          <p className="text-gray-400">{builderFormConfig.description}</p>
+          
+          {/* Progress Bar */}
+          <div className="mt-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-gray-400">Progress</span>
+              <span className="text-sm text-gray-400">
+                Step {currentStep + 1} of {totalSteps}
+              </span>
+            </div>
+            <div className="w-full bg-gray-800 rounded-full h-2">
+              <div 
+                className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <Card className="border-gray-800 bg-gray-900">
+          <CardHeader>
+            <CardTitle className="text-white">
+              Application Form
+              <Badge className="ml-2 bg-green-600">
+                {currentStep + 1}/{totalSteps}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {getCurrentStepQuestions().map((question) => (
+              <div key={question.id} className="space-y-2">
+                <label className="block text-white font-medium">
+                  {question.title}
+                  {question.required && <span className="text-red-400 ml-1">*</span>}
+                </label>
+                {question.description && (
+                  <p className="text-sm text-gray-400">{question.description}</p>
+                )}
+                {renderQuestion(question)}
+              </div>
+            ))}
+
+            <div className="flex justify-between pt-6">
+              <button
+                onClick={prevStep}
+                disabled={currentStep === 0}
+                className="px-6 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
+              >
+                Previous
+              </button>
+              
+              {currentStep === totalSteps - 1 ? (
+                <button
+                  onClick={handleSubmit}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Submit Application
+                </button>
+              ) : (
+                <button
+                  onClick={nextStep}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Next
+                </button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <style jsx>{`
+          .slider::-webkit-slider-thumb {
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+          }
+          
+          .slider::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            border: none;
+          }
+        `}</style>
+      </div>
+    </div>
+  );
+}
