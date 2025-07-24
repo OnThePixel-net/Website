@@ -1,9 +1,13 @@
+"use client";
+
 import React, { useState } from 'react';
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import TopPage from "@/components/page/top";
 
 // Types für verschiedene Fragetypen
-type QuestionType = 'text' | 'textarea' | 'select' | 'multiselect' | 'file' | 'scale';
+type QuestionType = 'text' | 'textarea' | 'select' | 'multiselect' | 'scale';
 
 interface Question {
   id: string;
@@ -17,138 +21,129 @@ interface Question {
   max?: number;
 }
 
-interface ApplicationFormConfig {
-  position: string;
-  description: string;
-  questions: Question[];
-}
+// Builder-spezifische Fragen
+const builderQuestions: Question[] = [
+  {
+    id: "name",
+    type: "text",
+    title: "Full Name",
+    placeholder: "Your real name",
+    required: true
+  },
+  {
+    id: "age",
+    type: "text",
+    title: "Age",
+    placeholder: "Your age",
+    required: true
+  },
+  {
+    id: "minecraft_username",
+    type: "text",
+    title: "Minecraft Username",
+    placeholder: "Your current Minecraft IGN",
+    required: true
+  },
+  {
+    id: "discord",
+    type: "text",
+    title: "Discord Username",
+    placeholder: "username#1234",
+    required: true
+  },
+  {
+    id: "timezone",
+    type: "select",
+    title: "Timezone",
+    required: true,
+    options: ["GMT-8 (PST)", "GMT-5 (EST)", "GMT+0 (UTC)", "GMT+1 (CET)", "GMT+2 (EET)", "Other"]
+  },
+  {
+    id: "experience",
+    type: "scale",
+    title: "Building Experience",
+    description: "Rate your overall Minecraft building experience",
+    required: true,
+    min: 1,
+    max: 10
+  },
+  {
+    id: "worldedit_experience",
+    type: "select",
+    title: "WorldEdit Experience",
+    required: true,
+    options: ["No experience", "Basic commands", "Intermediate", "Advanced", "Expert"]
+  },
+  {
+    id: "tools",
+    type: "multiselect",
+    title: "Building Tools Experience",
+    description: "Select all tools you have experience with",
+    required: false,
+    options: ["WorldEdit", "VoxelSniper", "Axiom", "WorldPainter", "MCEdit", "Litematica"]
+  },
+  {
+    id: "building_styles",
+    type: "multiselect",
+    title: "Preferred Building Styles",
+    description: "What styles do you enjoy building most?",
+    required: true,
+    options: ["Medieval", "Modern", "Fantasy", "Sci-Fi", "Steampunk", "Oriental", "Rustic", "PvP Maps", "Minigame Arenas"]
+  },
+  {
+    id: "portfolio",
+    type: "textarea",
+    title: "Portfolio Links",
+    description: "Share links to your builds (Screenshots, PMC, etc.)",
+    placeholder: "https://www.planetminecraft.com/member/yourname/\nhttps://imgur.com/gallery/yourbuilds",
+    required: true
+  },
+  {
+    id: "availability",
+    type: "textarea",
+    title: "Availability",
+    description: "When are you typically available to build?",
+    placeholder: "Monday-Friday: 6-10 PM CET\nWeekends: Flexible",
+    required: true
+  },
+  {
+    id: "motivation",
+    type: "textarea",
+    title: "Why do you want to join our team?",
+    description: "Tell us about your motivation and what you hope to contribute",
+    placeholder: "I'm passionate about creating unique gaming experiences...",
+    required: true
+  },
+  {
+    id: "biggest_project",
+    type: "textarea",
+    title: "Describe your biggest building project",
+    description: "What was the most challenging or impressive build you've completed?",
+    placeholder: "My biggest project was a medieval castle that took 3 months...",
+    required: true
+  },
+  {
+    id: "team_experience",
+    type: "select",
+    title: "Team Building Experience",
+    description: "Have you worked with other builders before?",
+    required: true,
+    options: ["No team experience", "Small projects with friends", "Server building team", "Multiple server teams", "Lead builder experience"]
+  }
+];
 
-// Builder-spezifische Konfiguration
-const builderFormConfig: ApplicationFormConfig = {
-  position: "Builder",
-  description: "Join our creative team and help build amazing worlds and game modes for OnThePixel.net!",
-  questions: [
-    {
-      id: "name",
-      type: "text",
-      title: "Full Name",
-      placeholder: "Your real name",
-      required: true
-    },
-    {
-      id: "age",
-      type: "text",
-      title: "Age",
-      placeholder: "Your age",
-      required: true
-    },
-    {
-      id: "minecraft_username",
-      type: "text",
-      title: "Minecraft Username",
-      placeholder: "Your current Minecraft IGN",
-      required: true
-    },
-    {
-      id: "discord",
-      type: "text",
-      title: "Discord Username",
-      placeholder: "username#1234",
-      required: true
-    },
-    {
-      id: "timezone",
-      type: "select",
-      title: "Timezone",
-      required: true,
-      options: ["GMT-8 (PST)", "GMT-5 (EST)", "GMT+0 (UTC)", "GMT+1 (CET)", "GMT+2 (EET)", "Other"]
-    },
-    {
-      id: "experience",
-      type: "scale",
-      title: "Building Experience",
-      description: "Rate your overall Minecraft building experience",
-      required: true,
-      min: 1,
-      max: 10
-    },
-    {
-      id: "worldedit_experience",
-      type: "select",
-      title: "WorldEdit Experience",
-      required: true,
-      options: ["No experience", "Basic commands", "Intermediate", "Advanced", "Expert"]
-    },
-    {
-      id: "tools",
-      type: "multiselect",
-      title: "Building Tools Experience",
-      description: "Select all tools you have experience with",
-      required: false,
-      options: ["WorldEdit", "VoxelSniper", "Axiom", "WorldPainter", "MCEdit", "Litematica"]
-    },
-    {
-      id: "building_styles",
-      type: "multiselect",
-      title: "Preferred Building Styles",
-      description: "What styles do you enjoy building most?",
-      required: true,
-      options: ["Medieval", "Modern", "Fantasy", "Sci-Fi", "Steampunk", "Oriental", "Rustic", "PvP Maps", "Minigame Arenas"]
-    },
-    {
-      id: "portfolio",
-      type: "textarea",
-      title: "Portfolio Links",
-      description: "Share links to your builds (Screenshots, PMC, etc.)",
-      placeholder: "https://www.planetminecraft.com/member/yourname/\nhttps://imgur.com/gallery/yourbuilds",
-      required: true
-    },
-    {
-      id: "availability",
-      type: "textarea",
-      title: "Availability",
-      description: "When are you typically available to build?",
-      placeholder: "Monday-Friday: 6-10 PM CET\nWeekends: Flexible",
-      required: true
-    },
-    {
-      id: "motivation",
-      type: "textarea",
-      title: "Why do you want to join our team?",
-      description: "Tell us about your motivation and what you hope to contribute",
-      placeholder: "I'm passionate about creating unique gaming experiences...",
-      required: true
-    },
-    {
-      id: "biggest_project",
-      type: "textarea",
-      title: "Describe your biggest building project",
-      description: "What was the most challenging or impressive build you've completed?",
-      placeholder: "My biggest project was a medieval castle that took 3 months...",
-      required: true
-    },
-    {
-      id: "team_experience",
-      type: "select",
-      title: "Team Building Experience",
-      description: "Have you worked with other builders before?",
-      required: true,
-      options: ["No team experience", "Small projects with friends", "Server building team", "Multiple server teams", "Lead builder experience"]
-    }
-  ]
-};
-
-export default function ApplicationForm() {
+export default function BuilderApplicationPage() {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   
   const questionsPerStep = 4;
-  const totalSteps = Math.ceil(builderFormConfig.questions.length / questionsPerStep);
+  const totalSteps = Math.ceil(builderQuestions.length / questionsPerStep);
   
   const getCurrentStepQuestions = () => {
     const start = currentStep * questionsPerStep;
     const end = start + questionsPerStep;
-    return builderFormConfig.questions.slice(start, end);
+    return builderQuestions.slice(start, end);
   };
 
   const handleInputChange = (questionId: string, value: any) => {
@@ -240,7 +235,10 @@ export default function ApplicationForm() {
               max={question.max}
               value={value || question.min}
               onChange={(e) => handleInputChange(question.id, parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              style={{
+                background: `linear-gradient(to right, #10b981 0%, #10b981 ${((value || question.min!) - question.min!) / (question.max! - question.min!) * 100}%, #374151 ${((value || question.min!) - question.min!) / (question.max! - question.min!) * 100}%, #374151 100%)`
+              }}
               required={question.required}
             />
             <div className="text-center">
@@ -267,107 +265,134 @@ export default function ApplicationForm() {
   };
 
   const handleSubmit = () => {
-    console.log('Form submitted:', formData);
-    alert('Application submitted successfully! We will review your application and get back to you soon.');
+    console.log('Builder application submitted:', formData);
+    setIsSubmitted(true);
   };
 
-  return (
-    <div className="min-h-screen bg-gray-950 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Apply for {builderFormConfig.position}
-          </h1>
-          <p className="text-gray-400">{builderFormConfig.description}</p>
-          
-          {/* Progress Bar */}
-          <div className="mt-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-400">Progress</span>
-              <span className="text-sm text-gray-400">
-                Step {currentStep + 1} of {totalSteps}
-              </span>
-            </div>
-            <div className="w-full bg-gray-800 rounded-full h-2">
-              <div 
-                className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
-              ></div>
+  if (isSubmitted) {
+    return (
+      <>
+        <TopPage />
+        <section className="bg-gray-950 pt-36 min-h-screen">
+          <div className="container mx-auto px-4 py-20">
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="mb-8">
+                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h1 className="text-3xl font-bold text-white mb-4">Application Submitted!</h1>
+                <p className="text-gray-400 mb-8">
+                  Thank you for applying to be a Builder at OnThePixel.net! We've received your application 
+                  and will review it carefully. You can expect to hear back from us within 3-5 business days.
+                </p>
+                <div className="space-y-4">
+                  <Link href="/apply" className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    View Other Positions
+                  </Link>
+                  <br />
+                  <Link href="/" className="inline-block px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                    Back to Home
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
+      </>
+    );
+  }
 
-        <Card className="border-gray-800 bg-gray-900">
-          <CardHeader>
-            <CardTitle className="text-white">
-              Application Form
-              <Badge className="ml-2 bg-green-600">
-                {currentStep + 1}/{totalSteps}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {getCurrentStepQuestions().map((question) => (
-              <div key={question.id} className="space-y-2">
-                <label className="block text-white font-medium">
-                  {question.title}
-                  {question.required && <span className="text-red-400 ml-1">*</span>}
-                </label>
-                {question.description && (
-                  <p className="text-sm text-gray-400">{question.description}</p>
-                )}
-                {renderQuestion(question)}
+  return (
+    <>
+      <TopPage />
+      <section className="bg-gray-950 pt-36 min-h-screen">
+        <div className="container mx-auto px-4 py-10">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-8">
+              <div className="mb-4">
+                <Link href="/apply" className="text-green-400 hover:text-green-300 text-sm">
+                  ← Back to Applications
+                </Link>
               </div>
-            ))}
-
-            <div className="flex justify-between pt-6">
-              <button
-                onClick={prevStep}
-                disabled={currentStep === 0}
-                className="px-6 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
-              >
-                Previous
-              </button>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                Builder Application
+              </h1>
+              <p className="text-gray-400">
+                Join our creative team and help build amazing worlds and game modes for OnThePixel.net!
+              </p>
               
-              {currentStep === totalSteps - 1 ? (
-                <button
-                  onClick={handleSubmit}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  Submit Application
-                </button>
-              ) : (
-                <button
-                  onClick={nextStep}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  Next
-                </button>
-              )}
+              {/* Progress Bar */}
+              <div className="mt-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-400">Progress</span>
+                  <span className="text-sm text-gray-400">
+                    Step {currentStep + 1} of {totalSteps}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-800 rounded-full h-2">
+                  <div 
+                    className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
             </div>
-          </CardContent>
-        </Card>
 
-        <style jsx>{`
-          .slider::-webkit-slider-thumb {
-            appearance: none;
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #10b981;
-            cursor: pointer;
-          }
-          
-          .slider::-moz-range-thumb {
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #10b981;
-            cursor: pointer;
-            border: none;
-          }
-        `}</style>
-      </div>
-    </div>
+            <Card className="border-gray-800 bg-gray-900">
+              <CardHeader>
+                <CardTitle className="text-white">
+                  Application Form
+                  <Badge className="ml-2 bg-green-600">
+                    {currentStep + 1}/{totalSteps}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {getCurrentStepQuestions().map((question) => (
+                  <div key={question.id} className="space-y-2">
+                    <label className="block text-white font-medium">
+                      {question.title}
+                      {question.required && <span className="text-red-400 ml-1">*</span>}
+                    </label>
+                    {question.description && (
+                      <p className="text-sm text-gray-400">{question.description}</p>
+                    )}
+                    {renderQuestion(question)}
+                  </div>
+                ))}
+
+                <div className="flex justify-between pt-6">
+                  <button
+                    onClick={prevStep}
+                    disabled={currentStep === 0}
+                    className="px-6 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
+                  >
+                    Previous
+                  </button>
+                  
+                  {currentStep === totalSteps - 1 ? (
+                    <button
+                      onClick={handleSubmit}
+                      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      Submit Application
+                    </button>
+                  ) : (
+                    <button
+                      onClick={nextStep}
+                      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      Next
+                    </button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
