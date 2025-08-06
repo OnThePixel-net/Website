@@ -85,13 +85,13 @@ const getStatusText = (status: string) => {
   }
 };
 
-export default function SiteQuests() {
+export default function SideQuests() {
   return (
     <>
       <TopPage />
       <section className="bg-gray-950 pt-36">
         <div className="container mx-auto px-4 py-10">
-          <h1 className="text-2xl font-bold mb-5">OUR SITE QUESTS</h1>
+          <h1 className="text-2xl font-bold mb-5">OUR SIDE QUESTS</h1>
           <p className="mb-8 text-gray-400">
             Explore the exciting projects and initiatives that power OnThePixel.net. 
             From cutting-edge security solutions to performance optimizations, 
