@@ -4,23 +4,21 @@ import Image from "next/image";
 
 // Rolle Farben und Reihenfolge
 const roleColors: { [key: string]: string } = {
-  owner: "#ff6b6b",
-  admin: "#4ecdc4", 
-  builder: "#45b7d1",
-  socialmanager: "#96ceb4",
-  moderator: "#ffeaa7",
-  helper: "#dda0dd",
-  member: "#ffffff"
+  owner: "#f1c40f",
+  admin: "#ff505e",
+  developer: "#5ac2de",
+  builder: "#00de6d",
+  supporter: "#a1101a",
+  socialmanager: "#2581d6",
 };
 
 const roleOrder = [
   "OWNER",
   "ADMIN", 
+  "DEVELOPER",
   "SOCIALMANAGER",
   "BUILDER",
-  "MODERATOR",
-  "HELPER",
-  "MEMBER"
+  "SUPPORTER"
 ];
 
 const getRoleColor = (role: string) =>
