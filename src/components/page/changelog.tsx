@@ -1,25 +1,52 @@
-import React from "react";
+// src/components/page/changelog.tsx
+"use client";
+import React, { useState, useEffect } from "react";
 
-async function fetchNews() {
-  try {
-    const response = await fetch('https://cms.onthepixel.net/items/News', {
-      next: { revalidate: 60 }, // Cache for 60 seconds
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch news');
-    }
-    
-    const data = await response.json();
-    return data.data || [];
-  } catch (error) {
-    console.error('Error fetching news:', error);
-    return [];
-  }
+interface NewsItem {
+  title: string;
+  Date: string;
+  short_description: string;
+  url: string;
 }
 
-export default async function ChangeLog() {
-  const newsItems = await fetchNews();
+export default function ChangeLog() {
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchNews() {
+      try {
+        const response = await fetch('https://cms.onthepixel.net/items/News');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch news');
+        }
+        
+        const data = await response.json();
+        setNewsItems(data.data || []);
+      } catch (error) {
+        console.error('Error fetching news:', error);
+        setNewsItems([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchNews();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-10 px-4 bg-gray-950">
+        <div className="container mx-auto px-4 py-10">
+          <h1 id="news" className="text-3xl font-bold mb-4 text-white">
+            NEWS
+          </h1>
+          <div className="text-gray-400">Loading...</div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-10 px-4 bg-gray-950">
