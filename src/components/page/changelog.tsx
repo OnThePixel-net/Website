@@ -1,21 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-interface NewsItem {
-  url: string;
-  title: string;
-  short_description: string;
-  Text: string;
-  Date: string;
-}
-
-interface NewsApiResponse {
-  data: NewsItem[];
-}
-
 export default function ChangeLog() {
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [newsItems, setNewsItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -27,10 +15,10 @@ export default function ChangeLog() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data: NewsApiResponse = await response.json();
-        setNewsItems(data.data);
+        const data = await response.json();
+        setNewsItems(data.data || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch news');
+        setError(err.message || 'Failed to fetch news');
         console.error('Error fetching news:', err);
       } finally {
         setLoading(false);
