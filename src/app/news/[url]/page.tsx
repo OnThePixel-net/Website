@@ -23,7 +23,7 @@ export default function NewsPage() {
       if (!url) return;
       
       try {
-        const response = await fetch(`https://cms.onthepixel.net/items/News?limit=1&sort[]=url&page=1&search=${url}`);
+        const response = await fetch(`https://cms.onthepixel.net/items/News?filter%5B_and%5D%5B0%5D%5Burl%5D%5B_eq%5D=${url}`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch news');
