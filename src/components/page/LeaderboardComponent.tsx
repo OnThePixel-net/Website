@@ -139,7 +139,7 @@ export default function LeaderboardComponent({
                         <div className="flex items-center gap-2">
                           <Avatar className="h-8 w-8">
                             <AvatarImage
-                              src={`https://minotar.net/helm/${item.username}`}
+                              src={`https://vzge.me/face/512/${item.username}`}
                               alt={item.username}
                             />
                             <AvatarFallback>
