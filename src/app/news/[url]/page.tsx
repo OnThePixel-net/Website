@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 
 interface NewsItem {
   title: string;
-  content: string;
+  text: string;
   Date: string;
   url: string;
 }
