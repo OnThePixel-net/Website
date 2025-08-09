@@ -1,7 +1,8 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
-// Rolle Farben und Reihenfolge (du kannst diese anpassen)
+// Rolle Farben und Reihenfolge
 const roleColors: { [key: string]: string } = {
   owner: "#ff6b6b",
   admin: "#4ecdc4", 
@@ -25,136 +26,95 @@ const roleOrder = [
 const getRoleColor = (role: string) =>
   roleColors[role.toLowerCase()] || "#ffffff";
 
-interface APITeamMember {
+interface TeamMember {
   minecraft_username: string;
   Name: string;
   Rank: string;
 }
 
-interface TeamMember {
-  id: number;
-  minecraft_name: string;
-  discord_name: string;
-  role: string;
-}
-
-const sortTeamMembers = (members: TeamMember[]): TeamMember[] => {
-  return members.sort(
-    (a, b) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role),
-  );
-};
-
-const Team = () => {
+export default function Team() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTeamMembers = async () => {
+    async function fetchTeam() {
       try {
-        setLoading(true);
         const response = await fetch('https://cms.onthepixel.net/items/Team');
         
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error('Failed to fetch team');
         }
         
-        const apiData = await response.json();
-        
-        // Konvertierung der API-Daten in das erwartete Format
-        const convertedMembers: TeamMember[] = apiData.data.map((member: APITeamMember, index: number) => ({
-          id: index + 1,
-          minecraft_name: member.minecraft_username,
-          discord_name: member.Name,
-          role: member.Rank
-        }));
-        
-        setTeamMembers(convertedMembers);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten');
-        console.error('Fehler beim Laden der Team-Daten:', err);
+        const data = await response.json();
+        setTeamMembers(data.data || []);
+      } catch (error) {
+        console.error('Error fetching team:', error);
+        setTeamMembers([]);
       } finally {
         setLoading(false);
       }
-    };
+    }
 
-    fetchTeamMembers();
+    fetchTeam();
   }, []);
 
-  const sortedMembers = sortTeamMembers([...teamMembers]);
+  // Sortierung der Team-Mitglieder
+  const sortedMembers = [...teamMembers].sort(
+    (a, b) => roleOrder.indexOf(a.Rank) - roleOrder.indexOf(b.Rank)
+  );
 
   if (loading) {
     return (
-      <section className="bg-gray-950 px-4 py-10">
+      <section className="py-10 px-4 bg-gray-950">
         <div className="container mx-auto px-4 py-10">
-          <h1 id="team" className="mb-4 text-3xl font-bold text-white">
+          <h1 id="team" className="text-3xl font-bold mb-4 text-white">
             TEAM
           </h1>
-          <div className="flex justify-center items-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-            <p className="ml-4 text-white">Lade Team-Mitglieder...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="bg-gray-950 px-4 py-10">
-        <div className="container mx-auto px-4 py-10">
-          <h1 id="team" className="mb-4 text-3xl font-bold text-white">
-            TEAM
-          </h1>
-          <div className="text-center text-red-400">
-            <p>Fehler beim Laden der Team-Daten: {error}</p>
-          </div>
+          <div className="text-gray-400">Loading...</div>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="bg-gray-950 px-4 py-10">
+    <section className="py-10 px-4 bg-gray-950">
       <div className="container mx-auto px-4 py-10">
-        <h1 id="team" className="mb-4 text-3xl font-bold text-white">
+        <h1 id="team" className="text-3xl font-bold mb-4 text-white">
           TEAM
         </h1>
-        {sortedMembers.length === 0 ? (
-          <p className="text-center text-white">Keine Team-Mitglieder gefunden.</p>
-        ) : (
+        {sortedMembers.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {sortedMembers.map((member) => (
+            {sortedMembers.map((member, index) => (
               <div
-                key={member.id}
+                key={index}
                 className="m-1 flex items-center rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105"
               >
                 <Image
-                  alt={member.minecraft_name}
-                  src={`https://minotar.net/helm/${member.minecraft_name}`}
+                  alt={member.minecraft_username}
+                  src={`https://minotar.net/helm/${member.minecraft_username}`}
                   width={40}
                   height={40}
                   className="rounded"
                 />
                 <div className="ml-4">
-                  <p className="font-bold text-white">{member.discord_name}</p>
+                  <p className="font-bold text-white">{member.Name}</p>
                   <p
                     className="text-sm font-medium"
                     style={{
-                      color: getRoleColor(member.role),
-                      textShadow: `0 0 10px ${getRoleColor(member.role)}`,
+                      color: getRoleColor(member.Rank),
+                      textShadow: `0 0 10px ${getRoleColor(member.Rank)}`,
                     }}
                   >
-                    {member.role.toUpperCase()}
+                    {member.Rank.toUpperCase()}
                   </p>
                 </div>
               </div>
             ))}
           </div>
+        ) : (
+          <div className="text-gray-400">No team members available.</div>
         )}
       </div>
     </section>
   );
-};
-
-export default Team;
+}
