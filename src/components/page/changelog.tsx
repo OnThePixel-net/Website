@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 
 export default function ChangeLog() {
@@ -6,27 +7,28 @@ export default function ChangeLog() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('https://cms.onthepixel.net/items/News');
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setNewsItems(data.data || []);
-      } catch (err) {
-        setError(err.message || 'Failed to fetch news');
-        console.error('Error fetching news:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchNews();
   }, []);
+
+  const fetchNews = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('https://cms.onthepixel.net/items/News');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch news');
+      }
+      
+      const data = await response.json();
+      setNewsItems(data.data || []);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch news');
+      console.error('Error fetching news:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
