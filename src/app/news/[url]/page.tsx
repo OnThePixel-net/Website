@@ -53,7 +53,7 @@ export default function NewsPage() {
         <TopPage />
         <section className="bg-gray-950 pt-36">
           <div className="container mx-auto px-4 py-10">
-            <h1 className="text-2xl font-bold mb-5">NEWS</h1>
+            <h1 className="text-2xl font-bold mb-5"></h1>
             <div className="text-gray-400">Loading...</div>
           </div>
         </section>
