@@ -100,36 +100,46 @@ export default function PlayerStatistics() {
   }, []);
 
   // Parse Minecraft rank color codes to Hex values
-  const parseColorCode = (colorCode: string | undefined): string => {
-    if (!colorCode) return '#FFFFFF';
-    
-    const colorMap: Record<string, string> = {
-      '0': '#000000', // Black
-      '1': '#0000AA', // Dark Blue
-      '2': '#00AA00', // Dark Green
-      '3': '#00AAAA', // Dark Aqua
-      '4': '#AA0000', // Dark Red
-      '5': '#AA00AA', // Dark Purple
-      '6': '#FFAA00', // Gold
-      '7': '#AAAAAA', // Gray
-      '8': '#555555', // Dark Gray
-      '9': '#5555FF', // Blue
-      'a': '#55FF55', // Green
-      'b': '#55FFFF', // Aqua
-      'c': '#FF5555', // Red
-      'd': '#FF55FF', // Light Purple
-      'e': '#FFFF55', // Yellow
-      'f': '#FFFFFF', // White
-    };
-
-    // If starts with & or § followed by a color code
-    if (colorCode && (colorCode.startsWith('&') || colorCode.startsWith('§')) && colorCode.length > 1) {
-      const code = colorCode.charAt(1).toLowerCase();
-      return colorMap[code] || '#FFFFFF';
-    }
-    
-    return '#FFFFFF'; // Default white
+  // Parse Minecraft rank color codes to Hex values
+const parseColorCode = (colorCode: string | undefined): string => {
+  if (!colorCode) return '#FFFFFF';
+  
+  const colorMap: Record<string, string> = {
+    '0': '#000000', // Black
+    '1': '#0000AA', // Dark Blue
+    '2': '#00AA00', // Dark Green
+    '3': '#00AAAA', // Dark Aqua
+    '4': '#AA0000', // Dark Red
+    '5': '#AA00AA', // Dark Purple
+    '6': '#FFAA00', // Gold
+    '7': '#AAAAAA', // Gray
+    '8': '#555555', // Dark Gray
+    '9': '#5555FF', // Blue
+    'a': '#55FF55', // Green
+    'b': '#55FFFF', // Aqua
+    'c': '#FF5555', // Red
+    'd': '#FF55FF', // Light Purple
+    'e': '#FFFF55', // Yellow
+    'f': '#FFFFFF', // White
   };
+
+  // Check for HTML-style hex color codes (&#f1c40f)
+  if (colorCode.startsWith('&#') && colorCode.length >= 8) {
+    const hexColor = colorCode.substring(2); // Remove &#
+    // Validate hex color format (6 characters, valid hex)
+    if (/^[0-9a-fA-F]{6}$/.test(hexColor)) {
+      return `#${hexColor.toUpperCase()}`;
+    }
+  }
+
+  // If starts with & or § followed by a single character color code
+  if (colorCode && (colorCode.startsWith('&') || colorCode.startsWith('§')) && colorCode.length > 1) {
+    const code = colorCode.charAt(1).toLowerCase();
+    return colorMap[code] || '#FFFFFF';
+  }
+  
+  return '#FFFFFF'; // Default white
+};
 
   // Extract rank name from color-coded string
   const extractRankName = (rankString: string | undefined): string => {
