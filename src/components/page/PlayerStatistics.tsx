@@ -101,6 +101,7 @@ export default function PlayerStatistics() {
 
   // Parse Minecraft rank color codes to Hex values
   // Parse Minecraft rank color codes to Hex values
+// Parse Minecraft rank color codes to Hex values
 const parseColorCode = (colorCode: string | undefined): string => {
   if (!colorCode) return '#FFFFFF';
   
@@ -123,13 +124,10 @@ const parseColorCode = (colorCode: string | undefined): string => {
     'f': '#FFFFFF', // White
   };
 
-  // Check for HTML-style hex color codes (&#f1c40f)
-  if (colorCode.startsWith('&#') && colorCode.length >= 8) {
-    const hexColor = colorCode.substring(2); // Remove &#
-    // Validate hex color format (6 characters, valid hex)
-    if (/^[0-9a-fA-F]{6}$/.test(hexColor)) {
-      return `#${hexColor.toUpperCase()}`;
-    }
+  // Check for HTML-style hex color codes (&#f1c40f[Owner] or &#f1c40f)
+  const hexMatch = colorCode.match(/&#([0-9a-fA-F]{6})/);
+  if (hexMatch) {
+    return `#${hexMatch[1].toUpperCase()}`;
   }
 
   // If starts with & or § followed by a single character color code
@@ -142,11 +140,29 @@ const parseColorCode = (colorCode: string | undefined): string => {
 };
 
   // Extract rank name from color-coded string
-  const extractRankName = (rankString: string | undefined): string => {
-    if (!rankString) return 'Member';
-    // Remove color codes (& or § followed by a character)
-    return rankString.replace(/[&§][0-9a-fA-F]/g, '').trim() || 'Member';
-  };
+const extractRankName = (rankString: string | undefined): string => {
+  if (!rankString) return 'Member';
+  
+  // Handle hex color codes with brackets: &#f1c40f[Owner]
+  const hexBracketMatch = rankString.match(/&#[0-9a-fA-F]{6}\[([^\]]+)\]/);
+  if (hexBracketMatch) {
+    return hexBracketMatch[1];
+  }
+  
+  // Handle brackets without hex codes: [Owner]
+  const bracketMatch = rankString.match(/\[([^\]]+)\]/);
+  if (bracketMatch) {
+    return bracketMatch[1];
+  }
+  
+  // Remove traditional color codes (& or § followed by a character)
+  const cleanString = rankString.replace(/[&§][0-9a-fA-F]/g, '').trim();
+  
+  // Remove hex color codes from the string
+  const withoutHex = cleanString.replace(/&#[0-9a-fA-F]{6}/g, '').trim();
+  
+  return withoutHex || 'Member';
+};
 
   // Helper function to format playtime from milliseconds
   const formatPlaytime = (milliseconds: number | undefined): string => {
