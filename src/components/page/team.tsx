@@ -5,13 +5,13 @@ import Image from "next/image";
 interface TeamMember {
   minecraft_username: string;
   Name: string;
-  Ranks: {
+  Ranks?: {
     uuid: string;
     Name: string;
     Color: string;
     Discord_role_id: string;
     Priority: number;
-  };
+  } | null;
 }
 
 export default function Team() {
@@ -42,7 +42,7 @@ export default function Team() {
     fetchTeam();
   }, []);
 
-  // Sortierung nach Priority
+  // Sortierung nach Priority (falls keine Priority: ganz hinten)
   const sortedMembers = [...teamMembers].sort((a, b) => {
     const priorityA = a.Ranks?.Priority ?? 999;
     const priorityB = b.Ranks?.Priority ?? 999;
@@ -70,32 +70,37 @@ export default function Team() {
         </h1>
         {sortedMembers.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {sortedMembers.map((member, index) => (
-              <div
-                key={index}
-                className="m-1 flex items-center rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105"
-              >
-                <Image
-                  alt={member.minecraft_username}
-                  src={`https://vzge.me/face/512/${member.minecraft_username}.png`}
-                  width={40}
-                  height={40}
-                  className="rounded"
-                />
-                <div className="ml-4">
-                  <p className="font-bold text-white">{member.Name}</p>
-                  <p
-                    className="text-sm font-medium"
-                    style={{
-                      color: member.Ranks?.Color || "#ffffff",
-                      textShadow: `0 0 10px ${member.Ranks?.Color || "#ffffff"}`,
-                    }}
-                  >
-                    {member.Ranks?.Name?.toUpperCase()}
-                  </p>
+            {sortedMembers.map((member, index) => {
+              const roleName = member.Ranks?.Name || "Unranked";
+              const roleColor = member.Ranks?.Color || "#ffffff";
+
+              return (
+                <div
+                  key={index}
+                  className="m-1 flex items-center rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105"
+                >
+                  <Image
+                    alt={member.minecraft_username}
+                    src={`https://vzge.me/face/512/${member.minecraft_username}.png`}
+                    width={40}
+                    height={40}
+                    className="rounded"
+                  />
+                  <div className="ml-4">
+                    <p className="font-bold text-white">{member.Name}</p>
+                    <p
+                      className="text-sm font-medium"
+                      style={{
+                        color: roleColor,
+                        textShadow: `0 0 10px ${roleColor}`,
+                      }}
+                    >
+                      {roleName.toUpperCase()}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="text-gray-400">No team members available.</div>
