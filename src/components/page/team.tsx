@@ -2,16 +2,18 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
+interface Rank {
+  uuid: string;
+  Name: string;
+  Color: string;
+  Discord_role_id: string;
+  Priority: number;
+}
+
 interface TeamMember {
   minecraft_username: string;
   Name: string;
-  Ranks?: {
-    uuid: string;
-    Name: string;
-    Color: string;
-    Discord_role_id: string;
-    Priority: number;
-  } | null;
+  Ranks?: Rank[]; // jetzt als Array, da ein Spieler mehrere Ränge haben kann
 }
 
 export default function Team() {
@@ -22,7 +24,7 @@ export default function Team() {
     async function fetchTeam() {
       try {
         const response = await fetch(
-          "https://cms.onthepixel.net/items/Team?fields=*.*"
+          "https://cms.onthepixel.net/items/Team?fields=*.*.*"
         );
 
         if (!response.ok) {
@@ -42,10 +44,10 @@ export default function Team() {
     fetchTeam();
   }, []);
 
-  // Sortierung nach Priority (falls keine Priority: ganz hinten)
+  // Sortierung: höchster Rang nach Priority
   const sortedMembers = [...teamMembers].sort((a, b) => {
-    const priorityA = a.Ranks?.Priority ?? 999;
-    const priorityB = b.Ranks?.Priority ?? 999;
+    const priorityA = a.Ranks && a.Ranks.length > 0 ? a.Ranks[0].Priority : 999;
+    const priorityB = b.Ranks && b.Ranks.length > 0 ? b.Ranks[0].Priority : 999;
     return priorityA - priorityB;
   });
 
@@ -71,8 +73,8 @@ export default function Team() {
         {sortedMembers.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             {sortedMembers.map((member, index) => {
-              const roleName = member.Ranks?.Name || "Unranked";
-              const roleColor = member.Ranks?.Color || "#ffffff";
+              const ranks = member.Ranks || [];
+              const mainRank = ranks.length > 0 ? ranks[0] : null;
 
               return (
                 <div
@@ -88,15 +90,19 @@ export default function Team() {
                   />
                   <div className="ml-4">
                     <p className="font-bold text-white">{member.Name}</p>
-                    <p
-                      className="text-sm font-medium"
-                      style={{
-                        color: roleColor,
-                        textShadow: `0 0 10px ${roleColor}`,
-                      }}
-                    >
-                      {roleName.toUpperCase()}
-                    </p>
+                    {mainRank ? (
+                      <p
+                        className="text-sm font-medium"
+                        style={{
+                          color: mainRank.Color,
+                          textShadow: `0 0 10px ${mainRank.Color}`,
+                        }}
+                      >
+                        {mainRank.Name.toUpperCase()}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-gray-400">UNRANKED</p>
+                    )}
                   </div>
                 </div>
               );
