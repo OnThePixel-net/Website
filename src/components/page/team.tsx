@@ -13,7 +13,7 @@ interface Rank {
 interface TeamMember {
   minecraft_username: string;
   Name: string;
-  Ranks?: Rank[]; // jetzt als Array, da ein Spieler mehrere Ränge haben kann
+  Ranks?: Rank; // Korrigiert: einzelnes Objekt, nicht Array
 }
 
 export default function Team() {
@@ -26,11 +26,9 @@ export default function Team() {
         const response = await fetch(
           "https://cms.onthepixel.net/items/Team?fields=*.*.*"
         );
-
         if (!response.ok) {
           throw new Error("Failed to fetch team");
         }
-
         const data = await response.json();
         setTeamMembers(data.data || []);
       } catch (error) {
@@ -40,14 +38,13 @@ export default function Team() {
         setLoading(false);
       }
     }
-
     fetchTeam();
   }, []);
 
   // Sortierung: höchster Rang nach Priority
   const sortedMembers = [...teamMembers].sort((a, b) => {
-    const priorityA = a.Ranks && a.Ranks.length > 0 ? a.Ranks[0].Priority : 999;
-    const priorityB = b.Ranks && b.Ranks.length > 0 ? b.Ranks[0].Priority : 999;
+    const priorityA = a.Ranks ? a.Ranks.Priority : 999;
+    const priorityB = b.Ranks ? b.Ranks.Priority : 999;
     return priorityA - priorityB;
   });
 
@@ -73,8 +70,7 @@ export default function Team() {
         {sortedMembers.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             {sortedMembers.map((member, index) => {
-              const ranks = member.Ranks || [];
-              const mainRank = ranks.length > 0 ? ranks[0] : null;
+              const mainRank = member.Ranks; // Direkt zugreifen, da es ein Objekt ist
 
               return (
                 <div
