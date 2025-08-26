@@ -1,16 +1,19 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
+
+interface Rank {
+  uuid: string;
+  Name: string;
+  Color: string;
+  Discord_role_id: string;
+  Priority: number;
+}
 
 interface TeamMember {
   minecraft_username: string;
   Name: string;
-  Ranks?: {
-    uuid: string;
-    Name: string;
-    Color: string;
-    Discord_role_id: string;
-    Priority: number;
-  };
+  Ranks?: Rank; // Korrigiert: einzelnes Objekt, nicht Array
 }
 
 export default function Team() {
@@ -21,13 +24,12 @@ export default function Team() {
     async function fetchTeam() {
       try {
         const response = await fetch(
-          "https://cms.onthepixel.net/items/Team?fields=*.*"
+          "https://cms.onthepixel.net/items/Team?fields=*.*.*"
         );
         if (!response.ok) {
           throw new Error("Failed to fetch team");
         }
         const data = await response.json();
-        console.log("API Response:", data); // Debug-Ausgabe
         setTeamMembers(data.data || []);
       } catch (error) {
         console.error("Error fetching team:", error);
@@ -73,22 +75,31 @@ export default function Team() {
               return (
                 <div
                   key={index}
-                  className="m-1 rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105 text-center"
+                  className="m-1 flex items-center rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105"
                 >
-                  <p className="font-bold text-white text-lg mb-2">{member.Name}</p>
-                  {mainRank ? (
-                    <p
-                      className="text-sm font-medium"
-                      style={{
-                        color: mainRank.Color,
-                        textShadow: `0 0 10px ${mainRank.Color}`,
-                      }}
-                    >
-                      {mainRank.Name.toUpperCase()}
-                    </p>
-                  ) : (
-                    <p className="text-sm text-gray-400">UNRANKED</p>
-                  )}
+                  <Image
+                    alt={member.minecraft_username}
+                    src={`https://vzge.me/face/512/${member.minecraft_username}.png`}
+                    width={40}
+                    height={40}
+                    className="rounded"
+                  />
+                  <div className="ml-4">
+                    <p className="font-bold text-white">{member.Name}</p>
+                    {mainRank ? (
+                      <p
+                        className="text-sm font-medium"
+                        style={{
+                          color: mainRank.Color,
+                          textShadow: `0 0 10px ${mainRank.Color}`,
+                        }}
+                      >
+                        {mainRank.Name.toUpperCase()}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-gray-400">UNRANKED</p>
+                    )}
+                  </div>
                 </div>
               );
             })}
