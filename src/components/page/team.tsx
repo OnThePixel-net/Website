@@ -2,18 +2,16 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
-interface Rank {
-  uuid: string;
-  Name: string;
-  Color: string;
-  Discord_role_id: string;
-  Priority: number;
-}
-
 interface TeamMember {
   minecraft_username: string;
   Name: string;
-  Ranks?: Rank; // Korrigiert: einzelnes Objekt, nicht Array
+  Ranks?: {
+    uuid: string;
+    Name: string;
+    Color: string;
+    Discord_role_id: string;
+    Priority: number;
+  };
 }
 
 export default function Team() {
@@ -30,6 +28,7 @@ export default function Team() {
           throw new Error("Failed to fetch team");
         }
         const data = await response.json();
+        console.log("API Response:", data); // Debug-Ausgabe
         setTeamMembers(data.data || []);
       } catch (error) {
         console.error("Error fetching team:", error);
