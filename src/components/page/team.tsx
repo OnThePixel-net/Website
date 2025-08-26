@@ -24,7 +24,7 @@ export default function Team() {
     async function fetchTeam() {
       try {
         const response = await fetch(
-          "https://cms.onthepixel.net/items/Team?fields=*.*.*"
+          "https://cms.onthepixel.net/items/Team?fields=*.*"
         );
         if (!response.ok) {
           throw new Error("Failed to fetch team");
