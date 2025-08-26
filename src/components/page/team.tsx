@@ -2,33 +2,28 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
-// Rolle Farben und Reihenfolge
-const roleColors: { [key: string]: string } = {
-  owner: "#f1c40f",
-  admin: "#ff505e",
-  developer: "#5ac2de",
-  builder: "#00de6d",
-  supporter: "#a1101a",
-  socialmanager: "#2581d6",
-};
-
-const roleOrder = [
-  "OWNER",
-  "ADMIN", 
-  "DEVELOPER",
-  "SOCIALMANAGER",
-  "BUILDER",
-  "SUPPORTER"
-];
-
-const getRoleColor = (role: string) =>
-  roleColors[role.toLowerCase()] || "#ffffff";
-
 interface TeamMember {
   minecraft_username: string;
   Name: string;
-  Rank: string;
+  Ranks: {
+    uuid: string;
+    Name: string;
+    Color: string;
+    Discord_role_id: string;
+  };
 }
+
+// Reihenfolge der Rollen (falls du eine bestimmte Anzeige-Reihenfolge willst)
+const roleOrder = [
+  "CREATOR",
+  "OWNER",
+  "ADMIN",
+  "DEVELOPER",
+  "TEAM MANAGER",
+  "SOCIALMANAGER",
+  "BUILDER",
+  "SUPPORTER",
+];
 
 export default function Team() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -37,16 +32,18 @@ export default function Team() {
   useEffect(() => {
     async function fetchTeam() {
       try {
-        const response = await fetch('https://cms.onthepixel.net/items/Team');
-        
+        const response = await fetch(
+          "https://cms.onthepixel.net/items/Team?fields=*.*"
+        );
+
         if (!response.ok) {
-          throw new Error('Failed to fetch team');
+          throw new Error("Failed to fetch team");
         }
-        
+
         const data = await response.json();
         setTeamMembers(data.data || []);
       } catch (error) {
-        console.error('Error fetching team:', error);
+        console.error("Error fetching team:", error);
         setTeamMembers([]);
       } finally {
         setLoading(false);
@@ -56,10 +53,16 @@ export default function Team() {
     fetchTeam();
   }, []);
 
-  // Sortierung der Team-Mitglieder
-  const sortedMembers = [...teamMembers].sort(
-    (a, b) => roleOrder.indexOf(a.Rank) - roleOrder.indexOf(b.Rank)
-  );
+  // Sortierung nach RoleOrder
+  const sortedMembers = [...teamMembers].sort((a, b) => {
+    const rankA = a.Ranks?.Name?.toUpperCase() || "";
+    const rankB = b.Ranks?.Name?.toUpperCase() || "";
+    const indexA = roleOrder.indexOf(rankA);
+    const indexB = roleOrder.indexOf(rankB);
+
+    // falls nicht in roleOrder -> ans Ende packen
+    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+  });
 
   if (loading) {
     return (
@@ -99,11 +102,11 @@ export default function Team() {
                   <p
                     className="text-sm font-medium"
                     style={{
-                      color: getRoleColor(member.Rank),
-                      textShadow: `0 0 10px ${getRoleColor(member.Rank)}`,
+                      color: member.Ranks?.Color || "#ffffff",
+                      textShadow: `0 0 10px ${member.Ranks?.Color || "#ffffff"}`,
                     }}
                   >
-                    {member.Rank.toUpperCase()}
+                    {member.Ranks?.Name?.toUpperCase()}
                   </p>
                 </div>
               </div>
