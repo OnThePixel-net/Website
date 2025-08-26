@@ -10,20 +10,9 @@ interface TeamMember {
     Name: string;
     Color: string;
     Discord_role_id: string;
+    Priority: number;
   };
 }
-
-// Reihenfolge der Rollen (falls du eine bestimmte Anzeige-Reihenfolge willst)
-const roleOrder = [
-  "CREATOR",
-  "OWNER",
-  "ADMIN",
-  "DEVELOPER",
-  "TEAM MANAGER",
-  "SOCIALMANAGER",
-  "BUILDER",
-  "SUPPORTER",
-];
 
 export default function Team() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -53,15 +42,11 @@ export default function Team() {
     fetchTeam();
   }, []);
 
-  // Sortierung nach RoleOrder
+  // Sortierung nach Priority
   const sortedMembers = [...teamMembers].sort((a, b) => {
-    const rankA = a.Ranks?.Name?.toUpperCase() || "";
-    const rankB = b.Ranks?.Name?.toUpperCase() || "";
-    const indexA = roleOrder.indexOf(rankA);
-    const indexB = roleOrder.indexOf(rankB);
-
-    // falls nicht in roleOrder -> ans Ende packen
-    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+    const priorityA = a.Ranks?.Priority ?? 999;
+    const priorityB = b.Ranks?.Priority ?? 999;
+    return priorityA - priorityB;
   });
 
   if (loading) {
