@@ -10,26 +10,6 @@ interface NewsItem {
   url: string;
 }
 
-// Generate static params for all news articles
-export async function generateStaticParams() {
-  try {
-    const response = await fetch('https://cms.onthepixel.net/items/News');
-    if (!response.ok) {
-      return [];
-    }
-    
-    const data = await response.json();
-    const newsItems = data.data || [];
-    
-    return newsItems.map((item: NewsItem) => ({
-      url: item.url,
-    }));
-  } catch (error) {
-    console.error('Error fetching news for static generation:', error);
-    return [];
-  }
-}
-
 export default function NewsPage() {
   const params = useParams();
   const url = params.url as string;
