@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+"use client";
+import React, { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { Search, Sword, Trophy, Target, Zap, Hammer, Bomb, Clock } from "lucide-react";
 
 // Define types for our stats
@@ -80,89 +82,68 @@ export default function PlayerStatistics() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Nur laden wenn Username in URL gefunden wird
-    const checkForUsername = () => {
-      try {
-        const pathname = window.location.pathname;
-        const storedUsername = pathname.split("/").pop();
-        if (storedUsername && storedUsername !== "stats" && storedUsername !== "" && storedUsername.length > 0) {
-          setUsername(storedUsername);
-          fetchPlayerStats(storedUsername);
-        }
-      } catch (error) {
-        // Falls window.location nicht verfügbar ist, ignorieren
-        console.log("URL parsing not available in this environment");
-      }
-    };
+  // Parse Minecraft rank color codes to Hex values
+  const parseColorCode = (colorCode: string | undefined): string => {
+    if (!colorCode) return '#FFFFFF';
     
-    checkForUsername();
-  }, []);
+    const colorMap: Record<string, string> = {
+      '0': '#000000', // Black
+      '1': '#0000AA', // Dark Blue
+      '2': '#00AA00', // Dark Green
+      '3': '#00AAAA', // Dark Aqua
+      '4': '#AA0000', // Dark Red
+      '5': '#AA00AA', // Dark Purple
+      '6': '#FFAA00', // Gold
+      '7': '#AAAAAA', // Gray
+      '8': '#555555', // Dark Gray
+      '9': '#5555FF', // Blue
+      'a': '#55FF55', // Green
+      'b': '#55FFFF', // Aqua
+      'c': '#FF5555', // Red
+      'd': '#FF55FF', // Light Purple
+      'e': '#FFFF55', // Yellow
+      'f': '#FFFFFF', // White
+    };
 
-  // Parse Minecraft rank color codes to Hex values
-  // Parse Minecraft rank color codes to Hex values
-// Parse Minecraft rank color codes to Hex values
-const parseColorCode = (colorCode: string | undefined): string => {
-  if (!colorCode) return '#FFFFFF';
-  
-  const colorMap: Record<string, string> = {
-    '0': '#000000', // Black
-    '1': '#0000AA', // Dark Blue
-    '2': '#00AA00', // Dark Green
-    '3': '#00AAAA', // Dark Aqua
-    '4': '#AA0000', // Dark Red
-    '5': '#AA00AA', // Dark Purple
-    '6': '#FFAA00', // Gold
-    '7': '#AAAAAA', // Gray
-    '8': '#555555', // Dark Gray
-    '9': '#5555FF', // Blue
-    'a': '#55FF55', // Green
-    'b': '#55FFFF', // Aqua
-    'c': '#FF5555', // Red
-    'd': '#FF55FF', // Light Purple
-    'e': '#FFFF55', // Yellow
-    'f': '#FFFFFF', // White
+    // Check for HTML-style hex color codes (&#f1c40f[Owner] or &#f1c40f)
+    const hexMatch = colorCode.match(/&#([0-9a-fA-F]{6})/);
+    if (hexMatch) {
+      return `#${hexMatch[1].toUpperCase()}`;
+    }
+
+    // If starts with & or § followed by a single character color code
+    if (colorCode && (colorCode.startsWith('&') || colorCode.startsWith('§')) && colorCode.length > 1) {
+      const code = colorCode.charAt(1).toLowerCase();
+      return colorMap[code] || '#FFFFFF';
+    }
+    
+    return '#FFFFFF'; // Default white
   };
 
-  // Check for HTML-style hex color codes (&#f1c40f[Owner] or &#f1c40f)
-  const hexMatch = colorCode.match(/&#([0-9a-fA-F]{6})/);
-  if (hexMatch) {
-    return `#${hexMatch[1].toUpperCase()}`;
-  }
-
-  // If starts with & or § followed by a single character color code
-  if (colorCode && (colorCode.startsWith('&') || colorCode.startsWith('§')) && colorCode.length > 1) {
-    const code = colorCode.charAt(1).toLowerCase();
-    return colorMap[code] || '#FFFFFF';
-  }
-  
-  return '#FFFFFF'; // Default white
-};
-
   // Extract rank name from color-coded string
-const extractRankName = (rankString: string | undefined): string => {
-  if (!rankString) return 'Member';
-  
-  // Handle hex color codes with brackets: &#f1c40f[Owner]
-  const hexBracketMatch = rankString.match(/&#[0-9a-fA-F]{6}\[([^\]]+)\]/);
-  if (hexBracketMatch) {
-    return hexBracketMatch[1];
-  }
-  
-  // Handle brackets without hex codes: [Owner]
-  const bracketMatch = rankString.match(/\[([^\]]+)\]/);
-  if (bracketMatch) {
-    return bracketMatch[1];
-  }
-  
-  // Remove traditional color codes (& or § followed by a character)
-  const cleanString = rankString.replace(/[&§][0-9a-fA-F]/g, '').trim();
-  
-  // Remove hex color codes from the string
-  const withoutHex = cleanString.replace(/&#[0-9a-fA-F]{6}/g, '').trim();
-  
-  return withoutHex || 'Member';
-};
+  const extractRankName = (rankString: string | undefined): string => {
+    if (!rankString) return 'Member';
+    
+    // Handle hex color codes with brackets: &#f1c40f[Owner]
+    const hexBracketMatch = rankString.match(/&#[0-9a-fA-F]{6}\[([^\]]+)\]/);
+    if (hexBracketMatch) {
+      return hexBracketMatch[1];
+    }
+    
+    // Handle brackets without hex codes: [Owner]
+    const bracketMatch = rankString.match(/\[([^\]]+)\]/);
+    if (bracketMatch) {
+      return bracketMatch[1];
+    }
+    
+    // Remove traditional color codes (& or § followed by a character)
+    const cleanString = rankString.replace(/[&§][0-9a-fA-F]/g, '').trim();
+    
+    // Remove hex color codes from the string
+    const withoutHex = cleanString.replace(/&#[0-9a-fA-F]{6}/g, '').trim();
+    
+    return withoutHex || 'Member';
+  };
 
   // Helper function to format playtime from milliseconds
   const formatPlaytime = (milliseconds: number | undefined): string => {
@@ -209,7 +190,7 @@ const extractRankName = (rankString: string | undefined): string => {
     }
   };
 
-  const fetchPlayerStats = async (name: string) => {
+  const fetchPlayerStats = useCallback(async (name: string) => {
     if (!name) return;
     
     setLoading(true);
@@ -367,13 +348,30 @@ const extractRankName = (rankString: string | undefined): string => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formatPlaytime, calculateKDR, parseColorCode, extractRankName]);
+
+  useEffect(() => {
+    // Nur laden wenn Username in URL gefunden wird
+    const checkForUsername = () => {
+      try {
+        const pathname = window.location.pathname;
+        const storedUsername = pathname.split("/").pop();
+        if (storedUsername && storedUsername !== "stats" && storedUsername !== "" && storedUsername.length > 0) {
+          setUsername(storedUsername);
+          fetchPlayerStats(storedUsername);
+        }
+      } catch (error) {
+        // Falls window.location nicht verfügbar ist, ignorieren
+        console.log("URL parsing not available in this environment");
+      }
+    };
+    
+    checkForUsername();
+  }, [fetchPlayerStats]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
-
-
 
   // Format dates to be more readable with safe handling
   const formatDate = (dateString: string) => {
@@ -459,12 +457,12 @@ const extractRankName = (rankString: string | undefined): string => {
             <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6 mb-6">
               <div className="flex flex-col lg:flex-row lg:items-center gap-6">
                 <div className="relative h-40 w-40 overflow-hidden rounded-lg border-2 border-green-600 bg-gray-600 shadow-lg">
-                  <img
+                  <Image
                     src={`https://vzge.me/full/400/${stats.playerinfo.username}.png`}
                     className="absolute left-0 right-0 m-auto translate-y-10 scale-110 bg-gray-600"
                     alt={stats.playerinfo.username}
-                    width="400"
-                    height="400"
+                    width={400}
+                    height={400}
                   />
                 </div>
                 
