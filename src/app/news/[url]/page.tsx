@@ -17,8 +17,12 @@ interface PageProps {
 // Generate static params for all news articles
 export async function generateStaticParams() {
   try {
-    const response = await fetch('https://cms.onthepixel.net/items/News');
+    const response = await fetch('https://cms.onthepixel.net/items/News', {
+      next: { revalidate: 3600 } // Cache for 1 hour during build
+    });
+    
     if (!response.ok) {
+      console.error('Failed to fetch news for static generation');
       return [];
     }
     
@@ -36,9 +40,12 @@ export async function generateStaticParams() {
 
 async function getNewsItem(url: string): Promise<NewsItem | null> {
   try {
-    const response = await fetch(`https://cms.onthepixel.net/items/News?filter%5B_and%5D%5B0%5D%5Burl%5D%5B_eq%5D=${url}`, {
-      next: { revalidate: 60 } // Revalidate every minute
-    });
+    const response = await fetch(
+      `https://cms.onthepixel.net/items/News?filter%5B_and%5D%5B0%5D%5Burl%5D%5B_eq%5D=${url}`,
+      {
+        next: { revalidate: 3600 }
+      }
+    );
     
     if (!response.ok) {
       return null;
@@ -65,7 +72,7 @@ export default async function NewsPage({ params }: PageProps) {
     return (
       <>
         <TopPage />
-        <section className="bg-gray-950 pt-36">
+        <section className="bg-gray-950 pt-36 min-h-screen">
           <div className="container mx-auto px-4 py-10">
             <h1 className="text-2xl font-bold mb-5">NEWS</h1>
             <div className="text-red-400">News article not found</div>
@@ -78,7 +85,7 @@ export default async function NewsPage({ params }: PageProps) {
   return (
     <>
       <TopPage />
-      <section className="bg-gray-950 pt-36">
+      <section className="bg-gray-950 pt-36 min-h-screen">
         <div className="container mx-auto px-4 py-10">
           <h1 className="text-2xl font-bold mb-5">{newsItem.title}</h1>
           <div className="mb-4 text-gray-400 text-sm">{newsItem.Date}</div>
