@@ -8,17 +8,16 @@ interface PageProps {
   }>;
 }
 
-// Da es unendlich viele mögliche Benutzernamen gibt, generieren wir eine leere Liste
-// Dies ermöglicht es Next.js, die Seiten dynamisch zu erstellen
+// Für Static Export: dynamicParams auf false setzen würde alle unbekannten Routen blockieren
+// Stattdessen lassen wir es offen für client-side navigation
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
-  // Für Player-Statistiken können wir nicht alle möglichen Benutzernamen vorhersagen
-  // Eine leere Liste bedeutet, dass alle Parameter zur Laufzeit behandelt werden
+  // Leere Liste zurückgeben - alle Stats werden client-side geladen
   return [];
 }
 
 const StatisticsPage: React.FC<PageProps> = async ({ params }) => {
-  // Wir können die params hier extrahieren, aber PlayerStatistics
-  // wird sie selbst aus der URL lesen
   const { username } = await params;
   
   return (
