@@ -1,0 +1,7 @@
+{
+  "name": "otpwebsite",
+  "compatibility_date": "2025-09-29",
+  "assets": {
+    "directory": "./out"
+  }
+}
