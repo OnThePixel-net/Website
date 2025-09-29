@@ -8,12 +8,10 @@ interface PageProps {
   }>;
 }
 
-// Für Static Export: dynamicParams auf false setzen würde alle unbekannten Routen blockieren
-// Stattdessen lassen wir es offen für client-side navigation
-export const dynamicParams = true;
-
+// WICHTIG: Entferne "export const dynamicParams = true;"
+// Für Static Export nur leere generateStaticParams
 export async function generateStaticParams() {
-  // Leere Liste zurückgeben - alle Stats werden client-side geladen
+  // Leere Liste - keine Seiten werden vorab generiert
   return [];
 }
 
