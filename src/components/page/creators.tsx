@@ -38,7 +38,7 @@ const getIconComponent = (iconName: string) => {
     case 'twitter':
       return <FaTwitter {...iconProps} className={`${iconProps.className} text-blue-400`} />;
     case 'whatsapp':
-      return <FaWhatsapp {...iconProps} className={`${iconProps.className} text-blue-400`} />;
+      return <FaWhatsapp {...iconProps} className={`${iconProps.className} text-green-400`} />;
     case 'discord':
       return <FaDiscord {...iconProps} className={`${iconProps.className} text-indigo-500`} />;
     case 'tiktok':
