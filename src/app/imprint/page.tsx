@@ -60,13 +60,13 @@ export default function ImprintEnglish() {
             </a>
           </p>
           <p className="mt-2">
-            <span className="text-green-400">*.otp.cx</span>
-          </p>
-          <p className="mt-2">
             <span className="text-green-400">*.onthepixel.net</span>
           </p>
           <p className="mt-2">
             <span className="text-green-400">*.onthepixel.dev</span>
+          </p>
+          <p className="mt-2">
+            <span className="text-green-400">*.bedwars.net</span>
           </p>
           <p className="mt-2">
             <span className="text-green-400">*.tntrun.de</span>
