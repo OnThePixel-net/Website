@@ -81,7 +81,10 @@ export default function ImprintEnglish() {
             <span className="text-green-400">*.norizz.de</span>
           </p>
           <p className="mt-2">
-            <span className="text-green-400">thejocraft.monster</span>
+            <span className="text-green-400">*.thejocraft.monster</span>
+          </p>
+          <p className="mt-2">
+            <span className="text-green-400">*.deinmutter.de</span>
           </p>
         
           <h2 className="text-xl font-semibold mt-8 mb-4">Liability and Copyright Notices</h2>
