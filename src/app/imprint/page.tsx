@@ -128,6 +128,13 @@ export default function ImprintEnglish() {
             processing of data about you by Google in the manner and for the purposes set out above.
           </p>
           
+<h2 className="text-xl font-semibold mt-8 mb-4">Contact Policy</h2>
+<p>
+  The contact options provided on this website are intended <strong>exclusively for legally relevant inquiries</strong>, 
+  including communication from attorneys or individuals with non-commercial concerns. 
+  <strong>Commercial advertising, cooperation requests, or any promotional messages are strictly prohibited</strong> 
+  and will not be answered.
+</p>
           <p className="mt-8 text-gray-400">
             Created with the free <a href="https://datenschutz-generator.de/" target="_blank" rel="noopener noreferrer nofollow" className="text-gray-400 hover:text-gray-300">Datenschutz-Generator.de</a> by Dr. Thomas Schwenke
           </p>
