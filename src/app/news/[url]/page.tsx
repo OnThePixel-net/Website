@@ -1,4 +1,6 @@
-import React from "react";
+'use client';
+
+import React, { useEffect, useState } from "react";
 import TopPage from "@/components/page/top";
 
 interface NewsItem {
@@ -9,66 +11,71 @@ interface NewsItem {
 }
 
 interface PageProps {
-  params: Promise<{
-    url: string;
-  }>;
+  params: Promise<{ url: string; }>;
 }
 
-// Generate static params for all news articles
-export async function generateStaticParams() {
-  try {
-    const response = await fetch('https://cms.onthepixel.net/items/News', {
-      next: { revalidate: 3600 } // Cache for 1 hour during build
-    });
-    
-    if (!response.ok) {
-      console.error('Failed to fetch news for static generation');
-      return [];
+export default function NewsPage({ params }: PageProps) {
+  const [newsItem, setNewsItem] = useState<NewsItem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [url, setUrl] = useState<string>('');
+
+  useEffect(() => {
+    async function loadParams() {
+      const resolvedParams = await params;
+      setUrl(resolvedParams.url);
     }
-    
-    const data = await response.json();
-    const newsItems = data.data || [];
-    
-    return newsItems.map((item: NewsItem) => ({
-      url: item.url,
-    }));
-  } catch (error) {
-    console.error('Error fetching news for static generation:', error);
-    return [];
-  }
-}
+    loadParams();
+  }, [params]);
 
-async function getNewsItem(url: string): Promise<NewsItem | null> {
-  try {
-    const response = await fetch(
-      `https://cms.onthepixel.net/items/News?filter%5B_and%5D%5B0%5D%5Burl%5D%5B_eq%5D=${url}`,
-      {
-        next: { revalidate: 3600 }
+  useEffect(() => {
+    if (!url) return;
+
+    async function fetchNewsItem() {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `https://cms.onthepixel.net/items/News?filter%5B_and%5D%5B0%5D%5Burl%5D%5B_eq%5D=${url}`
+        );
+
+        if (!response.ok) {
+          setError(true);
+          return;
+        }
+
+        const data = await response.json();
+
+        if (data.data && data.data.length > 0) {
+          setNewsItem(data.data[0]);
+        } else {
+          setError(true);
+        }
+      } catch (err) {
+        console.error('Error fetching news:', err);
+        setError(true);
+      } finally {
+        setLoading(false);
       }
+    }
+
+    fetchNewsItem();
+  }, [url]);
+
+  if (loading) {
+    return (
+      <>
+        <TopPage />
+        <section className="bg-gray-950 pt-36 min-h-screen">
+          <div className="container mx-auto px-4 py-10">
+            <h1 className="text-2xl font-bold mb-5">NEWS</h1>
+            <div className="text-gray-400">Loading...</div>
+          </div>
+        </section>
+      </>
     );
-    
-    if (!response.ok) {
-      return null;
-    }
-    
-    const data = await response.json();
-    
-    if (data.data && data.data.length > 0) {
-      return data.data[0];
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Error fetching news:', error);
-    return null;
   }
-}
 
-export default async function NewsPage({ params }: PageProps) {
-  const { url } = await params;
-  const newsItem = await getNewsItem(url);
-
-  if (!newsItem) {
+  if (error || !newsItem) {
     return (
       <>
         <TopPage />
