@@ -128,6 +128,7 @@ export default function NewsPage({ params }: PageProps) {
 
   // Text in Zeilen aufteilen und Links parsen
   const textLines = newsItem.text.split('\n');
+  console.log('Original text:', newsItem.text);
 
   return (
     <>
@@ -139,6 +140,9 @@ export default function NewsPage({ params }: PageProps) {
           <div className="mb-8 text-gray-300 text-lg leading-relaxed">
             {textLines.map((line, lineIndex) => {
               const parts = parseMarkdownLinks(line);
+              console.log('Line:', line);
+              console.log('Parsed parts:', parts);
+              
               return (
                 <React.Fragment key={lineIndex}>
                   {parts.map((part, partIndex) => {
