@@ -137,15 +137,9 @@ export default function NewsPage({ params }: PageProps) {
               return (
                 <React.Fragment key={lineIndex}>
                   {parts.map((part, partIndex) => {
-                    if (part.type === 'link') {
+                    if (part.type === 'link' && part.url && part.text) {
                       return (
-                        
-                          key={partIndex}
-                          href={part.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-400 hover:text-blue-300 underline"
-                        >
+                        <a key={partIndex} href={part.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">
                           {part.text}
                         </a>
                       );
