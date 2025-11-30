@@ -14,15 +14,13 @@ interface PageProps {
   params: Promise<{ url: string; }>;
 }
 
-// Funktion zum Parsen von Markdown-Links
 function parseMarkdownLinks(text: string) {
-  const parts = [];
+  const parts: Array<{type: string; content?: string; text?: string; url?: string}> = [];
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   let lastIndex = 0;
   let match;
 
   while ((match = linkRegex.exec(text)) !== null) {
-    // Text vor dem Link
     if (match.index > lastIndex) {
       parts.push({
         type: 'text',
@@ -30,7 +28,6 @@ function parseMarkdownLinks(text: string) {
       });
     }
 
-    // Der Link selbst
     parts.push({
       type: 'link',
       text: match[1],
@@ -40,7 +37,6 @@ function parseMarkdownLinks(text: string) {
     lastIndex = match.index + match[0].length;
   }
 
-  // Restlicher Text nach dem letzten Link
   if (lastIndex < text.length) {
     parts.push({
       type: 'text',
@@ -100,7 +96,7 @@ export default function NewsPage({ params }: PageProps) {
 
   if (loading) {
     return (
-      <>
+      <React.Fragment>
         <TopPage />
         <section className="bg-gray-950 pt-36 min-h-screen">
           <div className="container mx-auto px-4 py-10">
@@ -108,13 +104,13 @@ export default function NewsPage({ params }: PageProps) {
             <div className="text-gray-400">Loading...</div>
           </div>
         </section>
-      </>
+      </React.Fragment>
     );
   }
 
   if (error || !newsItem) {
     return (
-      <>
+      <React.Fragment>
         <TopPage />
         <section className="bg-gray-950 pt-36 min-h-screen">
           <div className="container mx-auto px-4 py-10">
@@ -122,16 +118,14 @@ export default function NewsPage({ params }: PageProps) {
             <div className="text-red-400">News article not found</div>
           </div>
         </section>
-      </>
+      </React.Fragment>
     );
   }
 
-  // Text in Zeilen aufteilen und Links parsen
   const textLines = newsItem.text.split('\n');
-  console.log('Original text:', newsItem.text);
 
   return (
-    <>
+    <React.Fragment>
       <TopPage />
       <section className="bg-gray-950 pt-36 min-h-screen">
         <div className="container mx-auto px-4 py-10">
@@ -140,9 +134,6 @@ export default function NewsPage({ params }: PageProps) {
           <div className="mb-8 text-gray-300 text-lg leading-relaxed">
             {textLines.map((line, lineIndex) => {
               const parts = parseMarkdownLinks(line);
-              console.log('Line:', line);
-              console.log('Parsed parts:', parts);
-              
               return (
                 <React.Fragment key={lineIndex}>
                   {parts.map((part, partIndex) => {
@@ -168,6 +159,6 @@ export default function NewsPage({ params }: PageProps) {
           </div>
         </div>
       </section>
-    </>
+    </React.Fragment>
   );
 }
