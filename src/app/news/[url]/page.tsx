@@ -14,6 +14,43 @@ interface PageProps {
   params: Promise<{ url: string; }>;
 }
 
+// Funktion zum Parsen von Markdown-Links
+function parseMarkdownLinks(text: string) {
+  const parts = [];
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = linkRegex.exec(text)) !== null) {
+    // Text vor dem Link
+    if (match.index > lastIndex) {
+      parts.push({
+        type: 'text',
+        content: text.substring(lastIndex, match.index)
+      });
+    }
+
+    // Der Link selbst
+    parts.push({
+      type: 'link',
+      text: match[1],
+      url: match[2]
+    });
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Restlicher Text nach dem letzten Link
+  if (lastIndex < text.length) {
+    parts.push({
+      type: 'text',
+      content: text.substring(lastIndex)
+    });
+  }
+
+  return parts.length > 0 ? parts : [{ type: 'text', content: text }];
+}
+
 export default function NewsPage({ params }: PageProps) {
   const [newsItem, setNewsItem] = useState<NewsItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -89,6 +126,9 @@ export default function NewsPage({ params }: PageProps) {
     );
   }
 
+  // Text in Zeilen aufteilen und Links parsen
+  const textLines = newsItem.text.split('\n');
+
   return (
     <>
       <TopPage />
@@ -96,8 +136,31 @@ export default function NewsPage({ params }: PageProps) {
         <div className="container mx-auto px-4 py-10">
           <h1 className="text-2xl font-bold mb-5">{newsItem.title}</h1>
           <div className="mb-4 text-gray-400 text-sm">{newsItem.Date}</div>
-          <div className="mb-8 text-gray-300 text-lg leading-relaxed whitespace-pre-wrap">
-            {newsItem.text}
+          <div className="mb-8 text-gray-300 text-lg leading-relaxed">
+            {textLines.map((line, lineIndex) => {
+              const parts = parseMarkdownLinks(line);
+              return (
+                <React.Fragment key={lineIndex}>
+                  {parts.map((part, partIndex) => {
+                    if (part.type === 'link') {
+                      return (
+                        
+                          key={partIndex}
+                          href={part.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 underline"
+                        >
+                          {part.text}
+                        </a>
+                      );
+                    }
+                    return <span key={partIndex}>{part.content}</span>;
+                  })}
+                  {lineIndex < textLines.length - 1 && <br />}
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
       </section>
