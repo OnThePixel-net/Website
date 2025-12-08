@@ -40,8 +40,8 @@ export default function Leaderboards() {
               title="Duels"
               description="The best duelists ranked by wins, K/D ratio and win streaks."
               link="/leaderboard/duels"
-              comingSoon={false}
-              enabled={true}
+              comingSoon={true}
+              enabled={false}
             />
             
             {/* Parkour Leaderboard */}
