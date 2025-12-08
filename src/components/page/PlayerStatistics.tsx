@@ -76,8 +76,12 @@ interface MinigamesResponse {
   };
 }
 
-export default function PlayerStatistics() {
-  const [username, setUsername] = useState<string>("");
+interface PlayerStatisticsProps {
+  initialUsername?: string;
+}
+
+export default function PlayerStatistics({ initialUsername }: PlayerStatisticsProps) {
+  const [username, setUsername] = useState<string>(initialUsername || "");
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,59 +91,40 @@ export default function PlayerStatistics() {
     if (!colorCode) return '#FFFFFF';
     
     const colorMap: Record<string, string> = {
-      '0': '#000000', // Black
-      '1': '#0000AA', // Dark Blue
-      '2': '#00AA00', // Dark Green
-      '3': '#00AAAA', // Dark Aqua
-      '4': '#AA0000', // Dark Red
-      '5': '#AA00AA', // Dark Purple
-      '6': '#FFAA00', // Gold
-      '7': '#AAAAAA', // Gray
-      '8': '#555555', // Dark Gray
-      '9': '#5555FF', // Blue
-      'a': '#55FF55', // Green
-      'b': '#55FFFF', // Aqua
-      'c': '#FF5555', // Red
-      'd': '#FF55FF', // Light Purple
-      'e': '#FFFF55', // Yellow
-      'f': '#FFFFFF', // White
+      '0': '#000000', '1': '#0000AA', '2': '#00AA00', '3': '#00AAAA',
+      '4': '#AA0000', '5': '#AA00AA', '6': '#FFAA00', '7': '#AAAAAA',
+      '8': '#555555', '9': '#5555FF', 'a': '#55FF55', 'b': '#55FFFF',
+      'c': '#FF5555', 'd': '#FF55FF', 'e': '#FFFF55', 'f': '#FFFFFF',
     };
 
-    // Check for HTML-style hex color codes (&#f1c40f[Owner] or &#f1c40f)
     const hexMatch = colorCode.match(/&#([0-9a-fA-F]{6})/);
     if (hexMatch) {
       return `#${hexMatch[1].toUpperCase()}`;
     }
 
-    // If starts with & or § followed by a single character color code
     if (colorCode && (colorCode.startsWith('&') || colorCode.startsWith('§')) && colorCode.length > 1) {
       const code = colorCode.charAt(1).toLowerCase();
       return colorMap[code] || '#FFFFFF';
     }
     
-    return '#FFFFFF'; // Default white
+    return '#FFFFFF';
   };
 
   // Extract rank name from color-coded string
   const extractRankName = (rankString: string | undefined): string => {
     if (!rankString) return 'Member';
     
-    // Handle hex color codes with brackets: &#f1c40f[Owner]
     const hexBracketMatch = rankString.match(/&#[0-9a-fA-F]{6}\[([^\]]+)\]/);
     if (hexBracketMatch) {
       return hexBracketMatch[1];
     }
     
-    // Handle brackets without hex codes: [Owner]
     const bracketMatch = rankString.match(/\[([^\]]+)\]/);
     if (bracketMatch) {
       return bracketMatch[1];
     }
     
-    // Remove traditional color codes (& or § followed by a character)
     const cleanString = rankString.replace(/[&§][0-9a-fA-F]/g, '').trim();
-    
-    // Remove hex color codes from the string
     const withoutHex = cleanString.replace(/&#[0-9a-fA-F]{6}/g, '').trim();
     
     return withoutHex || 'Member';
@@ -149,13 +134,11 @@ export default function PlayerStatistics() {
   const formatPlaytime = (milliseconds: number | undefined): string => {
     if (!milliseconds || milliseconds === 0) return '0m';
     
-    // Convert milliseconds to seconds, minutes, hours, and days
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
     
-    // Calculate remaining hours and minutes
     const remainingHours = hours % 24;
     const remainingMinutes = minutes % 60;
     
@@ -197,7 +180,6 @@ export default function PlayerStatistics() {
     setError(null);
     
     try {
-      // Create initial player data structure with safe defaults
       let playerData: PlayerStats = {
         playerinfo: {
           username: name,
@@ -239,7 +221,7 @@ export default function PlayerStatistics() {
         }
       };
       
-      // Fetch pixels data from API with safe handling
+      // Fetch pixels data
       try {
         const pixelResponse = await fetch(`https://api.onthepixel.net/stats/pixel/${name}`);
         if (pixelResponse.ok) {
@@ -251,7 +233,7 @@ export default function PlayerStatistics() {
         playerData.stats.balance.pixels = 0;
       }
 
-      // Fetch playtime data from API with safe handling
+      // Fetch playtime data
       try {
         const playtimeResponse = await fetch(`https://api.onthepixel.net/stats/playtime/${name}`);
         if (playtimeResponse.ok) {
@@ -264,10 +246,9 @@ export default function PlayerStatistics() {
         }
       } catch (playtimeError) {
         console.error("Error fetching playtime data:", playtimeError);
-        // Keep default values (already set to safe defaults)
       }
       
-      // Fetch rank data with safe handling
+      // Fetch rank data
       try {
         const rankResponse = await fetch(`https://api.onthepixel.net/stats/luckperms/rank/${name}`);
         if (rankResponse.ok) {
@@ -281,16 +262,14 @@ export default function PlayerStatistics() {
         }
       } catch (rankError) {
         console.error("Error fetching rank data:", rankError);
-        // Keep default rank values
       }
 
-      // Fetch Minigames stats (Duels and BuildFFA)
+      // Fetch Minigames stats
       try {
         const minigamesResponse = await fetch(`https://api.onthepixel.net/stats/minigames/${name}`);
         if (minigamesResponse.ok) {
           const minigamesData: MinigamesResponse = await minigamesResponse.json();
           
-          // Process Duels data
           if (minigamesData?.duels) {
             const duelsWins = minigamesData.duels.Wins ?? 0;
             const duelsLosses = minigamesData.duels.Losses ?? 0;
@@ -300,14 +279,13 @@ export default function PlayerStatistics() {
             playerData.stats.duels = {
               wins: duelsWins,
               losses: duelsLosses,
-              kills: 0, // Not provided in API
-              deaths: 0, // Not provided in API
+              kills: 0,
+              deaths: 0,
               kdr: duelsKDR,
               gamesPlayed: duelsGames
             };
           }
 
-          // Process BuildFFA data
           if (minigamesData?.buildffa) {
             const buildffaKills = minigamesData.buildffa.Kills ?? 0;
             const buildffaDeaths = minigamesData.buildffa.Deaths ?? 0;
@@ -322,10 +300,8 @@ export default function PlayerStatistics() {
         }
       } catch (minigamesError) {
         console.error("Error fetching minigames data:", minigamesError);
-        // Keep default values
       }
       
-      // Special test case
       if (name.toLowerCase() === 'error') {
         throw new Error("Player not found");
       }
@@ -337,7 +313,6 @@ export default function PlayerStatistics() {
         const newUrl = `/stats/${name}`;
         window.history.pushState({ path: newUrl }, "", newUrl);
       } catch (error) {
-        // Falls history API nicht verfügbar ist, ignorieren
         console.log("History API not available in this environment");
       }
       
@@ -348,37 +323,23 @@ export default function PlayerStatistics() {
     } finally {
       setLoading(false);
     }
-  }, [formatPlaytime, calculateKDR, parseColorCode, extractRankName]);
+  }, []);
 
+  // Load stats automatically when initialUsername is provided
   useEffect(() => {
-    // Nur laden wenn Username in URL gefunden wird
-    const checkForUsername = () => {
-      try {
-        const pathname = window.location.pathname;
-        const storedUsername = pathname.split("/").pop();
-        if (storedUsername && storedUsername !== "stats" && storedUsername !== "" && storedUsername.length > 0) {
-          setUsername(storedUsername);
-          fetchPlayerStats(storedUsername);
-        }
-      } catch (error) {
-        // Falls window.location nicht verfügbar ist, ignorieren
-        console.log("URL parsing not available in this environment");
-      }
-    };
-    
-    checkForUsername();
-  }, [fetchPlayerStats]);
+    if (initialUsername && initialUsername.length > 0) {
+      fetchPlayerStats(initialUsername);
+    }
+  }, [initialUsername, fetchPlayerStats]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
 
-  // Format dates to be more readable with safe handling
   const formatDate = (dateString: string) => {
     return safeFormatDate(dateString);
   };
 
-  // Stat item component for cleaner code
   const StatItem = ({ label, value, icon }: { label: string; value: string | number; icon?: React.ReactNode }) => (
     <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
       <div className="flex items-center gap-2">
@@ -389,7 +350,6 @@ export default function PlayerStatistics() {
     </div>
   );
 
-  // Coming Soon component
   const ComingSoonCard = ({ title, icon, color }: { title: string; icon: React.ReactNode; color: string }) => (
     <div className="bg-gray-900/50 border border-gray-800 rounded-lg">
       <div className="p-6 pb-4">
@@ -397,9 +357,7 @@ export default function PlayerStatistics() {
           {icon}
           {title}
         </div>
-        <p className="text-gray-400">
-          Statistics coming soon
-        </p>
+        <p className="text-gray-400">Statistics coming soon</p>
       </div>
       <div className="p-6 flex items-center justify-center py-12">
         <div className="text-center">
@@ -453,7 +411,6 @@ export default function PlayerStatistics() {
         
         {stats && (
           <>
-            {/* Player Info Card */}
             <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6 mb-6">
               <div className="flex flex-col lg:flex-row lg:items-center gap-6">
                 <div className="relative h-40 w-40 overflow-hidden rounded-lg border-2 border-green-600 bg-gray-600 shadow-lg">
@@ -501,25 +458,20 @@ export default function PlayerStatistics() {
               </div>
             </div>
 
-            {/* Gamemode Stats Grid */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              {/* Bedwars Stats - Coming Soon */}
               <ComingSoonCard 
                 title="BedWars"
                 icon={<Sword className="h-5 w-5" />}
                 color="text-red-400"
               />
 
-              {/* Duels Stats */}
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg">
                 <div className="p-6 pb-4">
                   <div className="flex items-center gap-2 text-xl font-bold text-purple-400 mb-2">
                     <Zap className="h-5 w-5" />
                     Duels
                   </div>
-                  <p className="text-gray-400">
-                    1v1 combat and skill statistics
-                  </p>
+                  <p className="text-gray-400">1v1 combat and skill statistics</p>
                 </div>
                 <div className="p-6 space-y-3">
                   <StatItem 
@@ -527,38 +479,25 @@ export default function PlayerStatistics() {
                     value={stats.stats.duels.wins.toLocaleString()} 
                     icon={<Trophy className="h-4 w-4 text-yellow-400" />}
                   />
-                  <StatItem 
-                    label="Losses" 
-                    value={stats.stats.duels.losses.toLocaleString()} 
-                  />
-                  <StatItem 
-                    label="K/D Ratio" 
-                    value={stats.stats.duels.kdr} 
-                  />
-                  <StatItem 
-                    label="Games Played" 
-                    value={stats.stats.duels.gamesPlayed.toLocaleString()} 
-                  />
+                  <StatItem label="Losses" value={stats.stats.duels.losses.toLocaleString()} />
+                  <StatItem label="K/D Ratio" value={stats.stats.duels.kdr} />
+                  <StatItem label="Games Played" value={stats.stats.duels.gamesPlayed.toLocaleString()} />
                 </div>
               </div>
 
-              {/* TNTRun Stats - Coming Soon */}
               <ComingSoonCard 
                 title="TNTRun"
                 icon={<Bomb className="h-5 w-5" />}
                 color="text-orange-400"
               />
 
-              {/* BuildFFA Stats */}
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg">
                 <div className="p-6 pb-4">
                   <div className="flex items-center gap-2 text-xl font-bold text-green-400 mb-2">
                     <Hammer className="h-5 w-5" />
                     BuildFFA
                   </div>
-                  <p className="text-gray-400">
-                    Building and combat statistics
-                  </p>
+                  <p className="text-gray-400">Building and combat statistics</p>
                 </div>
                 <div className="p-6 space-y-3">
                   <StatItem 
@@ -566,14 +505,8 @@ export default function PlayerStatistics() {
                     value={stats.stats.buildffa.kills.toLocaleString()} 
                     icon={<Target className="h-4 w-4 text-red-400" />}
                   />
-                  <StatItem 
-                    label="Deaths" 
-                    value={stats.stats.buildffa.deaths.toLocaleString()} 
-                  />
-                  <StatItem 
-                    label="K/D Ratio" 
-                    value={stats.stats.buildffa.kdr} 
-                  />
+                  <StatItem label="Deaths" value={stats.stats.buildffa.deaths.toLocaleString()} />
+                  <StatItem label="K/D Ratio" value={stats.stats.buildffa.kdr} />
                 </div>
               </div>
             </div>
