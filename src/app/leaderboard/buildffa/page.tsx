@@ -19,9 +19,9 @@ export default function BuildFFALeaderboard() {
             description="Players are ranked based on their kills, deaths, and overall performance in BuildFFA matches."
             endpoint="leaderbords/Buildffa"
             statColumns={[
-              { key: "statsAllKills", label: "Kills" },
-              { key: "statsAllDeaths", label: "Deaths" },
-              { key: "kd", label: "K/D Ratio" }
+              { key: "kills", label: "Kills" },
+              { key: "deaths", label: "Deaths" },
+              { key: "kdRatio", label: "K/D Ratio" }
             ]}
           />
         </div>
