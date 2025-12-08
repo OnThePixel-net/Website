@@ -21,7 +21,7 @@ const StatisticsPage: React.FC<PageProps> = async ({ params }) => {
   return (
     <section className="bg-gray-950 min-h-screen">
       <TopPage />
-      <PlayerStatistics />
+      <PlayerStatistics initialUsername={username} />
     </section>
   );
 };
