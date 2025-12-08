@@ -323,7 +323,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, []); // WICHTIG: Leeres Dependency-Array verhindert die Endlosschleife!
 
   // Load stats automatically when initialUsername is provided
   useEffect(() => {
