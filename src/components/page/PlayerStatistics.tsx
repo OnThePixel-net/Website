@@ -95,7 +95,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
       '4': '#AA0000', '5': '#AA00AA', '6': '#FFAA00', '7': '#AAAAAA',
       '8': '#555555', '9': '#5555FF', 'a': '#55FF55', 'b': '#55FFFF',
       'c': '#FF5555', 'd': '#FF55FF', 'e': '#FFFF55', 'f': '#FFFFFF',
-      'f': '&l',
+      '&l': '',
     };
 
     const hexMatch = colorCode.match(/&#([0-9a-fA-F]{6})/);
