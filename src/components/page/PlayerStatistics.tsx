@@ -378,15 +378,12 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
   );
 
   return (
-    <div className="bg-gray-950 min-h-screen p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-            {stats ? `STATISTICS FOR` : 'PLAYER STATISTICS'}
-          </h1>
-          <div className="h-1 w-20 bg-green-500 rounded"></div>
-        </div>
+    <section className="bg-gray-950 min-h-screen">
+      <div className="container mx-auto px-4 py-10">
+        <h1 className="text-2xl font-bold mb-5">PLAYER STATISTICS</h1>
+        <p className="mb-8 text-gray-400">
+          Search for any player and view their detailed statistics
+        </p>
 
         {/* Search Bar */}
         <div className="mb-8 flex gap-2">
@@ -474,7 +471,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
               {/* Duels */}
               <div className="bg-white/10 border border-gray-700 rounded-lg p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Sword className="w-6 h-6 text-green-400" />
+                  <Sword className="w-6 h-6 text-blue-400" />
                   <h3 className="text-2xl font-bold text-white">Duels</h3>
                 </div>
                 <p className="text-gray-400 text-sm mb-4">1v1 combat and skill statistics</p>
@@ -496,7 +493,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
               {/* Build FFA */}
               <div className="bg-white/10 border border-gray-700 rounded-lg p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Hammer className="w-6 h-6 text-green-400" />
+                  <Hammer className="w-6 h-6 text-orange-400" />
                   <h3 className="text-2xl font-bold text-white">BuildFFA</h3>
                 </div>
                 <p className="text-gray-400 text-sm mb-4">Building and combat statistics</p>
@@ -510,6 +507,6 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
           </>
         )}
       </div>
-    </div>
+    </section>
   );
 }
