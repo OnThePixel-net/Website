@@ -136,9 +136,9 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
       return bracketMatch[1];
     }
 
-    // Entferne Farb- und Formatierungscodes (&0-f, &l, &m, &n, &o, &k, §...)
-    // l = Bold, m = Strikethrough, n = Underline, o = Italic, k = Obfuscated
-    const cleanString = rankString.replace(/[&§][0-9a-fA-Flmnok]/g, '').trim();
+    // Entferne Farb- und Formatierungscodes (&0-f, &l, &m, &n, &o, &k, &r, §...)
+    // l = Bold, m = Strikethrough, n = Underline, o = Italic, k = Obfuscated, r = Reset
+    const cleanString = rankString.replace(/[&§][0-9a-fA-Flmnokr]/g, '').trim();
     const withoutHex = cleanString.replace(/&#[0-9a-fA-F]{6}/g, '').trim();
 
     return withoutHex || 'Member';
