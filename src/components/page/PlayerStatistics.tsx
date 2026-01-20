@@ -354,7 +354,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
   };
 
   const StatItem = ({ label, value, icon }: { label: string; value: string | number; icon?: React.ReactNode }) => (
-    <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded border border-gray-700/50">
+    <div className="flex items-center justify-between p-3 bg-white/5 rounded border border-gray-700">
       <div className="flex items-center gap-2 text-gray-400">
         {icon}
         {label}
@@ -364,13 +364,13 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
   );
 
   const ComingSoonCard = ({ title, icon, color }: { title: string; icon: React.ReactNode; color: string }) => (
-    <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 text-center">
+    <div className="bg-white/10 border border-gray-700 rounded-lg p-6 text-center">
       <div className={`flex justify-center mb-3 ${color}`}>
         {icon}
       </div>
       <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
       <p className="text-gray-400 text-sm mb-4">Statistics coming soon</p>
-      <span className="inline-block px-3 py-1 bg-gray-700/50 text-gray-400 text-xs rounded">
+      <span className="inline-block px-3 py-1 bg-gray-800 text-gray-400 text-xs rounded">
         Coming Soon
       </span>
       <p className="text-gray-500 text-xs mt-3">Statistics will be available in a future update</p>
@@ -378,14 +378,14 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 md:p-8">
+    <div className="bg-gray-950 min-h-screen p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-            {stats ? `STATISTICS FOR ${stats.playerinfo.username}` : 'PLAYER STATISTICS'}
+            {stats ? `STATISTICS FOR` : 'PLAYER STATISTICS'}
           </h1>
-          <div className="h-1 w-20 bg-gradient-to-r from-green-500 to-blue-500 rounded"></div>
+          <div className="h-1 w-20 bg-green-500 rounded"></div>
         </div>
 
         {/* Search Bar */}
@@ -398,7 +398,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
               onChange={handleInputChange}
               onKeyPress={(e) => e.key === 'Enter' && fetchPlayerStats(username)}
               placeholder="Enter A Minecraft Username"
-              className="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           </div>
           <button
@@ -416,7 +416,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded text-red-400">
+          <div className="mb-6 p-4 bg-red-900/20 border border-red-700 rounded text-red-400">
             {error}
           </div>
         )}
@@ -425,7 +425,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
         {stats && (
           <>
             {/* Player Info Card */}
-            <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-lg p-6 mb-8">
+            <div className="bg-white/10 border border-gray-700 rounded-lg p-6 mb-8">
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <h2 className="text-3xl font-bold text-white mb-2">{stats.playerinfo.username}</h2>
@@ -472,9 +472,9 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
               />
 
               {/* Duels */}
-              <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
+              <div className="bg-white/10 border border-gray-700 rounded-lg p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Sword className="w-6 h-6 text-blue-400" />
+                  <Sword className="w-6 h-6 text-green-400" />
                   <h3 className="text-2xl font-bold text-white">Duels</h3>
                 </div>
                 <p className="text-gray-400 text-sm mb-4">1v1 combat and skill statistics</p>
@@ -494,9 +494,9 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
               />
 
               {/* Build FFA */}
-              <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
+              <div className="bg-white/10 border border-gray-700 rounded-lg p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Hammer className="w-6 h-6 text-orange-400" />
+                  <Hammer className="w-6 h-6 text-green-400" />
                   <h3 className="text-2xl font-bold text-white">BuildFFA</h3>
                 </div>
                 <p className="text-gray-400 text-sm mb-4">Building and combat statistics</p>
