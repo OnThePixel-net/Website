@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { 
   FaYoutube, 
   FaTwitch, 
@@ -18,7 +19,7 @@ interface Platform {
 }
 
 interface Creator {
-  Minecarft_username: string; // Typo in der API beibehalten
+  Minecarft_username: string;
   Name: string;
   Platforms: Platform[];
 }
@@ -34,7 +35,6 @@ interface FollowerData {
   };
 }
 
-// Funktion zum Formatieren der Follower-Zahlen
 const formatFollowers = (count: number): string => {
   if (count >= 1000000) {
     return `${(count / 1000000).toFixed(1)}M`;
@@ -44,7 +44,6 @@ const formatFollowers = (count: number): string => {
   return count.toString();
 };
 
-// Icon-Mapping für die verschiedenen Plattformen
 const getIconComponent = (iconName: string) => {
   const iconProps = { size: 18, className: "hover:scale-110 transition-transform duration-200" };
   
@@ -72,6 +71,7 @@ const getIconComponent = (iconName: string) => {
 export default function Creators() {
   const [creators, setCreators] = useState<Creator[]>([]);
   const [followersData, setFollowersData] = useState<Map<string, number>>(new Map());
+  const [loadingFollowers, setLoadingFollowers] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -87,7 +87,6 @@ export default function Creators() {
         const creatorsList = data.data || [];
         setCreators(creatorsList);
         
-        // Follower-Daten für jeden Creator abrufen
         fetchAllFollowers(creatorsList);
       } catch (error) {
         console.error("Error fetching creators:", error);
@@ -102,7 +101,6 @@ export default function Creators() {
   async function fetchAllFollowers(creatorsList: Creator[]) {
     const followersMap = new Map<string, number>();
     
-    // Parallel alle Follower-Daten abrufen
     await Promise.all(
       creatorsList.map(async (creator) => {
         try {
@@ -124,6 +122,7 @@ export default function Creators() {
     );
     
     setFollowersData(followersMap);
+    setLoadingFollowers(false);
   }
 
   if (loading) {
@@ -169,21 +168,28 @@ export default function Creators() {
                     </div>
                     
                     {/* Follower Count */}
-                    {followerCount !== undefined && (
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-white">
-                          {formatFollowers(followerCount)}
-                        </p>
-                        <p className="text-xs text-gray-400">Followers</p>
-                      </div>
-                    )}
+                    <div className="text-right">
+                      {loadingFollowers ? (
+                        <div className="animate-pulse">
+                          <div className="h-6 w-12 bg-gray-700 rounded mb-1"></div>
+                          <div className="h-3 w-16 bg-gray-700 rounded"></div>
+                        </div>
+                      ) : followerCount !== undefined ? (
+                        <>
+                          <p className="text-lg font-bold text-white">
+                            {formatFollowers(followerCount)}
+                          </p>
+                          <p className="text-xs text-gray-400">Followers</p>
+                        </>
+                      ) : null}
+                    </div>
                   </div>
                   
                   {/* Platform Icons */}
                   {creator.Platforms && creator.Platforms.length > 0 && (
                     <div className="flex flex-wrap gap-3 mt-auto">
                       {creator.Platforms.map((platform, platformIndex) => (
-                        
+                        <Link
                           key={platformIndex}
                           href={platform.Link}
                           target="_blank"
@@ -192,7 +198,7 @@ export default function Creators() {
                           title={`${creator.Name} auf ${platform.Icons}`}
                         >
                           {getIconComponent(platform.Icons)}
-                        </a>
+                        </Link>
                       ))}
                     </div>
                   )}
