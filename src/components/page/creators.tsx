@@ -125,6 +125,13 @@ export default function Creators() {
     setLoadingFollowers(false);
   }
 
+  // Sortiere Creators nach Follower-Anzahl (höchste zuerst)
+  const sortedCreators = [...creators].sort((a, b) => {
+    const followersA = followersData.get(a.Name) || 0;
+    const followersB = followersData.get(b.Name) || 0;
+    return followersB - followersA; // Absteigende Sortierung
+  });
+
   if (loading) {
     return (
       <section className="py-10 px-4 bg-gray-950">
@@ -144,9 +151,9 @@ export default function Creators() {
         <h1 id="creators" className="text-3xl font-bold mb-4 text-white">
           CREATORS
         </h1>
-        {creators.length > 0 ? (
+        {sortedCreators.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {creators.map((creator, index) => {
+            {sortedCreators.map((creator, index) => {
               const followerCount = followersData.get(creator.Name);
               
               return (
