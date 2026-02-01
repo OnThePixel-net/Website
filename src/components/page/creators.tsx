@@ -75,6 +75,93 @@ const getIconComponent = (iconName: string) => {
   }
 };
 
+// Creator Card Komponente
+const CreatorCard = ({ 
+  creator, 
+  followerCount, 
+  live, 
+  loadingFollowers 
+}: { 
+  creator: Creator; 
+  followerCount?: number; 
+  live?: LiveStatus; 
+  loadingFollowers: boolean;
+}) => (
+  <div className="m-1 flex flex-col rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105 relative">
+    {/* Live Badge */}
+    {live?.isLive && (
+      <div className="absolute top-3 right-3 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+        <span className="w-2 h-2 bg-white rounded-full"></span>
+        LIVE
+      </div>
+    )}
+
+    <div className="flex items-center mb-4">
+      <Image
+        alt={creator.Minecarft_username}
+        src={`https://vzge.me/face/512/${creator.Minecarft_username}.png`}
+        width={40}
+        height={40}
+        className="rounded"
+      />
+      <div className="ml-4 flex-1">
+        <p className="font-bold text-white">{creator.Name}</p>
+        <p className="text-sm text-gray-400">CREATOR</p>
+        {live?.isLive && live.platform && (
+          <p className="text-xs text-red-400 mt-1">
+            {live.platform.toUpperCase()}
+            {live.viewers && ` • ${formatFollowers(live.viewers)} watching`}
+          </p>
+        )}
+      </div>
+      
+      {/* Follower Count */}
+      <div className="text-right">
+        {loadingFollowers ? (
+          <div className="animate-pulse">
+            <div className="h-6 w-12 bg-gray-700 rounded mb-1"></div>
+            <div className="h-3 w-16 bg-gray-700 rounded"></div>
+          </div>
+        ) : followerCount !== undefined ? (
+          <>
+            <p className="text-lg font-bold text-white">
+              {formatFollowers(followerCount)}
+            </p>
+            <p className="text-xs text-gray-400">Followers</p>
+          </>
+        ) : null}
+      </div>
+    </div>
+    
+    {/* Live Stream Title */}
+    {live?.isLive && live.title && (
+      <div className="mb-3 pb-3 border-b border-white/10">
+        <p className="text-sm text-gray-300 line-clamp-2">
+          {live.title}
+        </p>
+      </div>
+    )}
+
+    {/* Platform Icons */}
+    {creator.Platforms && creator.Platforms.length > 0 && (
+      <div className="flex flex-wrap gap-3 mt-auto">
+        {creator.Platforms.map((platform, platformIndex) => (
+          <Link
+            key={platformIndex}
+            href={platform.Link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-md bg-white/5 hover:bg-white/20 transition-colors duration-200"
+            title={`${creator.Name} auf ${platform.Icons}`}
+          >
+            {getIconComponent(platform.Icons)}
+          </Link>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 export default function Creators() {
   const [creators, setCreators] = useState<Creator[]>([]);
   const [followersData, setFollowersData] = useState<Map<string, number>>(new Map());
@@ -176,17 +263,18 @@ export default function Creators() {
     setLiveStatus(liveMap);
   }
 
-  // Sortiere Creators nach Live-Status und dann nach Follower-Anzahl
-  const sortedCreators = [...creators].sort((a, b) => {
-    const liveA = liveStatus.get(a.Name)?.isLive ? 1 : 0;
-    const liveB = liveStatus.get(b.Name)?.isLive ? 1 : 0;
-    
-    // Erst nach Live-Status sortieren (Live zuerst)
-    if (liveB !== liveA) {
-      return liveB - liveA;
-    }
-    
-    // Dann nach Follower-Anzahl
+  // Creators in Live und Offline aufteilen
+  const liveCreators = creators.filter(creator => 
+    liveStatus.get(creator.Name)?.isLive
+  ).sort((a, b) => {
+    const followersA = followersData.get(a.Name) || 0;
+    const followersB = followersData.get(b.Name) || 0;
+    return followersB - followersA;
+  });
+
+  const offlineCreators = creators.filter(creator => 
+    !liveStatus.get(creator.Name)?.isLive
+  ).sort((a, b) => {
     const followersA = followersData.get(a.Name) || 0;
     const followersB = followersData.get(b.Name) || 0;
     return followersB - followersA;
@@ -208,98 +296,58 @@ export default function Creators() {
   return (
     <section className="py-10 px-4 bg-gray-950">
       <div className="container mx-auto px-4 py-10">
-        <h1 id="creators" className="text-3xl font-bold mb-4 text-white">
+        <h1 id="creators" className="text-3xl font-bold mb-8 text-white">
           CREATORS
         </h1>
-        {sortedCreators.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {sortedCreators.map((creator, index) => {
-              const followerCount = followersData.get(creator.Name);
-              const live = liveStatus.get(creator.Name);
-              
-              return (
-                <div
-                  key={index}
-                  className="m-1 flex flex-col rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105 relative"
-                >
-                  {/* Live Badge */}
-                  {live?.isLive && (
-                    <div className="absolute top-3 right-3 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-                      <span className="w-2 h-2 bg-white rounded-full"></span>
-                      LIVE
-                    </div>
-                  )}
 
-                  <div className="flex items-center mb-4">
-                    <Image
-                      alt={creator.Minecarft_username}
-                      src={`https://vzge.me/face/512/${creator.Minecarft_username}.png`}
-                      width={40}
-                      height={40}
-                      className="rounded"
-                    />
-                    <div className="ml-4 flex-1">
-                      <p className="font-bold text-white">{creator.Name}</p>
-                      <p className="text-sm text-gray-400">CREATOR</p>
-                      {live?.isLive && live.platform && (
-                        <p className="text-xs text-red-400 mt-1">
-                          {live.platform.toUpperCase()}
-                          {live.viewers && ` • ${formatFollowers(live.viewers)} watching`}
-                        </p>
-                      )}
-                    </div>
-                    
-                    {/* Follower Count */}
-                    <div className="text-right">
-                      {loadingFollowers ? (
-                        <div className="animate-pulse">
-                          <div className="h-6 w-12 bg-gray-700 rounded mb-1"></div>
-                          <div className="h-3 w-16 bg-gray-700 rounded"></div>
-                        </div>
-                      ) : followerCount !== undefined ? (
-                        <>
-                          <p className="text-lg font-bold text-white">
-                            {formatFollowers(followerCount)}
-                          </p>
-                          <p className="text-xs text-gray-400">Followers</p>
-                        </>
-                      ) : null}
-                    </div>
-                  </div>
-                  
-                  {/* Live Stream Title */}
-                  {live?.isLive && live.title && (
-                    <div className="mb-3 pb-3 border-b border-white/10">
-                      <p className="text-sm text-gray-300 line-clamp-2">
-                        {live.title}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Platform Icons */}
-                  {creator.Platforms && creator.Platforms.length > 0 && (
-                    <div className="flex flex-wrap gap-3 mt-auto">
-                      {creator.Platforms.map((platform, platformIndex) => (
-                        <Link
-                          key={platformIndex}
-                          href={platform.Link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 rounded-md bg-white/5 hover:bg-white/20 transition-colors duration-200"
-                          title={`${creator.Name} auf ${platform.Icons}`}
-                        >
-                          {getIconComponent(platform.Icons)}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+        {/* Live Creators Section */}
+        {liveCreators.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+                <span className="w-3 h-3 bg-white rounded-full animate-pulse"></span>
+                LIVE NOW
+              </div>
+              <div className="h-px flex-1 bg-gradient-to-r from-red-600 to-transparent"></div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+              {liveCreators.map((creator, index) => (
+                <CreatorCard
+                  key={`live-${index}`}
+                  creator={creator}
+                  followerCount={followersData.get(creator.Name)}
+                  live={liveStatus.get(creator.Name)}
+                  loadingFollowers={loadingFollowers}
+                />
+              ))}
+            </div>
           </div>
-        ) : (
-          <div className="text-gray-400">No creators available.</div>
         )}
+
+        {/* All Creators Section */}
+        <div>
+          {liveCreators.length > 0 && (
+            <div className="flex items-center gap-3 mb-6">
+              <h2 className="text-xl font-bold text-white">ALL CREATORS</h2>
+              <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
+            </div>
+          )}
+          {offlineCreators.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+              {offlineCreators.map((creator, index) => (
+                <CreatorCard
+                  key={`offline-${index}`}
+                  creator={creator}
+                  followerCount={followersData.get(creator.Name)}
+                  live={liveStatus.get(creator.Name)}
+                  loadingFollowers={loadingFollowers}
+                />
+              ))}
+            </div>
+          ) : liveCreators.length === 0 ? (
+            <div className="text-gray-400">No creators available.</div>
+          ) : null}
+        </div>
       </div>
     </section>
   );
