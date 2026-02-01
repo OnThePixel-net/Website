@@ -35,6 +35,13 @@ interface FollowerData {
   };
 }
 
+interface LiveStatus {
+  isLive: boolean;
+  platform?: string;
+  title?: string;
+  viewers?: number;
+}
+
 const formatFollowers = (count: number): string => {
   if (count >= 1000000) {
     return `${(count / 1000000).toFixed(1)}M`;
@@ -71,6 +78,7 @@ const getIconComponent = (iconName: string) => {
 export default function Creators() {
   const [creators, setCreators] = useState<Creator[]>([]);
   const [followersData, setFollowersData] = useState<Map<string, number>>(new Map());
+  const [liveStatus, setLiveStatus] = useState<Map<string, LiveStatus>>(new Map());
   const [loadingFollowers, setLoadingFollowers] = useState(true);
   const [loading, setLoading] = useState(true);
 
@@ -88,6 +96,7 @@ export default function Creators() {
         setCreators(creatorsList);
         
         fetchAllFollowers(creatorsList);
+        fetchAllLiveStatus(creatorsList);
       } catch (error) {
         console.error("Error fetching creators:", error);
         setCreators([]);
@@ -96,6 +105,15 @@ export default function Creators() {
       }
     }
     fetchCreators();
+
+    // Live-Status alle 60 Sekunden aktualisieren
+    const liveInterval = setInterval(() => {
+      if (creators.length > 0) {
+        fetchAllLiveStatus(creators);
+      }
+    }, 60000);
+
+    return () => clearInterval(liveInterval);
   }, []);
 
   async function fetchAllFollowers(creatorsList: Creator[]) {
@@ -125,11 +143,53 @@ export default function Creators() {
     setLoadingFollowers(false);
   }
 
-  // Sortiere Creators nach Follower-Anzahl (höchste zuerst)
+  async function fetchAllLiveStatus(creatorsList: Creator[]) {
+    const liveMap = new Map<string, LiveStatus>();
+    
+    await Promise.all(
+      creatorsList.map(async (creator) => {
+        try {
+          const response = await fetch(
+            `https://api.onthepixel.net/creators/live/${creator.Name}`
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data) {
+              liveMap.set(creator.Name, {
+                isLive: data.data.isLive || false,
+                platform: data.data.platform,
+                title: data.data.title,
+                viewers: data.data.viewers
+              });
+            } else {
+              liveMap.set(creator.Name, { isLive: false });
+            }
+          }
+        } catch (error) {
+          console.error(`Error fetching live status for ${creator.Name}:`, error);
+          liveMap.set(creator.Name, { isLive: false });
+        }
+      })
+    );
+    
+    setLiveStatus(liveMap);
+  }
+
+  // Sortiere Creators nach Live-Status und dann nach Follower-Anzahl
   const sortedCreators = [...creators].sort((a, b) => {
+    const liveA = liveStatus.get(a.Name)?.isLive ? 1 : 0;
+    const liveB = liveStatus.get(b.Name)?.isLive ? 1 : 0;
+    
+    // Erst nach Live-Status sortieren (Live zuerst)
+    if (liveB !== liveA) {
+      return liveB - liveA;
+    }
+    
+    // Dann nach Follower-Anzahl
     const followersA = followersData.get(a.Name) || 0;
     const followersB = followersData.get(b.Name) || 0;
-    return followersB - followersA; // Absteigende Sortierung
+    return followersB - followersA;
   });
 
   if (loading) {
@@ -155,12 +215,21 @@ export default function Creators() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             {sortedCreators.map((creator, index) => {
               const followerCount = followersData.get(creator.Name);
+              const live = liveStatus.get(creator.Name);
               
               return (
                 <div
                   key={index}
-                  className="m-1 flex flex-col rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105"
+                  className="m-1 flex flex-col rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105 relative"
                 >
+                  {/* Live Badge */}
+                  {live?.isLive && (
+                    <div className="absolute top-3 right-3 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                      <span className="w-2 h-2 bg-white rounded-full"></span>
+                      LIVE
+                    </div>
+                  )}
+
                   <div className="flex items-center mb-4">
                     <Image
                       alt={creator.Minecarft_username}
@@ -172,6 +241,12 @@ export default function Creators() {
                     <div className="ml-4 flex-1">
                       <p className="font-bold text-white">{creator.Name}</p>
                       <p className="text-sm text-gray-400">CREATOR</p>
+                      {live?.isLive && live.platform && (
+                        <p className="text-xs text-red-400 mt-1">
+                          {live.platform.toUpperCase()}
+                          {live.viewers && ` • ${formatFollowers(live.viewers)} watching`}
+                        </p>
+                      )}
                     </div>
                     
                     {/* Follower Count */}
@@ -192,6 +267,15 @@ export default function Creators() {
                     </div>
                   </div>
                   
+                  {/* Live Stream Title */}
+                  {live?.isLive && live.title && (
+                    <div className="mb-3 pb-3 border-b border-white/10">
+                      <p className="text-sm text-gray-300 line-clamp-2">
+                        {live.title}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Platform Icons */}
                   {creator.Platforms && creator.Platforms.length > 0 && (
                     <div className="flex flex-wrap gap-3 mt-auto">
