@@ -85,7 +85,7 @@ const getStreamEmbedUrl = (creator: Creator, live: LiveStatus) => {
   if (platformType === 'twitch') {
     const match = firstPlatform.Link.match(/twitch\.tv\/([^\/\?]+)/i);
     if (match) {
-      return `https://player.twitch.tv/?channel=${match[1]}&parent=${window.location.hostname}`;
+      return `https://player.twitch.tv/?channel=${match[1]}&parent=${window.location.hostname}&autoplay=false`;
     }
   } else if (platformType === 'youtube') {
     // YouTube Live Embed würde die Video ID benötigen
@@ -339,14 +339,6 @@ export default function Creators() {
                     key={index}
                     className="m-1 flex flex-col rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105 relative"
                   >
-                    {/* Live Badge */}
-                    {live?.isLive && (
-                      <div className="absolute top-3 right-3 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-                        <span className="w-2 h-2 bg-white rounded-full"></span>
-                        LIVE
-                      </div>
-                    )}
-
                     <div className="flex items-center mb-4">
                       <Image
                         alt={creator.Minecarft_username}
