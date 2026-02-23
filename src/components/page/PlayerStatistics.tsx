@@ -433,7 +433,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
 
         {/* Search Bar */}
         <div className="mb-12 max-w-2xl mx-auto">
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none" />
               <Input
