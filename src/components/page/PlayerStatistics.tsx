@@ -423,9 +423,6 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
       <div className="container mx-auto px-4 py-12 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center p-3 bg-primary text-primary-foreground rounded-xl mb-4">
-            <Trophy className="size-8" />
-          </div>
           <h1 className="text-4xl font-bold mb-2">
             Player Statistics
           </h1>
