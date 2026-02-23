@@ -1,7 +1,8 @@
-"use client";
 import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
-import { Search, Sword, Trophy, Target, Zap, Hammer, Bomb, Clock } from "lucide-react";
+import { Search, Sword, Trophy, Target, Zap, Hammer, Bomb, Clock, User, TrendingUp, Award } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card";
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
 
 // Define types for our stats
 interface PlayerStats {
@@ -76,12 +77,8 @@ interface MinigamesResponse {
   };
 }
 
-interface PlayerStatisticsProps {
-  initialUsername?: string;
-}
-
-export default function PlayerStatistics({ initialUsername }: PlayerStatisticsProps) {
-  const [username, setUsername] = useState(initialUsername || "");
+export default function App() {
+  const [username, setUsername] = useState("");
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +86,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
   // Parse Minecraft rank color codes to Hex values
   const parseColorCode = (colorCode: string | undefined): string => {
     if (!colorCode) return '#FFFFFF';
-
+    
     const colorMap: Record<string, string> = {
       '0': '#000000',
       '1': '#0000AA',
@@ -108,53 +105,51 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
       'e': '#FFFF55',
       'f': '#FFFFFF',
     };
-
+    
     const hexMatch = colorCode.match(/&#([0-9a-fA-F]{6})/);
     if (hexMatch) {
       return `#${hexMatch[1].toUpperCase()}`;
     }
-
+    
     if (colorCode && (colorCode.startsWith('&') || colorCode.startsWith('§')) && colorCode.length > 1) {
       const code = colorCode.charAt(1).toLowerCase();
       return colorMap[code] || '#FFFFFF';
     }
-
+    
     return '#FFFFFF';
   };
 
   // Extract rank name from color-coded string
   const extractRankName = (rankString: string | undefined): string => {
     if (!rankString) return 'Member';
-
+    
     const hexBracketMatch = rankString.match(/&#[0-9a-fA-F]{6}\[([^\]]+)\]/);
     if (hexBracketMatch) {
       return hexBracketMatch[1];
     }
-
+    
     const bracketMatch = rankString.match(/\[([^\]]+)\]/);
     if (bracketMatch) {
       return bracketMatch[1];
     }
-
-    // Entferne Farb- und Formatierungscodes (&0-f, &l, &m, &n, &o, &k, &r, §...)
-    // l = Bold, m = Strikethrough, n = Underline, o = Italic, k = Obfuscated, r = Reset
+    
     const cleanString = rankString.replace(/[&§][0-9a-fA-Flmnokr]/g, '').trim();
     const withoutHex = cleanString.replace(/&#[0-9a-fA-F]{6}/g, '').trim();
-
+    
     return withoutHex || 'Member';
   };
 
   // Helper function to format playtime from milliseconds
   const formatPlaytime = (milliseconds: number | undefined): string => {
     if (!milliseconds || milliseconds === 0) return '0m';
-
+    
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
     const remainingHours = hours % 24;
     const remainingMinutes = minutes % 60;
-
+    
     if (days > 0) {
       return `${days}d ${remainingHours}h ${remainingMinutes}m`;
     } else if (hours > 0) {
@@ -173,13 +168,13 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
   // Safe date formatter
   const safeFormatDate = (dateString: string | undefined): string => {
     if (!dateString) return 'Unknown';
-
+    
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return 'Unknown';
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric'
       });
     } catch {
@@ -189,10 +184,10 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
 
   const fetchPlayerStats = useCallback(async (name: string) => {
     if (!name) return;
-
+    
     setLoading(true);
     setError(null);
-
+    
     try {
       let playerData: PlayerStats = {
         playerinfo: {
@@ -281,13 +276,13 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
         const minigamesResponse = await fetch(`https://api.onthepixel.net/stats/minigames/${name}`);
         if (minigamesResponse.ok) {
           const minigamesData: MinigamesResponse = await minigamesResponse.json();
-
+          
           if (minigamesData?.duels) {
             const duelsWins = minigamesData.duels.Wins ?? 0;
             const duelsLosses = minigamesData.duels.Losses ?? 0;
             const duelsGames = minigamesData.duels.Total_Games ?? (duelsWins + duelsLosses);
             const duelsKDR = minigamesData.duels.KD_Ratio ? parseFloat(minigamesData.duels.KD_Ratio) : 0;
-
+            
             playerData.stats.duels = {
               wins: duelsWins,
               losses: duelsLosses,
@@ -297,14 +292,14 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
               gamesPlayed: duelsGames
             };
           }
-
+          
           if (minigamesData?.buildffa) {
             const buildffaKills = minigamesData.buildffa.Kills ?? 0;
             const buildffaDeaths = minigamesData.buildffa.Deaths ?? 0;
             const buildffaKDR = minigamesData.buildffa.KD_Ratio
               ? parseFloat(minigamesData.buildffa.KD_Ratio)
               : calculateKDR(buildffaKills, buildffaDeaths);
-
+            
             playerData.stats.buildffa = {
               kills: buildffaKills,
               deaths: buildffaDeaths,
@@ -321,14 +316,6 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
       }
 
       setStats(playerData);
-
-      // Update URL
-      try {
-        const newUrl = `/stats/${name}`;
-        window.history.pushState({ path: newUrl }, "", newUrl);
-      } catch (error) {
-        console.log("History API not available in this environment");
-      }
     } catch (error) {
       console.error("Error fetching player data:", error);
       setError("Player not found or an error occurred.");
@@ -338,175 +325,267 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
     }
   }, []);
 
-  // Load stats automatically when initialUsername is provided
-  useEffect(() => {
-    if (initialUsername && initialUsername.length > 0) {
-      fetchPlayerStats(initialUsername);
-    }
-  }, [initialUsername, fetchPlayerStats]);
-
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
 
-  const formatDate = (dateString: string) => {
-    return safeFormatDate(dateString);
-  };
-
-  const StatItem = ({ label, value, icon }: { label: string; value: string | number; icon?: React.ReactNode }) => (
-    <div className="flex items-center justify-between p-3 bg-white/5 rounded border border-gray-700">
-      <div className="flex items-center gap-2 text-gray-400">
+  const StatItem = ({ 
+    label, 
+    value, 
+    icon
+  }: { 
+    label: string; 
+    value: string | number; 
+    icon?: React.ReactNode;
+  }) => (
+    <div className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+      <div className="flex items-center gap-2 text-muted-foreground">
         {icon}
-        {label}
+        <span className="text-sm">{label}</span>
       </div>
-      <span className="font-semibold text-white">{value}</span>
+      <span className="font-semibold">{value}</span>
     </div>
   );
 
-  const ComingSoonCard = ({ title, icon, color }: { title: string; icon: React.ReactNode; color: string }) => (
-    <div className="bg-white/10 border border-gray-700 rounded-lg p-6 text-center">
-      <div className={`flex justify-center mb-3 ${color}`}>
-        {icon}
+  const ComingSoonCard = ({ 
+    title, 
+    icon
+  }: { 
+    title: string; 
+    icon: React.ReactNode;
+  }) => (
+    <Card>
+      <CardContent className="flex flex-col items-center justify-center py-12">
+        <CardTitle className="mb-2">{title}</CardTitle>
+        <CardDescription className="mb-4 text-center">Statistics coming soon</CardDescription>
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted text-muted-foreground text-sm rounded-md">
+          <Clock className="size-4" />
+          Coming Soon
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const SkeletonLoader = () => (
+    <div className="space-y-6 animate-pulse">
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <div className="size-20 bg-muted rounded-lg"></div>
+              <div>
+                <div className="h-8 w-32 bg-muted rounded mb-2"></div>
+                <div className="h-6 w-20 bg-muted rounded"></div>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-16 bg-muted rounded-lg"></div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-64 bg-muted rounded-xl"></div>
+        ))}
       </div>
-      <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-      <p className="text-gray-400 text-sm mb-4">Statistics coming soon</p>
-      <span className="inline-block px-3 py-1 bg-gray-800 text-gray-400 text-xs rounded">
-        Coming Soon
-      </span>
-      <p className="text-gray-500 text-xs mt-3">Statistics will be available in a future update</p>
     </div>
   );
 
   return (
-    <section className="bg-gray-950 min-h-screen">
-      <div className="container mx-auto px-4 py-10">
-        <h1 className="text-2xl font-bold mb-5">PLAYER STATISTICS</h1>
-        <p className="mb-8 text-gray-400">
-          Search for any player and view their detailed statistics
-        </p>
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 py-12 max-w-7xl">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center p-3 bg-primary text-primary-foreground rounded-xl mb-4">
+            <Trophy className="size-8" />
+          </div>
+          <h1 className="text-4xl font-bold mb-2">
+            Player Statistics
+          </h1>
+          <p className="text-muted-foreground">
+            Search for any player and view their detailed statistics
+          </p>
+        </div>
 
         {/* Search Bar */}
-        <div className="mb-8 flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              value={username}
-              onChange={handleInputChange}
-              onKeyPress={(e) => e.key === 'Enter' && fetchPlayerStats(username)}
-              placeholder="Enter A Minecraft Username"
-              className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
+        <div className="mb-12 max-w-2xl mx-auto">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none" />
+              <Input
+                type="text"
+                value={username}
+                onChange={handleInputChange}
+                onKeyPress={(e) => e.key === 'Enter' && fetchPlayerStats(username)}
+                placeholder="Enter a Minecraft username..."
+                className="pl-10"
+              />
+            </div>
+            <Button
+              onClick={() => fetchPlayerStats(username)}
+              disabled={loading || !username}
+              size="default"
+            >
+              {loading ? (
+                <div className="size-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                "Search"
+              )}
+            </Button>
           </div>
-          <button
-            onClick={() => fetchPlayerStats(username)}
-            className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={loading || !username}
-          >
-            {loading ? (
-              <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
-            ) : (
-              "Search"
-            )}
-          </button>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-900/20 border border-red-700 rounded text-red-400">
+          <div className="mb-8 p-4 bg-destructive/10 border border-destructive rounded-lg text-destructive text-center max-w-2xl mx-auto">
             {error}
           </div>
         )}
 
+        {/* Loading State */}
+        {loading && <SkeletonLoader />}
+
         {/* Player Stats */}
-        {stats && (
-          <>
+        {stats && !loading && (
+          <div className="space-y-6">
             {/* Player Info Card */}
-            <div className="bg-white/10 border border-gray-700 rounded-lg p-6 mb-8">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <h2 className="text-3xl font-bold text-white mb-2">{stats.playerinfo.username}</h2>
-                  <div
-                    className="inline-block px-3 py-1 rounded font-semibold text-white"
-                    style={{ backgroundColor: stats.playerinfo.rank.color }}
-                  >
-                    {stats.playerinfo.rank.id}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-6">
+                  <div className="flex items-center gap-4">
+                    {/* Minecraft Skin Avatar */}
+                    <img
+                      src={`https://mc-heads.net/avatar/${stats.playerinfo.username}/80`}
+                      alt={stats.playerinfo.username}
+                      className="size-20 rounded-lg border-2"
+                    />
+                    
+                    <div>
+                      <h2 className="text-3xl font-bold mb-2 flex items-center gap-2">
+                        {stats.playerinfo.username}
+                        <User className="size-5 text-muted-foreground" />
+                      </h2>
+                      <div
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-md font-semibold text-white text-sm"
+                        style={{ 
+                          backgroundColor: stats.playerinfo.rank.color
+                        }}
+                      >
+                        <Award className="size-3" />
+                        {stats.playerinfo.rank.id}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatItem
-                  label="First joined"
-                  value={formatDate(stats.playerinfo.firstLogin)}
-                  icon={<Clock className="w-4 h-4" />}
-                />
-                <StatItem
-                  label="Last online"
-                  value={formatDate(stats.playerinfo.lastLogin)}
-                  icon={<Clock className="w-4 h-4" />}
-                />
-                <StatItem
-                  label="Playtime"
-                  value={stats.stats.playtime.pretty}
-                  icon={<Zap className="w-4 h-4" />}
-                />
-                <StatItem
-                  label="Balance"
-                  value={`${stats.stats.balance.pixels.toLocaleString()} pixels`}
-                  icon={<Target className="w-4 h-4" />}
-                />
-              </div>
-            </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <StatItem
+                    label="First joined"
+                    value={safeFormatDate(stats.playerinfo.firstLogin)}
+                    icon={<Clock className="size-4" />}
+                  />
+                  <StatItem
+                    label="Last online"
+                    value={safeFormatDate(stats.playerinfo.lastLogin)}
+                    icon={<Clock className="size-4" />}
+                  />
+                  <StatItem
+                    label="Playtime"
+                    value={stats.stats.playtime.pretty}
+                    icon={<Zap className="size-4" />}
+                  />
+                  <StatItem
+                    label="Balance"
+                    value={`${stats.stats.balance.pixels.toLocaleString('en-US')} Pixel`}
+                    icon={<Target className="size-4" />}
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Minigames Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Bedwars */}
               <ComingSoonCard
                 title="Bedwars"
-                icon={<Bomb className="w-12 h-12" />}
-                color="text-red-400"
+                icon={<Bomb className="size-12" />}
               />
 
               {/* Duels */}
-              <div className="bg-white/10 border border-gray-700 rounded-lg p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Sword className="w-6 h-6 text-blue-400" />
-                  <h3 className="text-2xl font-bold text-white">Duels</h3>
-                </div>
-                <p className="text-gray-400 text-sm mb-4">1v1 combat and skill statistics</p>
-                <div className="space-y-3">
-                  <StatItem label="Wins" value={stats.stats.duels.wins} />
-                  <StatItem label="Losses" value={stats.stats.duels.losses} />
-                  <StatItem label="K/D Ratio" value={stats.stats.duels.kdr.toFixed(2)} />
-                  <StatItem label="Games Played" value={stats.stats.duels.gamesPlayed} />
-                </div>
-              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Duels</CardTitle>
+                  <CardDescription>1v1 combat and skill statistics</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <StatItem 
+                    label="Wins" 
+                    value={stats.stats.duels.wins}
+                    icon={<Trophy className="size-4" />}
+                  />
+                  <StatItem 
+                    label="Losses" 
+                    value={stats.stats.duels.losses}
+                  />
+                  <StatItem 
+                    label="K/D Ratio" 
+                    value={stats.stats.duels.kdr.toFixed(2)}
+                    icon={<TrendingUp className="size-4" />}
+                  />
+                  <StatItem 
+                    label="Games Played" 
+                    value={stats.stats.duels.gamesPlayed}
+                  />
+                </CardContent>
+              </Card>
 
               {/* TNT Run */}
               <ComingSoonCard
                 title="TNT Run"
-                icon={<Bomb className="w-12 h-12" />}
-                color="text-orange-400"
+                icon={<Bomb className="size-12" />}
               />
 
               {/* Build FFA */}
-              <div className="bg-white/10 border border-gray-700 rounded-lg p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Hammer className="w-6 h-6 text-orange-400" />
-                  <h3 className="text-2xl font-bold text-white">BuildFFA</h3>
-                </div>
-                <p className="text-gray-400 text-sm mb-4">Building and combat statistics</p>
-                <div className="space-y-3">
-                  <StatItem label="Kills" value={stats.stats.buildffa.kills} />
-                  <StatItem label="Deaths" value={stats.stats.buildffa.deaths} />
-                  <StatItem label="K/D Ratio" value={stats.stats.buildffa.kdr.toFixed(2)} />
-                </div>
-              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>BuildFFA</CardTitle>
+                  <CardDescription>Building and combat statistics</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <StatItem 
+                    label="Kills" 
+                    value={stats.stats.buildffa.kills}
+                    icon={<Sword className="size-4" />}
+                  />
+                  <StatItem 
+                    label="Deaths" 
+                    value={stats.stats.buildffa.deaths}
+                  />
+                  <StatItem 
+                    label="K/D Ratio" 
+                    value={stats.stats.buildffa.kdr.toFixed(2)}
+                    icon={<TrendingUp className="size-4" />}
+                  />
+                </CardContent>
+              </Card>
             </div>
-          </>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!stats && !loading && !error && (
+          <div className="text-center py-20">
+            <div className="inline-flex p-6 bg-muted rounded-xl mb-4">
+              <Search className="size-12 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">No Statistics</h3>
+            <p className="text-muted-foreground">Search for a player to view their statistics</p>
+          </div>
         )}
       </div>
-    </section>
+    </div>
   );
 }
