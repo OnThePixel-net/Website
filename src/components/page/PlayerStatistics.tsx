@@ -1,5 +1,7 @@
+"use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { Search, Sword, Trophy, Target, Zap, Hammer, Bomb, Clock, User, TrendingUp, Award } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, Sword, Trophy, Target, Zap, Clock, User, TrendingUp, Award } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,8 +79,13 @@ interface MinigamesResponse {
   };
 }
 
-export default function App() {
-  const [username, setUsername] = useState("");
+interface PlayerStatisticsProps {
+  initialUsername?: string;
+}
+
+export default function PlayerStatistics({ initialUsername }: PlayerStatisticsProps) {
+  const router = useRouter();
+  const [username, setUsername] = useState(initialUsername || "");
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -316,6 +323,11 @@ export default function App() {
       }
 
       setStats(playerData);
+      
+      // Update URL without triggering a reload
+      if (name !== initialUsername) {
+        router.push(`/stats/${name}`, { scroll: false });
+      }
     } catch (error) {
       console.error("Error fetching player data:", error);
       setError("Player not found or an error occurred.");
@@ -323,10 +335,21 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router, initialUsername]);
+
+  // Auto-fetch if initialUsername is provided
+  useEffect(() => {
+    if (initialUsername) {
+      fetchPlayerStats(initialUsername);
+    }
+  }, [initialUsername, fetchPlayerStats]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
+  };
+
+  const handleSearch = () => {
+    fetchPlayerStats(username);
   };
 
   const StatItem = ({ 
@@ -356,6 +379,7 @@ export default function App() {
   }) => (
     <Card>
       <CardContent className="flex flex-col items-center justify-center py-12">
+        <div className="text-muted-foreground mb-4">{icon}</div>
         <CardTitle className="mb-2">{title}</CardTitle>
         <CardDescription className="mb-4 text-center">Statistics coming soon</CardDescription>
         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted text-muted-foreground text-sm rounded-md">
@@ -395,7 +419,7 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-36">
       <div className="container mx-auto px-4 py-12 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-12">
@@ -419,13 +443,13 @@ export default function App() {
                 type="text"
                 value={username}
                 onChange={handleInputChange}
-                onKeyPress={(e) => e.key === 'Enter' && fetchPlayerStats(username)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder="Enter a Minecraft username..."
                 className="pl-10"
               />
             </div>
             <Button
-              onClick={() => fetchPlayerStats(username)}
+              onClick={handleSearch}
               disabled={loading || !username}
               size="default"
             >
@@ -511,7 +535,7 @@ export default function App() {
               {/* Bedwars */}
               <ComingSoonCard
                 title="Bedwars"
-                icon={<Bomb className="size-12" />}
+                icon={<Trophy className="size-12" />}
               />
 
               {/* Duels */}
@@ -545,7 +569,7 @@ export default function App() {
               {/* TNT Run */}
               <ComingSoonCard
                 title="TNT Run"
-                icon={<Bomb className="size-12" />}
+                icon={<Clock className="size-12" />}
               />
 
               {/* Build FFA */}
