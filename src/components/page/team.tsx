@@ -79,7 +79,7 @@ export default function Team() {
                 >
                   <Image
                     alt={member.minecraft_username}
-                    src={`https://vzge.me/face/512/${member.minecraft_username}.png`}
+                    src={`https://minecraftpfp.com/api/pfp/{member.minecraft_username}.png?gradient=0$`}
                     width={40}
                     height={40}
                     className="rounded"
