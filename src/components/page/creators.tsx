@@ -342,7 +342,7 @@ export default function Creators() {
                     <div className="flex items-center mb-4">
                       <Image
                         alt={creator.Minecarft_username}
-                        src={`https://vzge.me/face/512/${creator.Minecarft_username}.png`}
+                        src={`https://mcskin.me/api/head/${creator.Minecarft_username}.png`}
                         width={40}
                         height={40}
                         className="rounded"
