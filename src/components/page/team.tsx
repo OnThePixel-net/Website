@@ -92,7 +92,7 @@ export default function Team() {
                   <div className="relative shrink-0 rounded-lg overflow-hidden">
                     <Image
                       alt={member.minecraft_username}
-                      src={`https://heads.intern.onthepixel.net/api/pfp/${member.minecraft_username}.png?transparent=true`}
+                      src={`https://mcwith.me/api/pfp/${member.minecraft_username}.png?transparent=true`}
                       width={64}
                       height={64}
                       className="rounded-lg object-cover"
