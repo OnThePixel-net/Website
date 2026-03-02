@@ -13,7 +13,7 @@ interface Rank {
 interface TeamMember {
   minecraft_username: string;
   Name: string;
-  Ranks?: Rank; // Korrigiert: einzelnes Objekt, nicht Array
+  Ranks?: Rank;
 }
 
 export default function Team() {
@@ -41,7 +41,6 @@ export default function Team() {
     fetchTeam();
   }, []);
 
-  // Sortierung: höchster Rang nach Priority
   const sortedMembers = [...teamMembers].sort((a, b) => {
     const priorityA = a.Ranks ? a.Ranks.Priority : 999;
     const priorityB = b.Ranks ? b.Ranks.Priority : 999;
@@ -55,7 +54,20 @@ export default function Team() {
           <h1 id="team" className="text-3xl font-bold mb-4 text-white">
             TEAM
           </h1>
-          <div className="text-gray-400">Loading...</div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="m-1 flex items-center rounded-md bg-white/10 p-4 animate-pulse"
+              >
+                <div className="w-16 h-16 rounded-lg bg-white/20 shrink-0" />
+                <div className="ml-4 space-y-2">
+                  <div className="h-4 w-24 bg-white/20 rounded" />
+                  <div className="h-3 w-16 bg-white/10 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -70,35 +82,49 @@ export default function Team() {
         {sortedMembers.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             {sortedMembers.map((member, index) => {
-              const mainRank = member.Ranks; // Direkt zugreifen, da es ein Objekt ist
+              const mainRank = member.Ranks;
 
               return (
                 <div
                   key={index}
-                  className="m-1 flex items-center rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105"
+                  className="m-1 flex items-center rounded-md bg-white/10 p-4 transition-transform duration-300 hover:scale-105 hover:bg-white/15 gap-4"
                 >
-                  <Image
-                    alt={member.minecraft_username}
-                    src={`https://heads.intern.onthepixel.net/api/pfp/${member.minecraft_username}.png?transparent=true`}
-                    width={40}
-                    height={40}
-                    className="rounded"
-                  />
-                  <div className="ml-4">
-                    <p className="font-bold text-white">{member.Name}</p>
+                  {/* Custom Minecraft PFP – größer und mit leichtem Glühen in Rangfarbe */}
+                  <div
+                    className="relative shrink-0 rounded-lg overflow-hidden"
+                    style={{
+                      boxShadow: mainRank
+                        ? `0 0 12px 2px ${mainRank.Color}55`
+                        : "0 0 8px 1px rgba(255,255,255,0.1)",
+                    }}
+                  >
+                    <Image
+                      alt={member.minecraft_username}
+                      src={`https://heads.intern.onthepixel.net/api/pfp/${member.minecraft_username}.png?transparent=true`}
+                      width={64}
+                      height={64}
+                      className="rounded-lg object-cover"
+                    />
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="font-bold text-white truncate">{member.Name}</p>
                     {mainRank ? (
                       <p
-                        className="text-sm font-medium"
+                        className="text-sm font-semibold tracking-wide truncate"
                         style={{
                           color: mainRank.Color,
-                          textShadow: `0 0 10px ${mainRank.Color}`,
+                          textShadow: `0 0 8px ${mainRank.Color}`,
                         }}
                       >
                         {mainRank.Name.toUpperCase()}
                       </p>
                     ) : (
-                      <p className="text-sm text-gray-400">UNRANKED</p>
+                      <p className="text-sm text-gray-400">MEMBER</p>
                     )}
+                    <p className="text-xs text-gray-500 truncate mt-0.5">
+                      {member.minecraft_username}
+                    </p>
                   </div>
                 </div>
               );
