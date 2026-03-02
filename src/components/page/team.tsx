@@ -114,9 +114,7 @@ export default function Team() {
                     ) : (
                       <p className="text-sm text-gray-400">MEMBER</p>
                     )}
-                    <p className="text-xs text-gray-500 truncate mt-0.5">
-                      {member.minecraft_username}
-                    </p>
+
                   </div>
                 </div>
               );
