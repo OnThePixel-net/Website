@@ -89,15 +89,7 @@ export default function Team() {
                   key={index}
                   className="m-1 flex items-center rounded-md bg-white/10 p-4 transition-transform duration-300 hover:scale-105 hover:bg-white/15 gap-4"
                 >
-                  {/* Custom Minecraft PFP – größer und mit leichtem Glühen in Rangfarbe */}
-                  <div
-                    className="relative shrink-0 rounded-lg overflow-hidden"
-                    style={{
-                      boxShadow: mainRank
-                        ? `0 0 12px 2px ${mainRank.Color}55`
-                        : "0 0 8px 1px rgba(255,255,255,0.1)",
-                    }}
-                  >
+                  <div className="relative shrink-0 rounded-lg overflow-hidden">
                     <Image
                       alt={member.minecraft_username}
                       src={`https://heads.intern.onthepixel.net/api/pfp/${member.minecraft_username}.png?transparent=true`}
