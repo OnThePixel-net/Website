@@ -479,7 +479,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
                   <div className="flex items-center gap-4">
                     {/* Minecraft Skin Avatar */}
                     <img
-                      src={`https://mc-heads.net/avatar/${stats.playerinfo.username}/80`}
+                      src={`https://mcskin.me/api/pfp/${stats.playerinfo.username}.png`}
                       alt={stats.playerinfo.username}
                       className="size-20 rounded-lg border-2"
                     />
