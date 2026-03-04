@@ -50,6 +50,15 @@ export function MainNav() {
       >
         Creators
       </Link>
+      <Link
+        href="/apply"
+        className={cn(
+          "hidden text-sm font-medium transition-colors hover:text-primary sm:inline-block",
+          pathname.startsWith("/apply") ? "text-foreground" : "text-foreground/60",
+        )}
+      >
+        Apply
+      </Link>
     </nav>
   );
 }

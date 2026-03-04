@@ -38,6 +38,9 @@ export function MobileNav() {
           <MobileLink onOpenChange={setOpen} href="/creators">
             Creators
           </MobileLink>
+          <MobileLink onOpenChange={setOpen} href="/apply">
+            Apply
+          </MobileLink>
           <Link href="https://discord.onthepixel.net">Discord</Link>
           <Link href="https://x.com/onthepixelnet">Twitter</Link>
         </div>
