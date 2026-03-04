@@ -17,17 +17,16 @@ const fields: ApplicationField[] = [
     placeholder: "username",
   },
   {
-    id: "portfolio",
-    label: "Portfolio Links",
+    id: "why_supporter",
+    label: "Why do you want to be a Supporter?",
     type: "textarea",
-    placeholder: "Links to your builds (PMC, Imgur, Planet Minecraft...)",
-    description: "Share links where we can see your work",
+    placeholder: "Tell us why you'd like to join the support team...",
   },
   {
-    id: "motivation",
-    label: "Why do you want to join?",
+    id: "experience",
+    label: "Previous Experience",
     type: "textarea",
-    placeholder: "Tell us about yourself and why you want to be part of the team...",
+    placeholder: "Have you been a moderator or supporter before? Describe your experience...",
   },
 ];
 
@@ -42,16 +41,16 @@ async function isPositionOpen(name: string): Promise<boolean> {
   }
 }
 
-export default async function BuilderApplicationPage() {
-  const open = await isPositionOpen("Builder");
+export default async function SupporterApplicationPage() {
+  const open = await isPositionOpen("Supporter");
 
   return (
     <>
       <TopPage />
       {open ? (
-        <ApplicationForm position="Builder" fields={fields} apiEndpoint="apply/builder" />
+        <ApplicationForm position="Supporter" fields={fields} apiEndpoint="apply/supporter" />
       ) : (
-        <ClosedNotice position="Builder" />
+        <ClosedNotice position="Supporter" />
       )}
     </>
   );
