@@ -11,12 +11,6 @@ const fields: ApplicationField[] = [
     placeholder: "Your current IGN",
   },
   {
-    id: "discord",
-    label: "Discord Username",
-    type: "text",
-    placeholder: "username",
-  },
-  {
     id: "github",
     label: "GitHub / Portfolio",
     type: "text",
@@ -49,7 +43,7 @@ export default async function DeveloperApplicationPage() {
     <>
       <TopPage />
       {open ? (
-        <ApplicationForm position="Java Developer" fields={fields} apiEndpoint="apply/developer" />
+        <ApplicationForm position="Java Developer" fields={fields} apiEndpoint="developer" />
       ) : (
         <ClosedNotice position="Java Developer" />
       )}

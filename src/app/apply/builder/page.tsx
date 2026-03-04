@@ -11,12 +11,6 @@ const fields: ApplicationField[] = [
     placeholder: "Your current IGN",
   },
   {
-    id: "discord",
-    label: "Discord Username",
-    type: "text",
-    placeholder: "username",
-  },
-  {
     id: "portfolio",
     label: "Portfolio Links",
     type: "textarea",
@@ -49,7 +43,7 @@ export default async function BuilderApplicationPage() {
     <>
       <TopPage />
       {open ? (
-        <ApplicationForm position="Builder" fields={fields} apiEndpoint="apply/builder" />
+        <ApplicationForm position="Builder" fields={fields} apiEndpoint="builder" />
       ) : (
         <ClosedNotice position="Builder" />
       )}

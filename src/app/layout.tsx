@@ -4,6 +4,7 @@ import "./globals.css";
 import Footer from "@/components/page/footer";
 import { SiteHeader } from "@/components/page/site-header";
 import { AnalyticsProvider } from "@/components/analytics-provider";
+import SessionProvider from "@/components/SessionProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,11 +22,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} scroll-smooth bg-gray-950`}>
-        <AnalyticsProvider>
-          <SiteHeader />
-          <main>{children}</main>
-          <Footer />
-        </AnalyticsProvider>
+        <SessionProvider>
+          <AnalyticsProvider>
+            <SiteHeader />
+            <main>{children}</main>
+            <Footer />
+          </AnalyticsProvider>
+        </SessionProvider>
       </body>
     </html>
   );

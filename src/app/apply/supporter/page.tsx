@@ -11,12 +11,6 @@ const fields: ApplicationField[] = [
     placeholder: "Your current IGN",
   },
   {
-    id: "discord",
-    label: "Discord Username",
-    type: "text",
-    placeholder: "username",
-  },
-  {
     id: "why_supporter",
     label: "Why do you want to be a Supporter?",
     type: "textarea",
@@ -48,7 +42,7 @@ export default async function SupporterApplicationPage() {
     <>
       <TopPage />
       {open ? (
-        <ApplicationForm position="Supporter" fields={fields} apiEndpoint="apply/supporter" />
+        <ApplicationForm position="Supporter" fields={fields} apiEndpoint="supporter" />
       ) : (
         <ClosedNotice position="Supporter" />
       )}
