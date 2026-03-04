@@ -17,17 +17,17 @@ const fields: ApplicationField[] = [
     placeholder: "username",
   },
   {
-    id: "portfolio",
-    label: "Portfolio Links",
-    type: "textarea",
-    placeholder: "Links to your builds (PMC, Imgur, Planet Minecraft...)",
-    description: "Share links where we can see your work",
+    id: "github",
+    label: "GitHub / Portfolio",
+    type: "text",
+    placeholder: "https://github.com/yourname",
+    description: "Link to your GitHub profile or any other portfolio",
   },
   {
     id: "motivation",
     label: "Why do you want to join?",
     type: "textarea",
-    placeholder: "Tell us about yourself and why you want to be part of the team...",
+    placeholder: "Tell us about your Java/Spigot experience and what you'd like to contribute...",
   },
 ];
 
@@ -42,16 +42,16 @@ async function isPositionOpen(name: string): Promise<boolean> {
   }
 }
 
-export default async function BuilderApplicationPage() {
-  const open = await isPositionOpen("Builder");
+export default async function DeveloperApplicationPage() {
+  const open = await isPositionOpen("Java Developer");
 
   return (
     <>
       <TopPage />
       {open ? (
-        <ApplicationForm position="Builder" fields={fields} apiEndpoint="apply/builder" />
+        <ApplicationForm position="Java Developer" fields={fields} apiEndpoint="apply/developer" />
       ) : (
-        <ClosedNotice position="Builder" />
+        <ClosedNotice position="Java Developer" />
       )}
     </>
   );
