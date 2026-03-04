@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Rank {
   uuid: string;
@@ -123,6 +124,24 @@ export default function Team() {
         ) : (
           <div className="text-gray-400">No team members available.</div>
         )}
+
+        <div className="mt-12 p-6 bg-white/10 rounded-lg border-l-4 border-green-500">
+          <h2
+            className="text-lg font-bold"
+            style={{ color: "#00de6d", textShadow: "0 0 10px #00de6d" }}
+          >
+            Want to join the team?
+          </h2>
+          <p className="mt-2 text-gray-300">
+            We&apos;re always looking for passionate people to help build OnThePixel.net.
+          </p>
+          <Link
+            href="/apply"
+            className="inline-block mt-4 px-5 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg transition-colors font-medium"
+          >
+            Apply now →
+          </Link>
+        </div>
       </div>
     </section>
   );
