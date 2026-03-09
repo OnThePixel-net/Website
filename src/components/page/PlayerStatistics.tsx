@@ -285,10 +285,10 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
           const minigamesData: MinigamesResponse = await minigamesResponse.json();
           
           if (minigamesData?.duels) {
-            const duelsWins = minigamesData.duels.Wins ?? 0;
-            const duelsLosses = minigamesData.duels.Losses ?? 0;
-            const duelsGames = minigamesData.duels.Total_Games ?? (duelsWins + duelsLosses);
-            const duelsKDR = minigamesData.duels.KD_Ratio ? parseFloat(minigamesData.duels.KD_Ratio) : 0;
+            const duelsWins = minigamesData.duels.overall.wins ?? 0;
+            const duelsLosses = minigamesData.duels.overall.losses ?? 0;
+            const duelsGames = minigamesData.duels.overall.total_games ?? (duelsWins + duelsLosses);
+            const duelsKDR = minigamesData.duels.overall.kd_ratio ? parseFloat(minigamesData.duels.overall.kd_ratio) : 0;
             
             playerData.stats.duels = {
               wins: duelsWins,
@@ -301,10 +301,10 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
           }
           
           if (minigamesData?.buildffa) {
-            const buildffaKills = minigamesData.buildffa.Kills ?? 0;
-            const buildffaDeaths = minigamesData.buildffa.Deaths ?? 0;
-            const buildffaKDR = minigamesData.buildffa.KD_Ratio
-              ? parseFloat(minigamesData.buildffa.KD_Ratio)
+            const buildffaKills = minigamesData.buildffa.kills ?? 0;
+            const buildffaDeaths = minigamesData.buildffa.deaths ?? 0;
+            const buildffaKDR = minigamesData.buildffa.kd_ratio
+              ? parseFloat(minigamesData.buildffa.kd_ratio)
               : calculateKDR(buildffaKills, buildffaDeaths);
             
             playerData.stats.buildffa = {
