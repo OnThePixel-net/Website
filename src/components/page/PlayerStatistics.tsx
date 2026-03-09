@@ -67,6 +67,12 @@ interface MinigamesResponse {
   username?: string;
   uuid?: string;
   duels?: {
+    overall?: {
+      wins?: number;
+      losses?: number;
+      total_games?: number;
+      kd_ratio?: string;
+    };
     wins?: number;
     losses?: number;
     total_Games?: number;
@@ -285,10 +291,10 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
           const minigamesData: MinigamesResponse = await minigamesResponse.json();
           
           if (minigamesData?.duels) {
-            const duelsWins = minigamesData.duels.overall.wins ?? 0;
-            const duelsLosses = minigamesData.duels.overall.losses ?? 0;
-            const duelsGames = minigamesData.duels.overall.total_games ?? (duelsWins + duelsLosses);
-            const duelsKDR = minigamesData.duels.overall.kd_ratio ? parseFloat(minigamesData.duels.overall.kd_ratio) : 0;
+            const duelsWins = minigamesData.duels.overall?.wins ?? 0;
+            const duelsLosses = minigamesData.duels.overall?.losses ?? 0;
+            const duelsGames = minigamesData.duels.overall?.total_games ?? (duelsWins + duelsLosses);
+            const duelsKDR = minigamesData.duels.overall?.kd_ratio ? parseFloat(minigamesData.duels.overall.kd_ratio) : 0;
             
             playerData.stats.duels = {
               wins: duelsWins,
