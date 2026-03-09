@@ -67,15 +67,15 @@ interface MinigamesResponse {
   username?: string;
   uuid?: string;
   duels?: {
-    Wins?: number;
-    Losses?: number;
-    Total_Games?: number;
-    KD_Ratio?: string;
+    wins?: number;
+    losses?: number;
+    total_Games?: number;
+    kd_ratio?: string;
   };
   buildffa?: {
-    Kills?: number;
-    Deaths?: number;
-    KD_Ratio?: string;
+    kills?: number;
+    deaths?: number;
+    kd_ratio?: string;
   };
 }
 
