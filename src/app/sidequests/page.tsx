@@ -36,6 +36,7 @@ const projects: Project[] = [
     category: "Development",
     icon: <Code className="h-6 w-6" />,
     technologies: ["Node.js", "Java", "PostgreSQL", "Docker", "MariaDB"],
+    link: "https://steyon.dev"
   },
   {
     id: 3,
