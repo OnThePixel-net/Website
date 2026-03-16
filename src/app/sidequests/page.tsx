@@ -32,13 +32,23 @@ const projects: Project[] = [
     id: 2,
     name: "Steyon",
     description: "Steyon is a Minecraft development team specializing in custom server solutions, plugins for the Minecraft community.",
-    status: "in-progress",
+    status: "completed",
     category: "Development",
     icon: <Code className="h-6 w-6" />,
     technologies: ["Node.js", "Java", "PostgreSQL", "Docker", "MariaDB"],
   },
   {
-    id: 3,
+    id: 2,
+    name: "mcskin.me",
+    description: "An open source and free Minecraft skin api.",
+    status: "completed",
+    category: "Infrastructure",
+    icon: <Zap className="h-6 w-6" />,
+    technologies: ["API", "Vite", "Open Source", "Free"],
+    link: "https://McStatus.eu"
+  },
+  {
+    id: 4,
     name: "McStatus.eu",
     description: "An open source and free Minecraft status monitoring service. Check server availability and performance in real-time.",
     status: "in-progress",
@@ -48,7 +58,7 @@ const projects: Project[] = [
     link: "https://McStatus.eu"
   },
   {
-    id: 4,
+    id: 5,
     name: "McWith.me",
     description: "An open source and free Minecraft world hosting solution. Share your worlds seamlessly with friends and communities.",
     status: "planned",
