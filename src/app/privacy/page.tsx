@@ -48,7 +48,7 @@ export default function Privacy() {
           <p>These logs are automatically deleted after 7 days.</p>
 
           <h3 className="text-lg font-semibold mt-4 mb-2">3.2 Minecraft Server</h3>
-          <p>When you connect to our Minecraft server (via BungeeCord/Velocity proxy), we process:</p>
+          <p>When you connect to our Minecraft server we process:</p>
           <ul className="list-disc pl-6 mt-2 mb-4 space-y-2">
             <li>Minecraft username and UUID</li>
             <li>IP address (retained for up to 30 days for security purposes)</li>
