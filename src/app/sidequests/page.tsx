@@ -38,14 +38,14 @@ const projects: Project[] = [
     technologies: ["Node.js", "Java", "PostgreSQL", "Docker", "MariaDB"],
   },
   {
-    id: 2,
+    id: 3,
     name: "mcskin.me",
     description: "An open source and free Minecraft skin api.",
     status: "completed",
     category: "Infrastructure",
     icon: <Zap className="h-6 w-6" />,
-    technologies: ["API", "Vite", "Open Source", "Free"],
-    link: "https://McStatus.eu"
+    technologies: ["API", "Next.js", "Open Source", "Free"],
+    link: "https://McSkin.me"
   },
   {
     id: 4,
