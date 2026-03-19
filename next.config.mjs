@@ -2,21 +2,8 @@
 const nextConfig = {
   trailingSlash: true,
   images: {
-    unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "minotar.net",
-      },
-      {
-        protocol: "https",
-        hostname: "cdn.discordapp.com",
-      },
-      {
-        protocol: "https",
-        hostname: "vzge.me",
-      },
-    ],
+    loader: "imgix",
+    path: "https://cdn.deinedomain.de/",
   },
   async redirects() {
     return [
