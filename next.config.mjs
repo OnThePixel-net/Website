@@ -3,7 +3,7 @@ const nextConfig = {
   trailingSlash: true,
   images: {
     loader: "imgix",
-    path: "https://cdn.deinedomain.de/",
+    path: "https://cdn.onthepixel.net/",
   },
   async redirects() {
     return [
