@@ -24,6 +24,8 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://cms.onthepixel.net" />
         <link rel="dns-prefetch" href="https://cms.onthepixel.net" />
+        <link rel="preconnect" href="https://api.onthepixel.net" />
+        <link rel="dns-prefetch" href="https://api.onthepixel.net" />
       </head>
       <body className={`${inter.className} scroll-smooth bg-gray-950`}>
         <SessionProvider>
