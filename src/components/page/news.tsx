@@ -164,7 +164,11 @@ export default function News() {
         const response = await fetch("https://cms.onthepixel.net/items/News");
         if (!response.ok) throw new Error("Failed to fetch news");
         const data = await response.json();
-        setNewsItems(data.data || []);
+        const sorted = (data.data || []).sort(
+          (a: NewsItem, b: NewsItem) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        setNewsItems(sorted);
       } catch (error) {
         console.error("Error fetching news:", error);
         setNewsItems([]);
