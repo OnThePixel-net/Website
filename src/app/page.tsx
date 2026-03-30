@@ -9,7 +9,7 @@ export default function Home() {
     <>
       <Header />
       <Trailer />
-      <ChangeLog />
+      <News />
       <Team />
     </>
   );
