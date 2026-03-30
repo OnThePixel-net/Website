@@ -5,140 +5,115 @@ import Link from "next/link";
 
 interface NewsItem {
   title: string;
-  Date: string;
+  date: string;
   short_description: string;
   url: string;
+  icon_url: string | null;
 }
 
-function formatDate(dateStr: string): { day: string; month: string; year: string } {
+function formatDate(dateStr: string): string {
   try {
     const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return { day: "—", month: "—", year: "—" };
-    return {
-      day: d.getDate().toString().padStart(2, "0"),
-      month: d.toLocaleString("en-US", { month: "short" }).toUpperCase(),
-      year: d.getFullYear().toString(),
-    };
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   } catch {
-    return { day: "—", month: "—", year: "—" };
+    return dateStr;
   }
 }
 
-function FeaturedCard({ item }: { item: NewsItem }) {
+// Placeholder gradient backgrounds when no icon_url
+const FALLBACK_GRADIENTS = [
+  "linear-gradient(135deg, #0d2b1a 0%, #0a3d1f 50%, #052910 100%)",
+  "linear-gradient(135deg, #0a1f2e 0%, #0d3347 50%, #041520 100%)",
+  "linear-gradient(135deg, #1a1a0d 0%, #2b2b0a 50%, #101005 100%)",
+];
+
+function NewsCard({
+  item,
+  index,
+  featured,
+}: {
+  item: NewsItem;
+  index: number;
+  featured?: boolean;
+}) {
   const [hovered, setHovered] = useState(false);
-  const date = formatDate(item.Date);
+  const fallback = FALLBACK_GRADIENTS[index % FALLBACK_GRADIENTS.length];
 
   return (
-    <Link href={`https://onthepixel.net/news/${item.url}`} className="group block">
+    <Link href={`/news/${item.url}`} className="group block h-full">
       <article
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="relative flex overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] transition-all duration-300 hover:border-green-500/30 hover:bg-white/[0.06]"
+        className="relative flex h-full flex-col overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] transition-all duration-300 hover:border-green-500/30 hover:bg-white/[0.05]"
         style={{
           boxShadow: hovered
-            ? "0 0 0 1px rgba(0,222,109,0.15), 0 12px 48px rgba(0,222,109,0.07)"
+            ? "0 0 0 1px rgba(0,222,109,0.15), 0 12px 40px rgba(0,222,109,0.07)"
             : "none",
         }}
       >
-        {/* Glow line left */}
-        <div className="pointer-events-none absolute left-0 top-0 h-full w-0.5 origin-top scale-y-0 rounded-full bg-gradient-to-b from-green-400 to-green-600 transition-transform duration-300 group-hover:scale-y-100" />
+        {/* Glow line bottom of image */}
+        <div className="pointer-events-none absolute left-0 top-0 z-10 h-0.5 w-full origin-left scale-x-0 bg-gradient-to-r from-green-400 via-green-500 to-transparent transition-transform duration-300 group-hover:scale-x-100" />
 
-        {/* Date column */}
-        <div className="flex w-24 shrink-0 flex-col items-center justify-center gap-0.5 border-r border-white/5 bg-white/[0.02] px-3 py-8 text-center transition-colors duration-300 group-hover:border-green-500/20 group-hover:bg-green-950/20">
-          <span
-            className="text-3xl font-bold leading-none tabular-nums text-white/90"
-            style={{ fontFamily: "'Syne', sans-serif" }}
-          >
-            {date.day}
-          </span>
-          <span
-            className="mt-1 text-[11px] font-bold tracking-widest text-green-500/80"
-            style={{ fontFamily: "'Syne', sans-serif" }}
-          >
-            {date.month}
-          </span>
-          <span className="text-[10px] text-white/30">{date.year}</span>
-        </div>
-
-        {/* Content */}
-        <div className="flex flex-1 flex-col justify-center gap-2.5 px-7 py-7">
-          <div className="flex items-start justify-between gap-4">
-            <h3
-              className="text-xl font-bold leading-snug text-white transition-colors duration-200 group-hover:text-green-400 md:text-2xl"
-              style={{
-                fontFamily: "'Syne', sans-serif",
-                textShadow: hovered ? "0 0 24px rgba(0,222,109,0.25)" : "none",
-              }}
+        {/* Image area */}
+        <div
+          className={`relative w-full shrink-0 overflow-hidden ${featured ? "h-52 md:h-64" : "h-40"}`}
+        >
+          {item.icon_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={item.icon_url}
+              alt={item.title}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div
+              className="h-full w-full transition-transform duration-500 group-hover:scale-105"
+              style={{ background: fallback }}
             >
-              {item.title}
-            </h3>
-            <span className="mt-1 shrink-0 text-lg text-white/20 transition-all duration-200 group-hover:translate-x-1 group-hover:text-green-400">
-              →
+              {/* Decorative pattern */}
+              <div className="absolute inset-0 opacity-20"
+                style={{
+                  backgroundImage: `radial-gradient(circle at 20% 50%, rgba(0,222,109,0.3) 0%, transparent 50%),
+                                    radial-gradient(circle at 80% 20%, rgba(0,222,109,0.15) 0%, transparent 40%)`,
+                }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span
+                  className="text-5xl font-black text-white/5 select-none"
+                  style={{ fontFamily: "'Syne', sans-serif" }}
+                >
+                  OTP
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Bottom fade overlay */}
+          <div className="absolute bottom-0 left-0 h-16 w-full bg-gradient-to-t from-gray-950/80 to-transparent" />
+
+          {/* Date badge */}
+          <div className="absolute bottom-3 left-4">
+            <span
+              className="rounded-md bg-black/50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-green-400 backdrop-blur-sm"
+              style={{ fontFamily: "'Syne', sans-serif" }}
+            >
+              {formatDate(item.date)}
             </span>
           </div>
-          <p
-            className="text-sm leading-relaxed text-white/45 transition-colors duration-200 group-hover:text-white/60 md:text-base"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
-            {item.short_description}
-          </p>
-          <span
-            className="mt-1 text-xs font-bold tracking-widest text-green-500/50 uppercase transition-colors duration-200 group-hover:text-green-500/80"
-            style={{ fontFamily: "'Syne', sans-serif" }}
-          >
-            Read full article →
-          </span>
-        </div>
-      </article>
-    </Link>
-  );
-}
-
-function SmallCard({ item, index }: { item: NewsItem; index: number }) {
-  const [hovered, setHovered] = useState(false);
-  const date = formatDate(item.Date);
-
-  return (
-    <Link
-      href={`https://onthepixel.net/news/${item.url}`}
-      className="group block h-full"
-      style={{ animationDelay: `${(index + 1) * 80}ms` }}
-    >
-      <article
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        className="relative flex h-full overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] transition-all duration-300 hover:border-green-500/30 hover:bg-white/[0.06]"
-        style={{
-          boxShadow: hovered
-            ? "0 0 0 1px rgba(0,222,109,0.15), 0 8px 32px rgba(0,222,109,0.06)"
-            : "none",
-        }}
-      >
-        {/* Glow line left */}
-        <div className="pointer-events-none absolute left-0 top-0 h-full w-0.5 origin-top scale-y-0 rounded-full bg-gradient-to-b from-green-400 to-green-600 transition-transform duration-300 group-hover:scale-y-100" />
-
-        {/* Date column */}
-        <div className="flex w-20 shrink-0 flex-col items-center justify-center gap-0.5 border-r border-white/5 bg-white/[0.02] px-3 py-5 text-center transition-colors duration-300 group-hover:border-green-500/20 group-hover:bg-green-950/20">
-          <span
-            className="text-2xl font-bold leading-none tabular-nums text-white/90"
-            style={{ fontFamily: "'Syne', sans-serif" }}
-          >
-            {date.day}
-          </span>
-          <span
-            className="mt-0.5 text-[10px] font-bold tracking-widest text-green-500/80"
-            style={{ fontFamily: "'Syne', sans-serif" }}
-          >
-            {date.month}
-          </span>
-          <span className="text-[10px] text-white/30">{date.year}</span>
         </div>
 
         {/* Content */}
-        <div className="flex flex-1 flex-col justify-center gap-1.5 px-5 py-5">
+        <div className="flex flex-1 flex-col gap-2 p-5">
           <div className="flex items-start justify-between gap-3">
             <h3
-              className="text-base font-semibold leading-snug text-white transition-colors duration-200 group-hover:text-green-400"
+              className={`font-bold leading-snug text-white transition-colors duration-200 group-hover:text-green-400 ${
+                featured ? "text-xl md:text-2xl" : "text-base"
+              }`}
               style={{
                 fontFamily: "'Syne', sans-serif",
                 textShadow: hovered ? "0 0 20px rgba(0,222,109,0.2)" : "none",
@@ -151,7 +126,9 @@ function SmallCard({ item, index }: { item: NewsItem; index: number }) {
             </span>
           </div>
           <p
-            className="line-clamp-2 text-sm leading-relaxed text-white/45 transition-colors duration-200 group-hover:text-white/60"
+            className={`leading-relaxed text-white/45 transition-colors duration-200 group-hover:text-white/60 ${
+              featured ? "text-sm md:text-base" : "line-clamp-2 text-sm"
+            }`}
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
             {item.short_description}
@@ -162,36 +139,16 @@ function SmallCard({ item, index }: { item: NewsItem; index: number }) {
   );
 }
 
-function SkeletonFeatured() {
+function SkeletonCard({ featured }: { featured?: boolean }) {
   return (
-    <div className="flex overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] animate-pulse">
-      <div className="w-24 shrink-0 border-r border-white/5 bg-white/[0.02] px-3 py-8 flex flex-col items-center gap-1.5">
-        <div className="h-8 w-9 rounded bg-white/10" />
-        <div className="h-2.5 w-8 rounded bg-white/10" />
-        <div className="h-2 w-6 rounded bg-white/5" />
-      </div>
-      <div className="flex flex-1 flex-col justify-center gap-3 px-7 py-7">
-        <div className="h-6 w-3/4 rounded bg-white/10" />
-        <div className="h-4 w-full rounded bg-white/5" />
-        <div className="h-4 w-2/3 rounded bg-white/5" />
-        <div className="h-3 w-28 rounded bg-white/5 mt-1" />
-      </div>
-    </div>
-  );
-}
-
-function SkeletonSmall() {
-  return (
-    <div className="flex overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] animate-pulse">
-      <div className="w-20 shrink-0 border-r border-white/5 bg-white/[0.02] px-3 py-5 flex flex-col items-center gap-1">
-        <div className="h-7 w-8 rounded bg-white/10" />
-        <div className="h-2.5 w-7 rounded bg-white/10" />
-        <div className="h-2 w-5 rounded bg-white/5" />
-      </div>
-      <div className="flex flex-1 flex-col justify-center gap-2 px-5 py-4">
-        <div className="h-4 w-3/4 rounded bg-white/10" />
-        <div className="h-3 w-full rounded bg-white/5" />
-        <div className="h-3 w-2/3 rounded bg-white/5" />
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] animate-pulse">
+      <div
+        className={`w-full shrink-0 bg-white/5 ${featured ? "h-52 md:h-64" : "h-40"}`}
+      />
+      <div className="flex flex-col gap-2.5 p-5">
+        <div className={`rounded bg-white/10 ${featured ? "h-6 w-4/5" : "h-5 w-3/4"}`} />
+        <div className="h-3.5 w-full rounded bg-white/5" />
+        <div className="h-3.5 w-2/3 rounded bg-white/5" />
       </div>
     </div>
   );
@@ -230,17 +187,8 @@ export default function News() {
       <section className="bg-gray-950 py-10 px-4">
         <div className="container mx-auto px-4 py-10">
 
-          {/* Section header */}
+          {/* Header */}
           <div className="mb-8">
-            <div className="mb-1.5 flex items-center gap-2.5">
-              <span className="inline-block h-1 w-6 rounded-full bg-green-500" />
-              <span
-                className="text-xs font-bold uppercase tracking-[0.2em] text-green-500/70"
-                style={{ fontFamily: "'Syne', sans-serif" }}
-              >
-                Latest Updates
-              </span>
-            </div>
             <h2
               id="news"
               className="text-3xl font-bold tracking-tight text-white"
@@ -252,32 +200,29 @@ export default function News() {
 
           {/* Content */}
           {loading ? (
-            <div className="flex flex-col gap-3">
-              <SkeletonFeatured />
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <SkeletonSmall />
-                <SkeletonSmall />
+            <div className="flex flex-col gap-4">
+              <SkeletonCard featured />
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <SkeletonCard />
+                <SkeletonCard />
               </div>
             </div>
           ) : newsItems.length === 0 ? (
             <div className="rounded-xl border border-white/5 bg-white/[0.02] px-6 py-12 text-center">
-              <p
-                className="text-sm text-white/30"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              >
+              <p className="text-sm text-white/30" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                 No news available at the moment.
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
-              {/* Featured article — full width */}
-              {featured && <FeaturedCard item={featured} />}
+            <div className="flex flex-col gap-4">
+              {/* Featured — full width */}
+              {featured && <NewsCard item={featured} index={0} featured />}
 
-              {/* Two smaller cards in a row below */}
+              {/* Two smaller below */}
               {rest.length > 0 && (
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {rest.map((item, i) => (
-                    <SmallCard key={i} item={item} index={i} />
+                    <NewsCard key={i} item={item} index={i + 1} />
                   ))}
                 </div>
               )}
