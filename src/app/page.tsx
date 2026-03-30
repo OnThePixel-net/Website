@@ -9,8 +9,8 @@ export default function Home() {
     <>
       <Header />
       <Trailer />
-      <Team />
       <ChangeLog />
+      <Team />
     </>
   );
 }
