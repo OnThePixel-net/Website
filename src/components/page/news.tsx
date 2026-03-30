@@ -1,4 +1,4 @@
-// src/components/page/changelog.tsx
+// src/components/page/news.tsx
 "use client";
 import React, { useState, useEffect } from "react";
 
@@ -9,7 +9,7 @@ interface NewsItem {
   url: string;
 }
 
-export default function ChangeLog() {
+export default function News() {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
 
