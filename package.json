@@ -57,13 +57,16 @@
     "eslint-plugin-drizzle": "^0.2.3",
     "postcss": "^8.4.39",
     "prettier": "^3.4.1",
-    "prettier-plugin-tailwindcss": "^0.7.2",
+    "prettier-plugin-tailwindcss": "^0.6.9",
     "tailwindcss": "^3.4.12",
     "tsx": "^4.19.2",
     "typescript": "^5.6.2"
   },
   "overrides": {
     "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "yargs": "17.7.2",
+    "yargs-parser": "21.1.1",
+    "eslint-visitor-keys": "3.4.3"
   }
 }
