@@ -2,7 +2,17 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Search, Sword, Trophy, Target, Zap, Clock, TrendingUp, Award } from "lucide-react";
+import { Search, Sword, Trophy, Target, Zap, Clock, TrendingUp, Award, ChevronDown } from "lucide-react";
+
+interface DuelMode {
+  wins: number;
+  losses: number;
+  winStreak: number;
+  bestWinStreak: number;
+  elo: number;
+  kills: number;
+  deaths: number;
+}
 
 interface PlayerStats {
   playerinfo: {
@@ -15,7 +25,17 @@ interface PlayerStats {
   stats: {
     playtime: { total: number; pretty: string };
     balance: { pixels: number };
-    duels: { wins: number; losses: number; kdr: number; gamesPlayed: number };
+    duels: {
+      wins: number;
+      losses: number;
+      kdr: number;
+      gamesPlayed: number;
+      elo: number;
+      winRate: number;
+      winStreak: number;
+      bestWinStreak: number;
+      modes: Record<string, DuelMode>;
+    };
     buildffa: { kills: number; deaths: number; kdr: number };
   };
 }
@@ -24,7 +44,27 @@ interface RankResponse { uuid?: string; rank?: string }
 interface PixelResponse { balance?: number }
 interface PlaytimeResponse { playtime?: number; first_joined?: string; last_online?: string }
 interface MinigamesResponse {
-  duels?: { overall?: { wins?: number; losses?: number; total_games?: number; kd_ratio?: string } };
+  duels?: {
+    overall?: {
+      wins?: number;
+      losses?: number;
+      total_games?: number;
+      kd_ratio?: string;
+      elo?: number;
+      win_rate?: number;
+      winStreak?: number;
+      bestWinStreak?: number;
+    };
+    modes?: Record<string, {
+      wins?: number;
+      losses?: number;
+      winStreak?: number;
+      bestWinStreak?: number;
+      elo?: number;
+      kills?: number;
+      deaths?: number;
+    }>;
+  };
   buildffa?: { kills?: number; deaths?: number; kd_ratio?: string };
 }
 
@@ -137,6 +177,124 @@ function Skeleton() {
   );
 }
 
+const KIT_LABELS: Record<string, string> = {
+  spear: "Spear", uhc: "UHC", sword: "Sword", potion: "Potion",
+  mace: "Mace", crystal: "Crystal", shieldless: "Shieldless",
+  knockback: "Knockback", axe: "Axe", skywars: "Skywars", tactic: "Tactic",
+};
+
+function eloColor(elo: number): string {
+  if (elo >= 1100) return "#00de6d";
+  if (elo >= 1050) return "#55FF55";
+  if (elo >= 1000) return "#FFAA00";
+  if (elo >= 950) return "#FF5555";
+  return "#AAAAAA";
+}
+
+function DuelsCard({ duels }: { duels: PlayerStats["stats"]["duels"] }) {
+  const [open, setOpen] = useState(false);
+  const modeEntries = Object.entries(duels.modes).filter(
+    ([, m]) => m.wins + m.losses > 0
+  );
+
+  return (
+    <div className="rounded-xl border border-white/5 bg-white/[0.03] overflow-hidden">
+      <div className="px-5 py-4 border-b border-white/5">
+        <h3 className="font-bold text-white" style={{ fontFamily: "'Syne', sans-serif" }}>Duels</h3>
+      </div>
+
+      <div className="p-5 space-y-2">
+        <StatBox label="Wins" value={duels.wins} icon={<Trophy className="size-4" />} />
+        <StatBox label="Losses" value={duels.losses} />
+        <StatBox label="Win Rate" value={`${duels.winRate.toFixed(1)}%`} icon={<TrendingUp className="size-4" />} />
+        <StatBox label="K/D Ratio" value={duels.kdr.toFixed(2)} />
+        <StatBox label="Games Played" value={duels.gamesPlayed} />
+        <div className="flex items-center justify-between rounded-lg bg-white/5 px-4 py-3">
+          <div className="flex items-center gap-2 text-white/50 text-sm">
+            <span className="text-green-400/70"><Award className="size-4" /></span>
+            ELO
+          </div>
+          <span
+            className="font-bold text-sm"
+            style={{ color: eloColor(duels.elo) }}
+          >
+            {duels.elo}
+          </span>
+        </div>
+        <StatBox label="Win Streak" value={duels.winStreak} />
+        <StatBox label="Best Win Streak" value={duels.bestWinStreak} />
+      </div>
+
+      {/* Kit breakdown toggle */}
+      {modeEntries.length > 0 && (
+        <>
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="flex w-full items-center justify-between border-t border-white/5 px-5 py-3 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white/80"
+          >
+            <span className="font-semibold uppercase tracking-wide text-xs">
+              {open ? "Hide" : "Show"} Kit Details ({modeEntries.length} kits)
+            </span>
+            <ChevronDown
+              className="size-4 transition-transform duration-200"
+              style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+            />
+          </button>
+
+          {open && (
+            <div className="border-t border-white/5 p-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {modeEntries.map(([key, mode]) => {
+                  const total = mode.wins + mode.losses;
+                  const winPct = total > 0 ? Math.round((mode.wins / total) * 100) : 0;
+                  return (
+                    <div
+                      key={key}
+                      className="rounded-lg bg-white/5 p-3"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-bold text-white">
+                          {KIT_LABELS[key] ?? key}
+                        </span>
+                        <span
+                          className="text-xs font-bold"
+                          style={{ color: eloColor(mode.elo) }}
+                        >
+                          {mode.elo} ELO
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-white/50 mb-2">
+                        <span className="text-green-400 font-semibold">{mode.wins}W</span>
+                        <span>/</span>
+                        <span className="text-red-400 font-semibold">{mode.losses}L</span>
+                        <span>·</span>
+                        <span>{winPct}% WR</span>
+                        {mode.bestWinStreak > 0 && (
+                          <>
+                            <span>·</span>
+                            <span>🔥 {mode.bestWinStreak} best streak</span>
+                          </>
+                        )}
+                      </div>
+                      {/* Win rate bar */}
+                      <div className="h-1 w-full rounded-full bg-white/10 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-green-500 transition-all duration-500"
+                          style={{ width: `${winPct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function PlayerStatistics({ initialUsername }: PlayerStatisticsProps) {
   const router = useRouter();
   const [username, setUsername] = useState(initialUsername || "");
@@ -164,7 +322,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
         stats: {
           playtime: { total: 0, pretty: "0m" },
           balance: { pixels: 0 },
-          duels: { wins: 0, losses: 0, kdr: 0, gamesPlayed: 0 },
+          duels: { wins: 0, losses: 0, kdr: 0, gamesPlayed: 0, elo: 1000, winRate: 0, winStreak: 0, bestWinStreak: 0, modes: {} },
           buildffa: { kills: 0, deaths: 0, kdr: 0 },
         },
       };
@@ -214,11 +372,30 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
         if (d?.duels?.overall) {
           const w = d.duels.overall.wins ?? 0;
           const l = d.duels.overall.losses ?? 0;
+          const modes: Record<string, DuelMode> = {};
+          if (d.duels.modes) {
+            for (const [key, m] of Object.entries(d.duels.modes)) {
+              modes[key] = {
+                wins: m.wins ?? 0,
+                losses: m.losses ?? 0,
+                winStreak: m.winStreak ?? 0,
+                bestWinStreak: m.bestWinStreak ?? 0,
+                elo: m.elo ?? 1000,
+                kills: m.kills ?? 0,
+                deaths: m.deaths ?? 0,
+              };
+            }
+          }
           playerData.stats.duels = {
             wins: w,
             losses: l,
             kdr: d.duels.overall.kd_ratio ? parseFloat(d.duels.overall.kd_ratio) : 0,
             gamesPlayed: d.duels.overall.total_games ?? w + l,
+            elo: d.duels.overall.elo ?? 1000,
+            winRate: d.duels.overall.win_rate ?? 0,
+            winStreak: d.duels.overall.winStreak ?? 0,
+            bestWinStreak: d.duels.overall.bestWinStreak ?? 0,
+            modes,
           };
         }
         if (d?.buildffa) {
@@ -359,12 +536,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <ComingSoon title="BedWars" />
 
-              <GameCard title="Duels">
-                <StatBox label="Wins" value={stats.stats.duels.wins} icon={<Trophy className="size-4" />} />
-                <StatBox label="Losses" value={stats.stats.duels.losses} />
-                <StatBox label="K/D Ratio" value={stats.stats.duels.kdr.toFixed(2)} icon={<TrendingUp className="size-4" />} />
-                <StatBox label="Games Played" value={stats.stats.duels.gamesPlayed} />
-              </GameCard>
+              <DuelsCard duels={stats.stats.duels} />
 
               <ComingSoon title="TNT Run" />
 
