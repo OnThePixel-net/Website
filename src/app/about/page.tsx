@@ -52,14 +52,6 @@ const GAMES = [
     glow: "rgba(0,222,109,0.2)",
     status: "soon",
   },
-  {
-    name: "Side Quests",
-    description: "Complete in-game challenges and missions for exclusive rewards.",
-    color: "#f97316",
-    glow: "rgba(249,115,22,0.2)",
-    status: "live",
-    href: "/sidequests",
-  },
 ] as const;
 
 const GAME_ICONS = [
@@ -67,7 +59,6 @@ const GAME_ICONS = [
   <IconHammer key="hammer" size={28} />,
   <IconBolt key="bolt" size={28} />,
   <IconTrophy key="trophy" size={28} />,
-  <IconStar key="star2" size={28} />,
 ];
 
 const VALUES = [

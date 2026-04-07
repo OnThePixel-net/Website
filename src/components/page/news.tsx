@@ -6,7 +6,7 @@ interface NewsItem {
   date: string;
   short_description: string;
   url: string;
-  icon_url: string | null;
+  icon: string | null;
 }
 
 function formatDate(dateStr: string): string {
@@ -48,10 +48,10 @@ function NewsCard({
 
         {/* Image area */}
         <div className={`relative w-full shrink-0 overflow-hidden ${featured ? "h-52 md:h-64" : "h-40"}`}>
-          {item.icon_url ? (
+          {item.icon ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={item.icon_url}
+              src={`https://cms.onthepixel.net/assets/${item.icon}`}
               alt={item.title}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
