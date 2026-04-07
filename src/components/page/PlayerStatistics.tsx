@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Search, Sword, Trophy, Target, Zap, Clock, TrendingUp, Award, ChevronDown } from "lucide-react";
+import { Search, Sword, Trophy, Target, Zap, Clock, TrendingUp, Award } from "lucide-react";
+import Link from "next/link";
 
 interface DuelMode {
   wins: number;
@@ -177,12 +178,6 @@ function Skeleton() {
   );
 }
 
-const KIT_LABELS: Record<string, string> = {
-  spear: "Spear", uhc: "UHC", sword: "Sword", potion: "Potion",
-  mace: "Mace", crystal: "Crystal", shieldless: "Shieldless",
-  knockback: "Knockback", axe: "Axe", skywars: "Skywars", tactic: "Tactic",
-};
-
 function eloColor(elo: number): string {
   if (elo >= 1100) return "#00de6d";
   if (elo >= 1050) return "#55FF55";
@@ -191,105 +186,103 @@ function eloColor(elo: number): string {
   return "#AAAAAA";
 }
 
-function DuelsCard({ duels }: { duels: PlayerStats["stats"]["duels"] }) {
-  const [open, setOpen] = useState(false);
-  const modeEntries = Object.entries(duels.modes).filter(
-    ([, m]) => m.wins + m.losses > 0
-  );
+function eloLabel(elo: number): string {
+  if (elo >= 1100) return "Elite";
+  if (elo >= 1050) return "Diamond";
+  if (elo >= 1000) return "Gold";
+  if (elo >= 950) return "Silver";
+  return "Bronze";
+}
+
+function DuelsCard({ duels, username }: { duels: PlayerStats["stats"]["duels"]; username: string }) {
+  const winPct = duels.gamesPlayed > 0 ? (duels.wins / duels.gamesPlayed) * 100 : 0;
+  const color = eloColor(duels.elo);
+  const kitsPlayed = Object.values(duels.modes).filter((m) => m.wins + m.losses > 0).length;
 
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.03] overflow-hidden">
-      <div className="px-5 py-4 border-b border-white/5">
+    <div className="rounded-xl border border-white/5 bg-white/[0.03] overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
         <h3 className="font-bold text-white" style={{ fontFamily: "'Syne', sans-serif" }}>Duels</h3>
-      </div>
-
-      <div className="p-5 space-y-2">
-        <StatBox label="Wins" value={duels.wins} icon={<Trophy className="size-4" />} />
-        <StatBox label="Losses" value={duels.losses} />
-        <StatBox label="Win Rate" value={`${duels.winRate.toFixed(1)}%`} icon={<TrendingUp className="size-4" />} />
-        <StatBox label="K/D Ratio" value={duels.kdr.toFixed(2)} />
-        <StatBox label="Games Played" value={duels.gamesPlayed} />
-        <div className="flex items-center justify-between rounded-lg bg-white/5 px-4 py-3">
-          <div className="flex items-center gap-2 text-white/50 text-sm">
-            <span className="text-green-400/70"><Award className="size-4" /></span>
-            ELO
-          </div>
-          <span
-            className="font-bold text-sm"
-            style={{ color: eloColor(duels.elo) }}
-          >
-            {duels.elo}
-          </span>
+        <div
+          className="text-xs font-bold px-2.5 py-1 rounded-full"
+          style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}
+        >
+          {eloLabel(duels.elo)}
         </div>
-        <StatBox label="Win Streak" value={duels.winStreak} />
-        <StatBox label="Best Win Streak" value={duels.bestWinStreak} />
       </div>
 
-      {/* Kit breakdown toggle */}
-      {modeEntries.length > 0 && (
-        <>
-          <button
-            onClick={() => setOpen((v) => !v)}
-            className="flex w-full items-center justify-between border-t border-white/5 px-5 py-3 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white/80"
-          >
-            <span className="font-semibold uppercase tracking-wide text-xs">
-              {open ? "Hide" : "Show"} Kit Details ({modeEntries.length} kits)
-            </span>
-            <ChevronDown
-              className="size-4 transition-transform duration-200"
-              style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
-            />
-          </button>
+      <div className="p-5 flex flex-col gap-4 flex-1">
+        {/* ELO hero */}
+        <div className="flex items-center gap-4 rounded-xl bg-white/5 px-5 py-4">
+          <div className="flex-1">
+            <p className="text-xs text-white/40 mb-0.5">Overall ELO</p>
+            <p
+              className="text-3xl font-black"
+              style={{ fontFamily: "'Syne', sans-serif", color, textShadow: `0 0 20px ${color}40` }}
+            >
+              {duels.elo}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-white/40 mb-0.5">Win Streak</p>
+            <p className="text-lg font-bold text-white" style={{ fontFamily: "'Syne', sans-serif" }}>
+              {duels.winStreak > 0 ? `🔥 ${duels.winStreak}` : duels.winStreak}
+            </p>
+            <p className="text-[10px] text-white/30">best: {duels.bestWinStreak}</p>
+          </div>
+        </div>
 
-          {open && (
-            <div className="border-t border-white/5 p-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {modeEntries.map(([key, mode]) => {
-                  const total = mode.wins + mode.losses;
-                  const winPct = total > 0 ? Math.round((mode.wins / total) * 100) : 0;
-                  return (
-                    <div
-                      key={key}
-                      className="rounded-lg bg-white/5 p-3"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-bold text-white">
-                          {KIT_LABELS[key] ?? key}
-                        </span>
-                        <span
-                          className="text-xs font-bold"
-                          style={{ color: eloColor(mode.elo) }}
-                        >
-                          {mode.elo} ELO
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-white/50 mb-2">
-                        <span className="text-green-400 font-semibold">{mode.wins}W</span>
-                        <span>/</span>
-                        <span className="text-red-400 font-semibold">{mode.losses}L</span>
-                        <span>·</span>
-                        <span>{winPct}% WR</span>
-                        {mode.bestWinStreak > 0 && (
-                          <>
-                            <span>·</span>
-                            <span>🔥 {mode.bestWinStreak} best streak</span>
-                          </>
-                        )}
-                      </div>
-                      {/* Win rate bar */}
-                      <div className="h-1 w-full rounded-full bg-white/10 overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-green-500 transition-all duration-500"
-                          style={{ width: `${winPct}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </>
+        {/* Wins vs Losses */}
+        <div className="flex gap-2">
+          <div className="flex-1 rounded-lg bg-green-500/10 px-3 py-2.5 text-center">
+            <p className="text-xl font-black text-green-400" style={{ fontFamily: "'Syne', sans-serif" }}>{duels.wins}</p>
+            <p className="text-[10px] text-white/40 uppercase tracking-wide">Wins</p>
+          </div>
+          <div className="flex-1 rounded-lg bg-red-500/10 px-3 py-2.5 text-center">
+            <p className="text-xl font-black text-red-400" style={{ fontFamily: "'Syne', sans-serif" }}>{duels.losses}</p>
+            <p className="text-[10px] text-white/40 uppercase tracking-wide">Losses</p>
+          </div>
+          <div className="flex-1 rounded-lg bg-white/5 px-3 py-2.5 text-center">
+            <p className="text-xl font-black text-white" style={{ fontFamily: "'Syne', sans-serif" }}>{duels.gamesPlayed}</p>
+            <p className="text-[10px] text-white/40 uppercase tracking-wide">Played</p>
+          </div>
+        </div>
+
+        {/* Win rate bar */}
+        <div>
+          <div className="flex justify-between text-xs text-white/40 mb-1.5">
+            <span>Win Rate</span>
+            <span className="font-semibold text-white/70">{duels.winRate.toFixed(1)}%</span>
+          </div>
+          <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-700"
+              style={{
+                width: `${winPct}%`,
+                background: winPct >= 50
+                  ? "linear-gradient(90deg, #00de6d, #55FF55)"
+                  : "linear-gradient(90deg, #FF5555, #FFAA00)",
+              }}
+            />
+          </div>
+        </div>
+
+        {/* K/D */}
+        <StatBox label="K/D Ratio" value={duels.kdr.toFixed(2)} icon={<TrendingUp className="size-4" />} />
+      </div>
+
+      {/* Kit details link */}
+      {kitsPlayed > 0 && (
+        <Link
+          href={`/stats/${username}/duels`}
+          className="flex items-center justify-between border-t border-white/5 px-5 py-3 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-green-400 group"
+        >
+          <span className="text-xs font-semibold uppercase tracking-wide">
+            View all {kitsPlayed} kits
+          </span>
+          <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+        </Link>
       )}
     </div>
   );
@@ -536,7 +529,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <ComingSoon title="BedWars" />
 
-              <DuelsCard duels={stats.stats.duels} />
+              <DuelsCard duels={stats.stats.duels} username={stats.playerinfo.username} />
 
               <ComingSoon title="TNT Run" />
 
