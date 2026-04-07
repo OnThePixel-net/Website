@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 
 export default function StatisticsPage() {
   return (
-    <section className="bg-gray-950 min-h-screen">
+    <>
       <TopPage />
       <PlayerStatistics />
-    </section>
+    </>
   );
 }
