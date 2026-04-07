@@ -253,26 +253,20 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
   }, [initialUsername, fetchPlayerStats]);
 
   return (
-    <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500&display=swap');`}</style>
-      <div className="min-h-screen pt-36 bg-gray-950">
-        <div className="container mx-auto max-w-4xl px-4 py-10">
+    <section className="py-10 px-4 bg-gray-950">
+      <div className="container mx-auto px-4 py-10">
 
-          {/* Header */}
-          <div className="mb-10 text-center">
-            <h1
-              className="mb-2 text-3xl font-bold text-white md:text-4xl"
-              style={{ fontFamily: "'Syne', sans-serif" }}
-            >
-              Player Statistics
-            </h1>
-            <p className="text-white/40" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        {/* Page header — same style as TEAM / CREATORS */}
+        <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white">STATISTICS</h1>
+            <p className="mt-1 text-sm text-white/40">
               Search for any player on OnThePixel.net
             </p>
           </div>
 
-          {/* Search */}
-          <div className="mb-10 flex gap-3">
+          {/* Search bar — inline with heading on larger screens */}
+          <div className="flex w-full gap-2 sm:max-w-sm">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 size-4 pointer-events-none" />
               <input
@@ -280,133 +274,122 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchPlayerStats(username)}
-                placeholder="Enter a Minecraft username..."
-                className="w-full rounded-lg bg-white/5 border border-white/10 pl-10 pr-4 py-3 text-white placeholder:text-white/30 outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/30 transition-all"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                placeholder="Minecraft username..."
+                className="w-full rounded-lg bg-white/5 border border-white/10 pl-10 pr-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/30 transition-all"
               />
             </div>
             <button
               onClick={() => fetchPlayerStats(username)}
               disabled={loading || !username.trim()}
-              className="rounded-lg bg-green-700 px-6 py-3 font-semibold text-white transition-colors hover:bg-green-600 disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ fontFamily: "'Syne', sans-serif" }}
+              className="shrink-0 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-600 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? (
-                <div className="size-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="size-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : "Search"}
             </button>
           </div>
-
-          {/* Error */}
-          {error && (
-            <div className="mb-6 rounded-lg border border-red-500/20 bg-red-500/10 px-5 py-4 text-center text-red-400">
-              {error}
-            </div>
-          )}
-
-          {/* Not Found */}
-          {notFound && (
-            <div className="rounded-xl border border-white/5 bg-white/[0.03] px-6 py-16 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5">
-                <Search className="size-7 text-white/30" />
-              </div>
-              <h3
-                className="mb-2 text-lg font-bold text-white"
-                style={{ fontFamily: "'Syne', sans-serif" }}
-              >
-                Player not found
-              </h3>
-              <p className="text-sm text-white/40" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                <span className="font-mono text-white/60">{username}</span> has never played on OnThePixel.net,
-                or the username is incorrect.
-              </p>
-            </div>
-          )}
-
-          {/* Loading */}
-          {loading && <Skeleton />}
-
-          {/* Stats */}
-          {stats && !loading && (
-            <div className="space-y-4">
-              {/* Player info card */}
-              <div className="rounded-xl border border-white/5 bg-white/[0.03] p-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 mb-6">
-                  <div className="relative shrink-0">
-                    <Image
-                      src={`https://mcskin.me/api/pfp/${stats.playerinfo.username}.png?transparent=true`}
-                      alt={stats.playerinfo.username}
-                      width={80}
-                      height={80}
-                      className="rounded-lg"
-                    />
-                  </div>
-                  <div>
-                    <h2
-                      className="text-2xl font-bold text-white mb-1.5"
-                      style={{ fontFamily: "'Syne', sans-serif" }}
-                    >
-                      {stats.playerinfo.username}
-                    </h2>
-                    <div
-                      className="inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-sm font-bold text-white"
-                      style={{ backgroundColor: `${stats.playerinfo.rank.color}25`, color: stats.playerinfo.rank.color, boxShadow: `0 0 12px ${stats.playerinfo.rank.color}30` }}
-                    >
-                      <Award className="size-3.5" />
-                      {stats.playerinfo.rank.id}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  <StatBox label="First joined" value={safeDate(stats.playerinfo.firstLogin)} icon={<Clock className="size-4" />} />
-                  <StatBox label="Last online" value={safeDate(stats.playerinfo.lastLogin)} icon={<Clock className="size-4" />} />
-                  <StatBox label="Playtime" value={stats.stats.playtime.pretty} icon={<Zap className="size-4" />} />
-                  <StatBox label="Balance" value={`${stats.stats.balance.pixels.toLocaleString("en-US")} ✦`} icon={<Target className="size-4" />} />
-                </div>
-              </div>
-
-              {/* Minigames */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ComingSoon title="BedWars" />
-
-                <GameCard title="Duels">
-                  <StatBox label="Wins" value={stats.stats.duels.wins} icon={<Trophy className="size-4" />} />
-                  <StatBox label="Losses" value={stats.stats.duels.losses} />
-                  <StatBox label="K/D Ratio" value={stats.stats.duels.kdr.toFixed(2)} icon={<TrendingUp className="size-4" />} />
-                  <StatBox label="Games Played" value={stats.stats.duels.gamesPlayed} />
-                </GameCard>
-
-                <ComingSoon title="TNT Run" />
-
-                <GameCard title="BuildFFA">
-                  <StatBox label="Kills" value={stats.stats.buildffa.kills} icon={<Sword className="size-4" />} />
-                  <StatBox label="Deaths" value={stats.stats.buildffa.deaths} />
-                  <StatBox label="K/D Ratio" value={stats.stats.buildffa.kdr.toFixed(2)} icon={<TrendingUp className="size-4" />} />
-                </GameCard>
-              </div>
-            </div>
-          )}
-
-          {/* Empty state */}
-          {!stats && !loading && !error && !notFound && (
-            <div className="rounded-xl border border-white/5 bg-white/[0.03] px-6 py-20 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5">
-                <Search className="size-7 text-white/30" />
-              </div>
-              <h3
-                className="mb-2 text-lg font-bold text-white"
-                style={{ fontFamily: "'Syne', sans-serif" }}
-              >
-                Search for a player
-              </h3>
-              <p className="text-sm text-white/40" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                Enter a Minecraft username above to see their stats
-              </p>
-            </div>
-          )}
         </div>
+
+        {/* Error */}
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-500/20 bg-red-500/10 px-5 py-4 text-sm text-center text-red-400">
+            {error}
+          </div>
+        )}
+
+        {/* Not Found */}
+        {notFound && (
+          <div className="rounded-xl border border-white/5 bg-white/[0.03] px-6 py-16 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
+              <Search className="size-6 text-white/30" />
+            </div>
+            <h3 className="mb-2 text-base font-bold text-white">Player not found</h3>
+            <p className="text-sm text-white/40">
+              <span className="font-mono text-white/60">{username}</span> has never played on OnThePixel.net,
+              or the username is incorrect.
+            </p>
+          </div>
+        )}
+
+        {/* Loading */}
+        {loading && <Skeleton />}
+
+        {/* Stats */}
+        {stats && !loading && (
+          <div className="space-y-4">
+            {/* Player info card */}
+            <div className="rounded-xl border border-white/5 bg-white/[0.03] p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 mb-6">
+                <div className="shrink-0">
+                  <Image
+                    src={`https://mcskin.me/api/pfp/${stats.playerinfo.username}.png?transparent=true`}
+                    alt={stats.playerinfo.username}
+                    width={80}
+                    height={80}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-1.5">
+                    {stats.playerinfo.username}
+                  </h2>
+                  <div
+                    className="inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-sm font-bold"
+                    style={{
+                      backgroundColor: `${stats.playerinfo.rank.color}20`,
+                      color: stats.playerinfo.rank.color,
+                      boxShadow: `0 0 12px ${stats.playerinfo.rank.color}25`,
+                    }}
+                  >
+                    <Award className="size-3.5" />
+                    {stats.playerinfo.rank.id}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <StatBox label="First joined" value={safeDate(stats.playerinfo.firstLogin)} icon={<Clock className="size-4" />} />
+                <StatBox label="Last online" value={safeDate(stats.playerinfo.lastLogin)} icon={<Clock className="size-4" />} />
+                <StatBox label="Playtime" value={stats.stats.playtime.pretty} icon={<Zap className="size-4" />} />
+                <StatBox label="Balance" value={`${stats.stats.balance.pixels.toLocaleString("en-US")} ✦`} icon={<Target className="size-4" />} />
+              </div>
+            </div>
+
+            {/* Minigames */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <ComingSoon title="BedWars" />
+
+              <GameCard title="Duels">
+                <StatBox label="Wins" value={stats.stats.duels.wins} icon={<Trophy className="size-4" />} />
+                <StatBox label="Losses" value={stats.stats.duels.losses} />
+                <StatBox label="K/D Ratio" value={stats.stats.duels.kdr.toFixed(2)} icon={<TrendingUp className="size-4" />} />
+                <StatBox label="Games Played" value={stats.stats.duels.gamesPlayed} />
+              </GameCard>
+
+              <ComingSoon title="TNT Run" />
+
+              <GameCard title="BuildFFA">
+                <StatBox label="Kills" value={stats.stats.buildffa.kills} icon={<Sword className="size-4" />} />
+                <StatBox label="Deaths" value={stats.stats.buildffa.deaths} />
+                <StatBox label="K/D Ratio" value={stats.stats.buildffa.kdr.toFixed(2)} icon={<TrendingUp className="size-4" />} />
+              </GameCard>
+            </div>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!stats && !loading && !error && !notFound && (
+          <div className="rounded-xl border border-white/5 bg-white/[0.03] px-6 py-20 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
+              <Search className="size-6 text-white/30" />
+            </div>
+            <h3 className="mb-2 text-base font-bold text-white">Search for a player</h3>
+            <p className="text-sm text-white/40">
+              Enter a Minecraft username above to see their stats
+            </p>
+          </div>
+        )}
       </div>
-    </>
+    </section>
   );
 }
