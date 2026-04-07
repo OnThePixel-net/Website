@@ -9,7 +9,7 @@ interface NewsItem {
   text: string;
   date: string;
   url: string;
-  icon_url: string | null;
+  icon: string | null;
   short_description?: string;
 }
 
@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: item.title,
       description: item.short_description ?? item.text.slice(0, 160),
-      images: item.icon_url ? [item.icon_url] : [],
+      images: item.icon ? [`https://cdn.onthepixel.net/${item.icon}`] : [],
     },
   };
 }
@@ -108,10 +108,10 @@ export default async function NewsPage({ params }: PageProps) {
 
           {/* Hero image */}
           <div className="relative mb-8 w-full overflow-hidden rounded-xl">
-            {newsItem.icon_url ? (
+            {newsItem.icon ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={newsItem.icon_url}
+                src={`https://cdn.onthepixel.net/${newsItem.icon}`}
                 alt={newsItem.title}
                 className="h-56 w-full object-cover md:h-72"
               />
