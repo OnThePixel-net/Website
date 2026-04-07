@@ -11,8 +11,6 @@ interface DuelMode {
   winStreak: number;
   bestWinStreak: number;
   elo: number;
-  kills: number;
-  deaths: number;
 }
 
 interface DuelsData {
@@ -56,14 +54,6 @@ function eloColor(elo: number): string {
   return "#AAAAAA";
 }
 
-function eloLabel(elo: number): string {
-  if (elo >= 1100) return "Elite";
-  if (elo >= 1050) return "Diamond";
-  if (elo >= 1000) return "Gold";
-  if (elo >= 950) return "Silver";
-  return "Bronze";
-}
-
 async function getDuelsData(username: string): Promise<DuelsData | null> {
   try {
     const res = await fetch(
@@ -83,8 +73,6 @@ async function getDuelsData(username: string): Promise<DuelsData | null> {
           winStreak: m.winStreak ?? 0,
           bestWinStreak: m.bestWinStreak ?? 0,
           elo: m.elo ?? 1000,
-          kills: m.kills ?? 0,
-          deaths: m.deaths ?? 0,
         };
       }
     }
@@ -133,156 +121,106 @@ export default async function DuelsKitsPage({ params }: PageProps) {
   const playedModes = sortedModes.filter((m) => m.wins + m.losses > 0);
   const unplayedModes = sortedModes.filter((m) => m.wins + m.losses === 0);
 
+  const overallColor = eloColor(data.overall.elo);
+
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500&display=swap');`}</style>
       <TopPage />
       <section className="py-10 px-4 bg-gray-950 min-h-screen">
-        <div className="container mx-auto px-4 py-10 max-w-5xl">
+        <div className="container mx-auto px-4 py-10">
 
-          {/* Back + header */}
-          <div className="mb-8">
-            <Link
-              href={`/stats/${username}`}
-              className="inline-flex items-center gap-1.5 text-sm text-white/40 transition-colors hover:text-green-400 mb-5"
-              style={{ fontFamily: "'Syne', sans-serif" }}
-            >
-              ← Back to {username}&apos;s Stats
-            </Link>
+          {/* Back link */}
+          <Link
+            href={`/stats/${username}`}
+            className="inline-flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-green-400 mb-8"
+          >
+            ← Back to {username}&apos;s Stats
+          </Link>
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <Image
-                src={`https://mcskin.me/api/pfp/${username}.png?transparent=true`}
-                alt={username}
-                width={56}
-                height={56}
-                className="rounded-lg shrink-0"
-              />
-              <div>
-                <h1
-                  className="text-3xl font-bold text-white"
-                  style={{ fontFamily: "'Syne', sans-serif" }}
-                >
-                  {username} — DUELS KITS
-                </h1>
-                <p className="text-sm text-white/40 mt-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                  {playedModes.length} kits played · {data.overall.total_games} total games
-                </p>
-              </div>
+          {/* Header */}
+          <div className="flex items-center gap-4 mb-4">
+            <Image
+              src={`https://mcskin.me/api/pfp/${username}.png?transparent=true`}
+              alt={username}
+              width={56}
+              height={56}
+              className="rounded-lg shrink-0"
+            />
+            <div>
+              <h1 className="text-3xl font-bold text-white">
+                {username.toUpperCase()} — DUELS
+              </h1>
+              <p className="text-sm text-gray-400 mt-0.5">
+                {playedModes.length} kits played · {data.overall.total_games} total games
+              </p>
             </div>
           </div>
 
-          {/* Overall summary bar */}
-          <div className="mb-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { label: "Overall ELO", value: data.overall.elo, color: eloColor(data.overall.elo) },
-              { label: "Win Rate", value: `${data.overall.win_rate.toFixed(1)}%`, color: null },
-              { label: "Wins", value: data.overall.wins, color: "#00de6d" },
-              { label: "Best Streak", value: data.overall.bestWinStreak, color: null },
-            ].map((item, i) => (
-              <div key={i} className="rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-center">
-                <p className="text-xs text-white/40 mb-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>{item.label}</p>
-                <p
-                  className="text-xl font-bold"
-                  style={{ fontFamily: "'Syne', sans-serif", color: item.color ?? "#ffffff" }}
-                >
-                  {item.value}
-                </p>
-              </div>
-            ))}
+          {/* Overall stats — same card style as team apply CTA */}
+          <div className="mb-10 p-6 bg-white/10 rounded-lg border-l-4 border-green-500 grid grid-cols-2 sm:grid-cols-4 gap-6">
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">ELO</p>
+              <p
+                className="text-2xl font-bold"
+                style={{ color: overallColor, textShadow: `0 0 10px ${overallColor}` }}
+              >
+                {data.overall.elo}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Win Rate</p>
+              <p className="text-2xl font-bold text-white">{data.overall.win_rate.toFixed(1)}%</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Wins / Losses</p>
+              <p className="text-2xl font-bold text-white">{data.overall.wins} / {data.overall.losses}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Best Streak</p>
+              <p className="text-2xl font-bold text-white">{data.overall.bestWinStreak}</p>
+            </div>
           </div>
 
           {/* Played kits */}
           {playedModes.length > 0 && (
             <div className="mb-10">
-              <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-white/60" style={{ fontFamily: "'Syne', sans-serif" }}>
-                  Played Kits
-                </h2>
-                <div className="h-px flex-1 bg-white/5" />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <h2 className="text-xl font-bold text-white mb-4">KITS</h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {playedModes.map((mode) => {
                   const total = mode.wins + mode.losses;
                   const winPct = total > 0 ? (mode.wins / total) * 100 : 0;
                   const color = eloColor(mode.elo);
-                  const label = eloLabel(mode.elo);
 
                   return (
                     <div
                       key={mode.key}
-                      className="group rounded-xl border border-white/5 bg-white/[0.03] p-5 transition-all duration-300 hover:border-white/10 hover:bg-white/[0.05]"
+                      className="m-1 flex items-center rounded-md bg-white/10 p-4 transition-transform duration-300 hover:scale-105 hover:bg-white/15 gap-4"
                     >
-                      {/* Header */}
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <p
-                            className="text-base font-bold text-white"
-                            style={{ fontFamily: "'Syne', sans-serif" }}
-                          >
-                            {KIT_LABELS[mode.key] ?? mode.key}
+                      {/* Kit name + games */}
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-white truncate">
+                          {KIT_LABELS[mode.key] ?? mode.key}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {mode.wins}W · {mode.losses}L · {winPct.toFixed(0)}% WR
+                        </p>
+                        {mode.bestWinStreak > 0 && (
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            Best streak: {mode.bestWinStreak}
                           </p>
-                          <p className="text-xs text-white/40 mt-0.5">{total} games</p>
-                        </div>
-                        <div className="text-right">
-                          <p
-                            className="text-lg font-black"
-                            style={{ fontFamily: "'Syne', sans-serif", color }}
-                          >
-                            {mode.elo}
-                          </p>
-                          <p
-                            className="text-[10px] font-bold uppercase tracking-wider"
-                            style={{ color }}
-                          >
-                            {label}
-                          </p>
-                        </div>
+                        )}
                       </div>
 
-                      {/* Wins / Losses */}
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="flex-1 text-center rounded-lg bg-green-500/10 py-2">
-                          <p className="text-lg font-bold text-green-400" style={{ fontFamily: "'Syne', sans-serif" }}>{mode.wins}</p>
-                          <p className="text-[10px] text-white/40 uppercase tracking-wide">Wins</p>
-                        </div>
-                        <div className="text-white/20 text-sm font-bold">vs</div>
-                        <div className="flex-1 text-center rounded-lg bg-red-500/10 py-2">
-                          <p className="text-lg font-bold text-red-400" style={{ fontFamily: "'Syne', sans-serif" }}>{mode.losses}</p>
-                          <p className="text-[10px] text-white/40 uppercase tracking-wide">Losses</p>
-                        </div>
+                      {/* ELO — same style as rank in team page */}
+                      <div className="shrink-0 text-right">
+                        <p
+                          className="text-sm font-bold tracking-wide"
+                          style={{ color, textShadow: `0 0 8px ${color}` }}
+                        >
+                          {mode.elo} ELO
+                        </p>
+                        <p className="text-xs text-gray-500">{total} games</p>
                       </div>
-
-                      {/* Win rate bar */}
-                      <div className="mb-3">
-                        <div className="flex justify-between text-[10px] text-white/40 mb-1">
-                          <span>Win Rate</span>
-                          <span>{winPct.toFixed(1)}%</span>
-                        </div>
-                        <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-700"
-                            style={{
-                              width: `${winPct}%`,
-                              background: winPct >= 50
-                                ? "linear-gradient(90deg, #00de6d, #55FF55)"
-                                : "linear-gradient(90deg, #FF5555, #FFAA00)",
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Best streak */}
-                      {mode.bestWinStreak > 0 && (
-                        <div className="flex items-center gap-1.5 text-xs text-white/40">
-                          <span>🔥</span>
-                          <span>Best streak: <span className="text-white/60 font-semibold">{mode.bestWinStreak}</span></span>
-                          {mode.winStreak > 0 && (
-                            <span className="ml-auto text-green-400 font-semibold">+{mode.winStreak} active</span>
-                          )}
-                        </div>
-                      )}
                     </div>
                   );
                 })}
@@ -293,27 +231,21 @@ export default async function DuelsKitsPage({ params }: PageProps) {
           {/* Unplayed kits */}
           {unplayedModes.length > 0 && (
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-white/30" style={{ fontFamily: "'Syne', sans-serif" }}>
-                  Not yet played
-                </h2>
-                <div className="h-px flex-1 bg-white/5" />
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              <h2 className="text-xl font-bold text-white mb-4">NOT YET PLAYED</h2>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                 {unplayedModes.map((mode) => (
                   <div
                     key={mode.key}
-                    className="rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3 opacity-40"
+                    className="m-1 rounded-md bg-white/5 p-4 opacity-40"
                   >
-                    <p className="text-sm font-bold text-white" style={{ fontFamily: "'Syne', sans-serif" }}>
-                      {KIT_LABELS[mode.key] ?? mode.key}
-                    </p>
-                    <p className="text-xs text-white/40 mt-0.5">No games yet</p>
+                    <p className="font-bold text-white">{KIT_LABELS[mode.key] ?? mode.key}</p>
+                    <p className="text-sm text-gray-400">No games yet</p>
                   </div>
                 ))}
               </div>
             </div>
           )}
+
         </div>
       </section>
     </>
