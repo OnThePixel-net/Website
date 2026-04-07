@@ -1,5 +1,11 @@
 import React from "react";
+import type { Metadata } from "next";
 import Creators, { Creator, LiveStatus } from "@/components/page/creators";
+
+export const metadata: Metadata = {
+  title: "Creators — OnThePixel.net",
+  description: "Our content creators — streamers and YouTubers playing on OnThePixel.net. Watch them live or catch their latest videos.",
+};
 import TopPage from "@/components/page/top";
 
 async function getCreatorsData() {

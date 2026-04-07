@@ -26,7 +26,7 @@ const fields: ApplicationField[] = [
 
 async function isPositionOpen(name: string): Promise<boolean> {
   try {
-    const res = await fetch("https://cms.onthepixel.net/items/Apply", { cache: "no-store" });
+    const res = await fetch("https://cms.onthepixel.net/items/Apply", { next: { revalidate: 60 } });
     const data = await res.json();
     const position = (data.data ?? []).find((p: { name: string; status: string }) => p.name === name);
     return position?.status === "open";
