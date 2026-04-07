@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { 
-  FaYoutube, 
-  FaTwitch, 
-  FaInstagram, 
-  FaTwitter, 
+import {
+  FaYoutube,
+  FaTwitch,
+  FaInstagram,
+  FaTwitter,
   FaDiscord,
   FaTiktok,
   FaWhatsapp,
@@ -18,28 +18,23 @@ interface Platform {
   Link: string;
 }
 
-interface Creator {
+export interface Creator {
   Minecarft_username: string;
   Name: string;
   Platforms: Platform[];
 }
 
-interface FollowerData {
-  success: boolean;
-  data?: {
-    social: {
-      platform: string;
-      followers?: number;
-      subscribers?: number;
-    };
-  };
-}
-
-interface LiveStatus {
+export interface LiveStatus {
   isLive: boolean;
   platform?: string;
   title?: string;
   viewers?: number;
+}
+
+interface CreatorsProps {
+  initialCreators: Creator[];
+  initialFollowers: Record<string, number>;
+  initialLiveStatus: Record<string, LiveStatus>;
 }
 
 const formatFollowers = (count: number): string => {
@@ -53,7 +48,7 @@ const formatFollowers = (count: number): string => {
 
 const getIconComponent = (iconName: string) => {
   const iconProps = { size: 18, className: "hover:scale-110 transition-transform duration-200" };
-  
+
   switch (iconName.toLowerCase()) {
     case 'youtube':
       return <FaYoutube {...iconProps} className={`${iconProps.className} text-red-500`} />;
@@ -75,155 +70,70 @@ const getIconComponent = (iconName: string) => {
   }
 };
 
-// Funktion um Twitch/YouTube Embed URL zu erstellen
-const getStreamEmbedUrl = (creator: Creator, live: LiveStatus) => {
+const getStreamEmbedUrl = (creator: Creator, live: LiveStatus): string | null => {
   if (!live.isLive || !creator.Platforms || creator.Platforms.length === 0) return null;
-  
+
   const firstPlatform = creator.Platforms[0];
   const platformType = firstPlatform.Icons.toLowerCase();
-  
+
   if (platformType === 'twitch') {
     const match = firstPlatform.Link.match(/twitch\.tv\/([^\/\?]+)/i);
     if (match) {
       return `https://player.twitch.tv/?channel=${match[1]}&parent=${window.location.hostname}&autoplay=false`;
     }
-  } else if (platformType === 'youtube') {
-    // YouTube Live Embed würde die Video ID benötigen
-    // Diese müsste von der API zurückgegeben werden
-    return null;
   }
-  
+
   return null;
 };
 
-export default function Creators() {
-  const [creators, setCreators] = useState<Creator[]>([]);
-  const [followersData, setFollowersData] = useState<Map<string, number>>(new Map());
-  const [liveStatus, setLiveStatus] = useState<Map<string, LiveStatus>>(new Map());
-  const [loadingFollowers, setLoadingFollowers] = useState(true);
-  const [loading, setLoading] = useState(true);
+export default function Creators({ initialCreators, initialFollowers, initialLiveStatus }: CreatorsProps) {
+  const creators = initialCreators;
+  const followersData = initialFollowers;
+  const [liveStatus, setLiveStatus] = useState<Record<string, LiveStatus>>(initialLiveStatus);
 
   useEffect(() => {
-    async function fetchCreators() {
-      try {
-        const response = await fetch(
-          "https://cms.onthepixel.net/items/Creators?fields=*.*.*"
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch creators");
-        }
-        const data = await response.json();
-        const creatorsList = data.data || [];
-        setCreators(creatorsList);
-        
-        fetchAllFollowers(creatorsList);
-        fetchAllLiveStatus(creatorsList);
-      } catch (error) {
-        console.error("Error fetching creators:", error);
-        setCreators([]);
-      } finally {
-        setLoading(false);
-      }
+    async function fetchAllLiveStatus() {
+      const liveMap: Record<string, LiveStatus> = {};
+
+      await Promise.all(
+        creators.map(async (creator) => {
+          try {
+            const response = await fetch(
+              `https://api.onthepixel.net/creators/live/${creator.Name}`
+            );
+            if (response.ok) {
+              const data = await response.json();
+              if (data.success && data.data) {
+                liveMap[creator.Name] = {
+                  isLive: data.data.isLive || false,
+                  platform: data.data.platform,
+                  title: data.data.title,
+                  viewers: data.data.viewers,
+                };
+              } else {
+                liveMap[creator.Name] = { isLive: false };
+              }
+            }
+          } catch {
+            liveMap[creator.Name] = { isLive: false };
+          }
+        })
+      );
+
+      setLiveStatus(liveMap);
     }
-    fetchCreators();
 
-    // Live-Status alle 60 Sekunden aktualisieren
-    const liveInterval = setInterval(() => {
-      if (creators.length > 0) {
-        fetchAllLiveStatus(creators);
-      }
-    }, 60000);
-
+    const liveInterval = setInterval(fetchAllLiveStatus, 60000);
     return () => clearInterval(liveInterval);
-  }, []);
+  }, [creators]);
 
-  async function fetchAllFollowers(creatorsList: Creator[]) {
-    const followersMap = new Map<string, number>();
-    
-    await Promise.all(
-      creatorsList.map(async (creator) => {
-        try {
-          const response = await fetch(
-            `https://api.onthepixel.net/creators/followers/${creator.Name}`
-          );
-          
-          if (response.ok) {
-            const data: FollowerData = await response.json();
-            if (data.success && data.data?.social) {
-              const count = data.data.social.followers || data.data.social.subscribers || 0;
-              followersMap.set(creator.Name, count);
-            }
-          }
-        } catch (error) {
-          console.error(`Error fetching followers for ${creator.Name}:`, error);
-        }
-      })
-    );
-    
-    setFollowersData(followersMap);
-    setLoadingFollowers(false);
-  }
+  const liveCreators = creators
+    .filter((creator) => liveStatus[creator.Name]?.isLive)
+    .sort((a, b) => (followersData[b.Name] || 0) - (followersData[a.Name] || 0));
 
-  async function fetchAllLiveStatus(creatorsList: Creator[]) {
-    const liveMap = new Map<string, LiveStatus>();
-    
-    await Promise.all(
-      creatorsList.map(async (creator) => {
-        try {
-          const response = await fetch(
-            `https://api.onthepixel.net/creators/live/${creator.Name}`
-          );
-          
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.data) {
-              liveMap.set(creator.Name, {
-                isLive: data.data.isLive || false,
-                platform: data.data.platform,
-                title: data.data.title,
-                viewers: data.data.viewers
-              });
-            } else {
-              liveMap.set(creator.Name, { isLive: false });
-            }
-          }
-        } catch (error) {
-          console.error(`Error fetching live status for ${creator.Name}:`, error);
-          liveMap.set(creator.Name, { isLive: false });
-        }
-      })
-    );
-    
-    setLiveStatus(liveMap);
-  }
-
-  // Creators in Live und nach Followern sortiert aufteilen
-  const liveCreators = creators.filter(creator => 
-    liveStatus.get(creator.Name)?.isLive
-  ).sort((a, b) => {
-    const followersA = followersData.get(a.Name) || 0;
-    const followersB = followersData.get(b.Name) || 0;
-    return followersB - followersA;
-  });
-
-  const sortedCreators = [...creators].sort((a, b) => {
-    const followersA = followersData.get(a.Name) || 0;
-    const followersB = followersData.get(b.Name) || 0;
-    return followersB - followersA;
-  });
-
-  if (loading) {
-    return (
-      <section className="py-10 px-4 bg-gray-950">
-        <div className="container mx-auto px-4 py-10">
-          <h1 id="creators" className="text-3xl font-bold mb-4 text-white">
-            CREATORS
-          </h1>
-          <div className="text-gray-400">Loading...</div>
-        </div>
-      </section>
-    );
-  }
+  const sortedCreators = [...creators].sort(
+    (a, b) => (followersData[b.Name] || 0) - (followersData[a.Name] || 0)
+  );
 
   return (
     <section className="py-10 px-4 bg-gray-950">
@@ -242,18 +152,17 @@ export default function Creators() {
               </div>
               <div className="h-px flex-1 bg-gradient-to-r from-red-600 to-transparent"></div>
             </div>
-            
+
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {liveCreators.map((creator, index) => {
-                const live = liveStatus.get(creator.Name);
-                const embedUrl = getStreamEmbedUrl(creator, live!);
-                
+                const live = liveStatus[creator.Name];
+                const embedUrl = live ? getStreamEmbedUrl(creator, live) : null;
+
                 return (
                   <div
                     key={`live-${index}`}
                     className="rounded-lg bg-white/10 overflow-hidden transition-transform duration-300 hover:scale-105"
                   >
-                    {/* Stream Embed */}
                     {embedUrl ? (
                       <div className="aspect-video bg-black relative">
                         <iframe
@@ -276,8 +185,7 @@ export default function Creators() {
                         </div>
                       </div>
                     )}
-                    
-                    {/* Stream Info */}
+
                     <div className="p-4">
                       <div className="flex items-center gap-3 mb-3">
                         <Image
@@ -295,14 +203,13 @@ export default function Creators() {
                           </p>
                         </div>
                       </div>
-                      
+
                       {live?.title && (
                         <p className="text-sm text-gray-300 line-clamp-2 mb-3">
                           {live.title}
                         </p>
                       )}
-                      
-                      {/* Platform Link */}
+
                       {creator.Platforms && creator.Platforms.length > 0 && (
                         <Link
                           href={creator.Platforms[0].Link}
@@ -327,13 +234,12 @@ export default function Creators() {
             <h2 className="text-xl font-bold text-white">ALL CREATORS</h2>
             <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
           </div>
-          
+
           {sortedCreators.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
               {sortedCreators.map((creator, index) => {
-                const followerCount = followersData.get(creator.Name);
-                const live = liveStatus.get(creator.Name);
-                
+                const followerCount = followersData[creator.Name];
+
                 return (
                   <div
                     key={index}
@@ -351,15 +257,9 @@ export default function Creators() {
                         <p className="font-bold text-white">{creator.Name}</p>
                         <p className="text-sm text-gray-400">CREATOR</p>
                       </div>
-                      
-                      {/* Follower Count */}
+
                       <div className="text-right">
-                        {loadingFollowers ? (
-                          <div className="animate-pulse">
-                            <div className="h-6 w-12 bg-gray-700 rounded mb-1"></div>
-                            <div className="h-3 w-16 bg-gray-700 rounded"></div>
-                          </div>
-                        ) : followerCount !== undefined ? (
+                        {followerCount !== undefined ? (
                           <>
                             <p className="text-lg font-bold text-white">
                               {formatFollowers(followerCount)}
@@ -370,7 +270,6 @@ export default function Creators() {
                       </div>
                     </div>
 
-                    {/* Platform Icons */}
                     {creator.Platforms && creator.Platforms.length > 0 && (
                       <div className="flex flex-wrap gap-3 mt-auto">
                         {creator.Platforms.map((platform, platformIndex) => (
