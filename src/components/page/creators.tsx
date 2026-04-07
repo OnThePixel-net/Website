@@ -19,7 +19,7 @@ interface Platform {
 }
 
 export interface Creator {
-  Minecarft_username: string;
+  Minecraft_username: string;
   Name: string;
   Platforms: Platform[];
 }
@@ -189,8 +189,8 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                     <div className="p-4">
                       <div className="flex items-center gap-3 mb-3">
                         <Image
-                          alt={creator.Minecarft_username}
-                          src={`https://mcskin.me/api/head/${creator.Minecarft_username}.png`}
+                          alt={creator.Minecraft_username}
+                          src={`https://mcskin.me/api/head/${creator.Minecraft_username}.png`}
                           width={40}
                           height={40}
                           className="rounded"
@@ -247,8 +247,8 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                   >
                     <div className="flex items-center mb-4">
                       <Image
-                        alt={creator.Minecarft_username}
-                        src={`https://mcskin.me/api/head/${creator.Minecarft_username}.png`}
+                        alt={creator.Minecraft_username}
+                        src={`https://mcskin.me/api/head/${creator.Minecraft_username}.png`}
                         width={40}
                         height={40}
                         className="rounded"

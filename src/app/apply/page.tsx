@@ -1,6 +1,12 @@
 import Link from "next/link";
 import React from "react";
 import TopPage from "@/components/page/top";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Apply — OnThePixel.net",
+  description: "Join the OnThePixel.net team! Apply as a Builder, Supporter or Java Developer and help shape the server.",
+};
 
 interface Position {
   id: number;
@@ -23,7 +29,7 @@ const POSITION_DESCRIPTIONS: Record<string, string> = {
 async function getPositions(): Promise<Position[]> {
   try {
     const res = await fetch("https://cms.onthepixel.net/items/Apply", {
-      cache: "no-store",
+      next: { revalidate: 60 },
     });
     const data = await res.json();
     return data.data || [];
