@@ -57,7 +57,8 @@ const GAMES = [
     description: "Complete in-game challenges and missions for exclusive rewards.",
     color: "#f97316",
     glow: "rgba(249,115,22,0.2)",
-    status: "soon",
+    status: "live",
+    href: "/sidequests",
   },
 ] as const;
 
@@ -242,11 +243,20 @@ export default function AboutPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {GAMES.map((game, i) => (
-                <div
-                  key={i}
-                  className="group relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] p-6 transition-all duration-300 hover:border-white/10 hover:bg-white/[0.05]"
-                >
+              {GAMES.map((game, i) => {
+                const CardWrapper = "href" in game
+                  ? ({ children }: { children: React.ReactNode }) => (
+                      <Link href={(game as { href: string }).href} className="group relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] p-6 transition-all duration-300 hover:border-white/10 hover:bg-white/[0.05] block">
+                        {children}
+                      </Link>
+                    )
+                  : ({ children }: { children: React.ReactNode }) => (
+                      <div className="group relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] p-6 transition-all duration-300 hover:border-white/10 hover:bg-white/[0.05]">
+                        {children}
+                      </div>
+                    );
+                return (
+                <CardWrapper key={i}>
                   <div
                     className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                     style={{
@@ -282,8 +292,9 @@ export default function AboutPage() {
                       {game.description}
                     </p>
                   </div>
-                </div>
-              ))}
+                </CardWrapper>
+                );
+              })}
             </div>
           </div>
         </div>
