@@ -186,14 +186,6 @@ function eloColor(elo: number): string {
   return "#AAAAAA";
 }
 
-function eloLabel(elo: number): string {
-  if (elo >= 1100) return "Elite";
-  if (elo >= 1050) return "Diamond";
-  if (elo >= 1000) return "Gold";
-  if (elo >= 950) return "Silver";
-  return "Bronze";
-}
-
 function DuelsCard({ duels, username }: { duels: PlayerStats["stats"]["duels"]; username: string }) {
   const winPct = duels.gamesPlayed > 0 ? (duels.wins / duels.gamesPlayed) * 100 : 0;
   const color = eloColor(duels.elo);
@@ -202,14 +194,8 @@ function DuelsCard({ duels, username }: { duels: PlayerStats["stats"]["duels"]; 
   return (
     <div className="rounded-xl border border-white/5 bg-white/[0.03] overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+      <div className="px-5 py-4 border-b border-white/5">
         <h3 className="font-bold text-white" style={{ fontFamily: "'Syne', sans-serif" }}>Duels</h3>
-        <div
-          className="text-xs font-bold px-2.5 py-1 rounded-full"
-          style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}
-        >
-          {eloLabel(duels.elo)}
-        </div>
       </div>
 
       <div className="p-5 flex flex-col gap-4 flex-1">
