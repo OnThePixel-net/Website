@@ -51,7 +51,7 @@ function NewsCard({
           {item.icon ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={`https://cms.onthepixel.net/assets/${item.icon}`}
+              src={`https://cdn.onthepixel.net/${item.icon}`}
               alt={item.title}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />

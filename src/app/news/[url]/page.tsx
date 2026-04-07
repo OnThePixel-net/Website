@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: item.title,
       description: item.short_description ?? item.text.slice(0, 160),
-      images: item.icon ? [`https://cms.onthepixel.net/assets/${item.icon}`] : [],
+      images: item.icon ? [`https://cdn.onthepixel.net/${item.icon}`] : [],
     },
   };
 }
@@ -111,7 +111,7 @@ export default async function NewsPage({ params }: PageProps) {
             {newsItem.icon ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={`https://cms.onthepixel.net/assets/${newsItem.icon}`}
+                src={`https://cdn.onthepixel.net/${newsItem.icon}`}
                 alt={newsItem.title}
                 className="h-56 w-full object-cover md:h-72"
               />
