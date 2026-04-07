@@ -1,15 +1,16 @@
-'use client';
-
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import TopPage from "@/components/page/top";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 interface NewsItem {
   title: string;
   text: string;
   date: string;
   url: string;
-  icon_url: string | null;
+  icon: string | null;
+  short_description?: string;
 }
 
 interface PageProps {
@@ -51,96 +52,42 @@ function parseMarkdownLinks(text: string) {
   return parts.length > 0 ? parts : [{ type: "text", content: text }];
 }
 
-export default function NewsPage({ params }: PageProps) {
-  const [newsItem, setNewsItem] = useState<NewsItem | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [url, setUrl] = useState<string>("");
-
-  useEffect(() => {
-    async function loadParams() {
-      const resolvedParams = await params;
-      setUrl(resolvedParams.url);
-    }
-    loadParams();
-  }, [params]);
-
-  useEffect(() => {
-    if (!url) return;
-    async function fetchNewsItem() {
-      try {
-        setLoading(true);
-        const response = await fetch(
-          `https://cms.onthepixel.net/items/News?filter%5B_and%5D%5B0%5D%5Burl%5D%5B_eq%5D=${url}`
-        );
-        if (!response.ok) { setError(true); return; }
-        const data = await response.json();
-        if (data.data && data.data.length > 0) {
-          setNewsItem(data.data[0]);
-        } else {
-          setError(true);
-        }
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchNewsItem();
-  }, [url]);
-
-  const fonts = `@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500&display=swap');`;
-
-  /* ── Loading ── */
-  if (loading) {
-    return (
-      <>
-        <style>{fonts}</style>
-        <TopPage />
-        <section className="bg-gray-950 min-h-screen">
-          <div className="container mx-auto max-w-3xl px-4 py-10">
-            <div className="mb-8 h-4 w-24 animate-pulse rounded bg-white/10" />
-            <div className="mb-8 h-56 w-full animate-pulse rounded-xl bg-white/5 md:h-72" />
-            <div className="animate-pulse space-y-3">
-              <div className="h-8 w-3/4 rounded bg-white/10" />
-              <div className="h-4 w-1/4 rounded bg-white/5" />
-              <div className="mt-8 space-y-2">
-                <div className="h-4 rounded bg-white/5" />
-                <div className="h-4 rounded bg-white/5" />
-                <div className="h-4 w-2/3 rounded bg-white/5" />
-              </div>
-            </div>
-          </div>
-        </section>
-      </>
+async function getNewsItem(url: string): Promise<NewsItem | null> {
+  try {
+    const response = await fetch(
+      `https://cms.onthepixel.net/items/News?filter%5B_and%5D%5B0%5D%5Burl%5D%5B_eq%5D=${url}`,
+      { next: { revalidate: 300 } }
     );
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.data?.[0] ?? null;
+  } catch {
+    return null;
   }
+}
 
-  /* ── Error ── */
-  if (error || !newsItem) {
-    return (
-      <>
-        <style>{fonts}</style>
-        <TopPage />
-        <section className="bg-gray-950 min-h-screen">
-          <div className="container mx-auto max-w-3xl px-4 py-10">
-            <Link
-              href="/#news"
-              className="mb-8 inline-flex items-center gap-1.5 text-sm text-white/40 transition-colors duration-200 hover:text-green-400"
-              style={{ fontFamily: "'Syne', sans-serif" }}
-            >
-              ← Back to News
-            </Link>
-            <div className="mt-6 rounded-xl border border-white/5 bg-white/[0.03] p-12 text-center">
-              <p className="text-white/30" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                News article not found.
-              </p>
-            </div>
-          </div>
-        </section>
-      </>
-    );
-  }
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { url } = await params;
+  const item = await getNewsItem(url);
+  if (!item) return { title: "News — OnThePixel.net" };
+  return {
+    title: `${item.title} — OnThePixel.net`,
+    description: item.short_description ?? item.text.slice(0, 160),
+    openGraph: {
+      title: item.title,
+      description: item.short_description ?? item.text.slice(0, 160),
+      images: item.icon ? [`https://cdn.onthepixel.net/${item.icon}`] : [],
+    },
+  };
+}
+
+const fonts = `@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500&display=swap');`;
+
+export default async function NewsPage({ params }: PageProps) {
+  const { url } = await params;
+  const newsItem = await getNewsItem(url);
+
+  if (!newsItem) notFound();
 
   const textLines = newsItem.text.split("\n");
 
@@ -151,7 +98,6 @@ export default function NewsPage({ params }: PageProps) {
       <section className="bg-gray-950 min-h-screen">
         <div className="container mx-auto max-w-3xl px-4 py-10">
 
-          {/* Back link */}
           <Link
             href="/#news"
             className="mb-8 inline-flex items-center gap-1.5 text-sm text-white/40 transition-colors duration-200 hover:text-green-400"
@@ -162,10 +108,10 @@ export default function NewsPage({ params }: PageProps) {
 
           {/* Hero image */}
           <div className="relative mb-8 w-full overflow-hidden rounded-xl">
-            {newsItem.icon_url ? (
+            {newsItem.icon ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={newsItem.icon_url}
+                src={`https://cdn.onthepixel.net/${newsItem.icon}`}
                 alt={newsItem.title}
                 className="h-56 w-full object-cover md:h-72"
               />
@@ -193,7 +139,6 @@ export default function NewsPage({ params }: PageProps) {
                 </div>
               </div>
             )}
-            {/* Bottom fade into page */}
             <div className="absolute bottom-0 left-0 h-20 w-full bg-gradient-to-t from-gray-950 to-transparent" />
           </div>
 
@@ -253,7 +198,6 @@ export default function NewsPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Bottom back link */}
           <div className="mt-8">
             <Link
               href="/#news"

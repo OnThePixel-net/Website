@@ -1,6 +1,12 @@
 import Link from "next/link";
 import React from "react";
 import TopPage from "@/components/page/top";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Leaderboards — OnThePixel.net",
+  description: "Compete with other players and climb the rankings. View leaderboards for Pixels, BuildFFA, Duels and more.",
+};
 
 export default function Leaderboards() {
   return (
