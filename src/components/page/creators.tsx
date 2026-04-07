@@ -79,7 +79,8 @@ const getStreamEmbedUrl = (creator: Creator, live: LiveStatus): string | null =>
   if (platformType === 'twitch') {
     const match = firstPlatform.Link.match(/twitch\.tv\/([^\/\?]+)/i);
     if (match) {
-      return `https://player.twitch.tv/?channel=${match[1]}&parent=${window.location.hostname}&autoplay=false`;
+      const hostname = typeof window !== "undefined" ? window.location.hostname : "onthepixel.net";
+      return `https://player.twitch.tv/?channel=${match[1]}&parent=${hostname}&autoplay=false`;
     }
   }
 
