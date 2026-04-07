@@ -52,6 +52,13 @@ const GAMES = [
     glow: "rgba(0,222,109,0.2)",
     status: "soon",
   },
+  {
+    name: "Side Quests",
+    description: "Complete in-game challenges and missions for exclusive rewards.",
+    color: "#f97316",
+    glow: "rgba(249,115,22,0.2)",
+    status: "soon",
+  },
 ] as const;
 
 const GAME_ICONS = [
@@ -59,6 +66,7 @@ const GAME_ICONS = [
   <IconHammer key="hammer" size={28} />,
   <IconBolt key="bolt" size={28} />,
   <IconTrophy key="trophy" size={28} />,
+  <IconStar key="star2" size={28} />,
 ];
 
 const VALUES = [
@@ -126,9 +134,9 @@ export default function AboutPage() {
               Fast-paced minigames, a thriving community — all on one server.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <div className="flex items-center gap-2 rounded-full bg-green-500/10 px-4 py-2 text-sm font-semibold text-green-400 ring-1 ring-green-500/20">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
-                Live since 2022
+              <div className="flex items-center gap-2 rounded-full bg-yellow-500/10 px-4 py-2 text-sm font-semibold text-yellow-400 ring-1 ring-yellow-500/20">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-yellow-400" />
+                Under Construction
               </div>
               <div className="rounded-full bg-white/5 px-4 py-2 text-sm text-white/40 ring-1 ring-white/10">
                 play.onthepixel.net
