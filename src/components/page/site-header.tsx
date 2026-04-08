@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { MainNav } from "./main-nav";
 import { MobileNav } from "./mobile-nav";
-import { Twitter, Github } from "lucide-react";
+import { X, Github } from "lucide-react";
 import { RiDiscordLine } from "react-icons/ri";
 
 export function SiteHeader() {
@@ -42,7 +42,7 @@ export function SiteHeader() {
                 )}
                 aria-hidden="true"
               >
-                <Twitter className="size-4" />
+                <X className="size-4" />
               </div>
             </Link>
             <MobileNav />
