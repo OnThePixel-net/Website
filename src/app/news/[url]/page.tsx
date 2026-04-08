@@ -81,8 +81,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-const fonts = `@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500&display=swap');`;
-
 export default async function NewsPage({ params }: PageProps) {
   const { url } = await params;
   const newsItem = await getNewsItem(url);
@@ -93,7 +91,6 @@ export default async function NewsPage({ params }: PageProps) {
 
   return (
     <>
-      <style>{fonts}</style>
       <TopPage />
       <section className="bg-gray-950 min-h-screen">
         <div className="container mx-auto max-w-3xl px-4 py-10">
@@ -111,7 +108,9 @@ export default async function NewsPage({ params }: PageProps) {
             {newsItem.icon ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={`https://cdn.onthepixel.net/${newsItem.icon}`}
+                src={`https://cdn.onthepixel.net/${newsItem.icon}?w=900&auto=format`}
+                srcSet={`https://cdn.onthepixel.net/${newsItem.icon}?w=600&auto=format 600w, https://cdn.onthepixel.net/${newsItem.icon}?w=900&auto=format 900w, https://cdn.onthepixel.net/${newsItem.icon}?w=1400&auto=format 1400w`}
+                sizes="(max-width: 768px) 100vw, 768px"
                 alt={newsItem.title}
                 className="h-56 w-full object-cover md:h-72"
               />

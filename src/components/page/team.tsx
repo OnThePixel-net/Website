@@ -70,10 +70,7 @@ export default async function Team() {
                     {mainRank ? (
                       <p
                         className="text-sm font-semibold tracking-wide truncate"
-                        style={{
-                          color: mainRank.Color,
-                          textShadow: `0 0 8px ${mainRank.Color}`,
-                        }}
+                        style={{ color: mainRank.Color }}
                       >
                         {mainRank.Name.toUpperCase()}
                       </p>

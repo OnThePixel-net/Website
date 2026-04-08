@@ -85,7 +85,6 @@ const VALUE_ICONS = [
 export default function AboutPage() {
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500&display=swap');`}</style>
       <TopPage />
       <section className="min-h-screen bg-gray-950">
 
@@ -106,6 +105,7 @@ export default function AboutPage() {
                 width={80}
                 height={80}
                 className="drop-shadow-[0_0_24px_rgba(0,222,109,0.5)]"
+                unoptimized
               />
             </div>
             <h1
