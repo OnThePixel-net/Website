@@ -20,11 +20,10 @@ export default function Footer() {
               <Link href={"/"}>
                 <Image
                   className="mr-2 text-3xl font-bold"
-                  src={"https://cdn.onthepixel.net/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"}
+                  src={"/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"}
                   alt="OnThePixel.net"
                   width={40}
                   height={40}
-                  unoptimized
                 />
               </Link>
             </div>
