@@ -1,0 +1,37 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    # Läuft jeden Montag um 00:00 Uhr
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # Ermöglicht manuelles Starten
+
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          cache: 'npm'
+
+      - name: Update package.json
+        run: |
+          # Installiert npm-check-updates global
+          npx npm-check-updates -u
+          # Installiert die neuen Versionen und aktualisiert package-lock.json
+          npm install
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update dependencies to latest"
+          title: "Automatisches Update der Abhängigkeiten"
+          body: "Dieser PR aktualisiert alle npm-Pakete auf die neuesten Versionen (via ncu)."
+          branch: "auto-dep-update"
+          delete-branch: true
