@@ -19,7 +19,7 @@ export default function PlayerCount() {
   return (
     <div className="flex items-center space-x-4">
       <Link href="/">
-        <Image src="/logo.png" width={40} height={40} alt="logo" />
+        <Image src="https://cdn.onthepixel.net/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e" width={40} height={40} alt="logo" unoptimized />
       </Link>
       <span className={`relative flex h-3 w-3`}>
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>

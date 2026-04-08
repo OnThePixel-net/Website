@@ -18,7 +18,7 @@ export default function Header() {
           alt="Background Image"
           className="h-full w-full object-cover brightness-75 filter"
           height="1080"
-          src="/bg.png"
+          src="https://cdn.onthepixel.net/bc993216-3548-4e87-bb85-bfb349c3d3b3"
           width="1920"
           unoptimized
         />
@@ -30,7 +30,7 @@ export default function Header() {
           <Image
             alt="Logo"
             height="100"
-            src="/logo.png"
+            src="https://cdn.onthepixel.net/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"
             style={{
               aspectRatio: "100/100",
               objectFit: "cover",
