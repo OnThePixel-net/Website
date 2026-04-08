@@ -17,30 +17,32 @@ export function SiteHeader() {
               href="https://discord.com/invite/Dpx3eK9t3z"
               target="_blank"
               rel="noreferrer"
+              aria-label="Discord"
             >
               <div
                 className={cn(
                   buttonVariants({ variant: "ghost" }),
                   "hidden w-10 px-0 sm:inline-flex",
                 )}
+                aria-hidden="true"
               >
                 <RiDiscordLine className="size-5" />
-                <span className="sr-only">Discord</span>
               </div>
             </Link>
             <Link
               href="https://x.com/@onthepixelnet"
               target="_blank"
               rel="noreferrer"
+              aria-label="Twitter"
             >
               <div
                 className={cn(
                   buttonVariants({ variant: "ghost" }),
                   "hidden w-10 px-0 sm:inline-flex",
                 )}
+                aria-hidden="true"
               >
                 <Twitter className="size-4" />
-                <span className="sr-only">Twitter</span>
               </div>
             </Link>
             <MobileNav />

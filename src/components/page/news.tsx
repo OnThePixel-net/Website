@@ -51,7 +51,9 @@ function NewsCard({
           {item.icon ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={`https://cdn.onthepixel.net/${item.icon}`}
+              src={`https://cdn.onthepixel.net/${item.icon}?w=800&auto=format`}
+              srcSet={`https://cdn.onthepixel.net/${item.icon}?w=400&auto=format 400w, https://cdn.onthepixel.net/${item.icon}?w=800&auto=format 800w, https://cdn.onthepixel.net/${item.icon}?w=1200&auto=format 1200w`}
+              sizes="(max-width: 768px) 100vw, 50vw"
               alt={item.title}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
@@ -142,10 +144,6 @@ export default async function News() {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500&display=swap');
-      `}</style>
-
       <section className="bg-gray-950 py-10 px-4">
         <div className="container mx-auto px-4 py-10">
           <div className="mb-8">

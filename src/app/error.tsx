@@ -16,8 +16,6 @@ export default function Error({
 
   return (
     <section className="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-4 text-center">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500&display=swap');`}</style>
-
       <p
         className="mb-4 text-8xl font-black text-white/5 select-none"
         style={{ fontFamily: "'Syne', sans-serif" }}

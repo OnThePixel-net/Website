@@ -11,6 +11,7 @@ export default function TopPage() {
           src="/top.png"
           width={1920}
           height={256}
+          unoptimized
         />
         <div className="absolute inset-0">
           <div className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-transparent to-gray-950"></div>
