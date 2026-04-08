@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { MainNav } from "./main-nav";
 import { MobileNav } from "./mobile-nav";
-import { X, Github } from "lucide-react";
+import { X } from "lucide-react";
 import { RiDiscordLine } from "react-icons/ri";
 
 export function SiteHeader() {
