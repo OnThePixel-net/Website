@@ -19,13 +19,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 'latest'
-          cache: 'npm'
+          # Cache hier deaktiviert, um den Fehler zu vermeiden
 
       - name: Update package.json
         run: |
-          # Installiert npm-check-updates global
-          npx npm-check-updates -u
-          # Installiert die neuen Versionen und aktualisiert package-lock.json
+          # --yes sorgt dafür, dass npx nicht interaktiv nachfragt
+          npx --yes npm-check-updates -u
+          # Erstellt oder aktualisiert die Lock-Datei
           npm install
 
       - name: Create Pull Request
