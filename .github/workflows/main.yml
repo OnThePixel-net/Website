@@ -2,9 +2,8 @@ name: Update Dependencies
 
 on:
   schedule:
-    # Läuft jeden Montag um 00:00 Uhr
-    - cron: '0 0 * * 1'
-  workflow_dispatch: # Ermöglicht manuelles Starten
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   update-deps:
