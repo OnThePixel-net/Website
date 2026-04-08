@@ -24,6 +24,7 @@ export default function Footer() {
                   alt="OnThePixel.net"
                   width={40}
                   height={40}
+                  unoptimized
                 />
               </Link>
             </div>
@@ -35,32 +36,36 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 target="_blank"
                 className="text-gray-400 hover:text-green-500"
+                aria-label="Twitter"
               >
-                <IconBrandX size={20} />
+                <IconBrandX size={20} aria-hidden="true" />
               </Link>
               <Link
                 href="https://discord.com/invite/Dpx3eK9t3z"
                 rel="noopener noreferrer"
                 target="_blank"
                 className="text-gray-400 hover:text-green-500"
+                aria-label="Discord"
               >
-                <IconBrandDiscord size={20} />
+                <IconBrandDiscord size={20} aria-hidden="true" />
               </Link>
               <Link
                 href="https://twitch.tv/onthepixel"
                 rel="noopener noreferrer"
                 target="_blank"
                 className="text-gray-400 hover:text-green-500"
+                aria-label="Twitch"
               >
-                <IconBrandTwitch size={20} />
+                <IconBrandTwitch size={20} aria-hidden="true" />
               </Link>
               <Link
                 href="https://youtube.com/@thebestminecraftserver"
                 rel="noopener noreferrer"
                 target="_blank"
                 className="text-gray-400 hover:text-green-500"
+                aria-label="YouTube"
               >
-                <IconBrandYoutube size={20} />
+                <IconBrandYoutube size={20} aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -234,32 +239,36 @@ export default function Footer() {
               rel="noopener noreferrer"
               target="_blank"
               className="text-gray-400 hover:text-green-500"
+              aria-label="Twitter"
             >
-              <IconBrandX size={20} />
+              <IconBrandX size={20} aria-hidden="true" />
             </Link>
             <Link
               href="https://discord.com/invite/Dpx3eK9t3z"
               rel="noopener noreferrer"
               target="_blank"
               className="text-gray-400 hover:text-green-500"
+              aria-label="Discord"
             >
-              <IconBrandDiscord size={20} />
+              <IconBrandDiscord size={20} aria-hidden="true" />
             </Link>
             <Link
               href="https://twitch.tv/onthepixel"
               rel="noopener noreferrer"
               target="_blank"
               className="text-gray-400 hover:text-green-500"
+              aria-label="Twitch"
             >
-              <IconBrandTwitch size={20} />
+              <IconBrandTwitch size={20} aria-hidden="true" />
             </Link>
             <Link
               href="https://youtube.com/@thebestminecraftserver"
               rel="noopener noreferrer"
               target="_blank"
               className="text-gray-400 hover:text-green-500"
+              aria-label="YouTube"
             >
-              <IconBrandYoutube size={20} />
+              <IconBrandYoutube size={20} aria-hidden="true" />
             </Link>
           </div>
         </div>
