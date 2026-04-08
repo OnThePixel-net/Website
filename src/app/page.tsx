@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "OnThePixel.net",
     description: "Fast-paced Minecraft minigames. Duels, BuildFFA, TNT Run and more.",
-    images: ["/logo.png"],
+    images: ["https://cdn.onthepixel.net/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"],
   },
 };
 import Header from "@/components/page/header";

@@ -3,7 +3,6 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { MainNav } from "./main-nav";
 import { MobileNav } from "./mobile-nav";
-import { X } from "lucide-react";
 import { RiDiscordLine } from "react-icons/ri";
 
 export function SiteHeader() {
@@ -27,22 +26,6 @@ export function SiteHeader() {
                 aria-hidden="true"
               >
                 <RiDiscordLine className="size-5" />
-              </div>
-            </Link>
-            <Link
-              href="https://x.com/@onthepixelnet"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Twitter"
-            >
-              <div
-                className={cn(
-                  buttonVariants({ variant: "ghost" }),
-                  "hidden w-10 px-0 sm:inline-flex",
-                )}
-                aria-hidden="true"
-              >
-                <X className="size-4" />
               </div>
             </Link>
             <MobileNav />

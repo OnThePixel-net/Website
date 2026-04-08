@@ -13,7 +13,7 @@ export default function NotFound() {
           alt="Background Image"
           className="object-cover w-full h-full filter brightness-75"
           height="1080"
-          src="/bg.png"
+          src="/bc993216-3548-4e87-bb85-bfb349c3d3b3"
           style={{
             aspectRatio: "1920/1080",
             objectFit: "cover",
@@ -28,7 +28,7 @@ export default function NotFound() {
           <Image
             alt="Logo"
             height="100"
-            src="/logo.png"
+            src="/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"
             style={{
               aspectRatio: "100/100",
               objectFit: "cover",

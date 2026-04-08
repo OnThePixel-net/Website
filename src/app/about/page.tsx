@@ -100,7 +100,7 @@ export default function AboutPage() {
           <div className="container mx-auto max-w-4xl px-4 text-center">
             <div className="mb-6 flex justify-center">
               <Image
-                src="/logo.png"
+                src="/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"
                 alt="OnThePixel.net"
                 width={80}
                 height={80}
