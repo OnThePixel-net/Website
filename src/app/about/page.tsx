@@ -303,9 +303,9 @@ export default function AboutPage() {
               className="mb-8 text-white/45"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Join thousands of players on{" "}
+              Join on{" "}
               <span className="font-mono text-green-400">play.onthepixel.net</span>{" "}
-              — Java Edition 1.8+
+              — Java Edition 1.21.8+
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link
