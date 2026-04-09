@@ -34,9 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://cdn.onthepixel.net" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://cms.onthepixel.net" />
-        <link rel="dns-prefetch" href="https://api.onthepixel.net" />
+        <script async src="https://analytics.intern.onthepixel.net/script.js" data-website-id="2362b4d0-3dea-4b1e-b3f8-86b0af3e4bd1"></script>
       </head>
       <body className={`${inter.className} ${syne.variable} ${dmSans.variable} scroll-smooth bg-gray-950`}>
         <SessionProvider>
