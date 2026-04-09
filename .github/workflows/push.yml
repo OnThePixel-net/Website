@@ -3,11 +3,13 @@ name: Build and Push Next.js Image
 on:
   push:
     branches:
-      - main  # Der Workflow startet bei jedem Push auf main
+      - main
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  # Behebt die Node.js 20 Warnung
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
 
 jobs:
   build-and-push:
@@ -20,6 +22,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # DIESER SCHRITT FEHLTE: Initialisiert die Build-Engine
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
@@ -27,7 +33,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -37,12 +43,12 @@ jobs:
             type=sha,format=short
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6 # Upgrade auf v6 für besseren Support
         with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # Cache optimiert die Build-Zeit bei mehrmaligem Ausführen
+          # Nutze inline cache, falls gha-Backend Probleme macht
           cache-from: type=gha
           cache-to: type=gha,mode=max
