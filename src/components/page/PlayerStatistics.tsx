@@ -178,87 +178,23 @@ function Skeleton() {
   );
 }
 
-function eloColor(elo: number): string {
-  if (elo >= 1100) return "#00de6d";
-  if (elo >= 1050) return "#55FF55";
-  if (elo >= 1000) return "#FFAA00";
-  if (elo >= 950) return "#FF5555";
-  return "#AAAAAA";
-}
-
 function DuelsCard({ duels, username }: { duels: PlayerStats["stats"]["duels"]; username: string }) {
-  const winPct = duels.gamesPlayed > 0 ? (duels.wins / duels.gamesPlayed) * 100 : 0;
-  const color = eloColor(duels.elo);
   const kitsPlayed = Object.values(duels.modes).filter((m) => m.wins + m.losses > 0).length;
 
   return (
     <div className="rounded-xl border border-white/5 bg-white/[0.03] overflow-hidden flex flex-col">
-      {/* Header */}
       <div className="px-5 py-4 border-b border-white/5">
         <h3 className="font-bold text-white" style={{ fontFamily: "'Syne', sans-serif" }}>Duels</h3>
       </div>
-
-      <div className="p-5 flex flex-col gap-4 flex-1">
-        {/* ELO hero */}
-        <div className="flex items-center gap-4 rounded-xl bg-white/5 px-5 py-4">
-          <div className="flex-1">
-            <p className="text-xs text-white/40 mb-0.5">Overall ELO</p>
-            <p
-              className="text-3xl font-black"
-              style={{ fontFamily: "'Syne', sans-serif", color, textShadow: `0 0 20px ${color}40` }}
-            >
-              {duels.elo}
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-xs text-white/40 mb-0.5">Win Streak</p>
-            <p className="text-lg font-bold text-white" style={{ fontFamily: "'Syne', sans-serif" }}>
-              {duels.winStreak > 0 ? `🔥 ${duels.winStreak}` : duels.winStreak}
-            </p>
-            <p className="text-[10px] text-white/30">best: {duels.bestWinStreak}</p>
-          </div>
-        </div>
-
-        {/* Wins vs Losses */}
-        <div className="flex gap-2">
-          <div className="flex-1 rounded-lg bg-green-500/10 px-3 py-2.5 text-center">
-            <p className="text-xl font-black text-green-400" style={{ fontFamily: "'Syne', sans-serif" }}>{duels.wins}</p>
-            <p className="text-[10px] text-white/40 uppercase tracking-wide">Wins</p>
-          </div>
-          <div className="flex-1 rounded-lg bg-red-500/10 px-3 py-2.5 text-center">
-            <p className="text-xl font-black text-red-400" style={{ fontFamily: "'Syne', sans-serif" }}>{duels.losses}</p>
-            <p className="text-[10px] text-white/40 uppercase tracking-wide">Losses</p>
-          </div>
-          <div className="flex-1 rounded-lg bg-white/5 px-3 py-2.5 text-center">
-            <p className="text-xl font-black text-white" style={{ fontFamily: "'Syne', sans-serif" }}>{duels.gamesPlayed}</p>
-            <p className="text-[10px] text-white/40 uppercase tracking-wide">Played</p>
-          </div>
-        </div>
-
-        {/* Win rate bar */}
-        <div>
-          <div className="flex justify-between text-xs text-white/40 mb-1.5">
-            <span>Win Rate</span>
-            <span className="font-semibold text-white/70">{duels.winRate.toFixed(1)}%</span>
-          </div>
-          <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{
-                width: `${winPct}%`,
-                background: winPct >= 50
-                  ? "linear-gradient(90deg, #00de6d, #55FF55)"
-                  : "linear-gradient(90deg, #FF5555, #FFAA00)",
-              }}
-            />
-          </div>
-        </div>
-
-        {/* K/D */}
-        <StatBox label="K/D Ratio" value={duels.kdr.toFixed(2)} icon={<TrendingUp className="size-4" />} />
+      <div className="p-5 space-y-2 flex-1">
+        <StatBox label="ELO" value={duels.elo} icon={<Trophy className="size-4" />} />
+        <StatBox label="Wins" value={duels.wins} icon={<Sword className="size-4" />} />
+        <StatBox label="Losses" value={duels.losses} />
+        <StatBox label="Games Played" value={duels.gamesPlayed} />
+        <StatBox label="Win Rate" value={`${duels.winRate.toFixed(1)}%`} icon={<TrendingUp className="size-4" />} />
+        <StatBox label="K/D Ratio" value={duels.kdr.toFixed(2)} />
+        <StatBox label="Win Streak" value={duels.winStreak} />
       </div>
-
-      {/* Kit details link */}
       {kitsPlayed > 0 && (
         <Link
           href={`/stats/${username}/duels`}
