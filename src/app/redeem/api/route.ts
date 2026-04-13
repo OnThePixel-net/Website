@@ -4,10 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   const session = await auth();
 
-  if (!session?.user) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await req.json();
 
   if (!body.code?.trim()) {
@@ -22,20 +18,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Captcha token is required" }, { status: 400 });
   }
 
-  // Forward to external API with verified Discord identity from session.
-  // Discord ID and username are taken from the server-side session —
-  // they cannot be spoofed by the client.
+  // Discord identity is optional. If the user is logged in, attach verified
+  // Discord data from the server-side session (cannot be spoofed by the client).
+  const discord = session?.user
+    ? {
+        id: session.user.discordId,
+        username: session.user.name,
+        avatar: session.user.image,
+      }
+    : undefined;
+
   const response = await fetch("https://api.onthepixel.net/redeem", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       code: body.code.trim(),
       minecraftUsername: body.minecraftUsername.trim(),
-      discord: {
-        id: session.user.discordId,
-        username: session.user.name,
-        avatar: session.user.image,
-      },
+      ...(discord && { discord }),
       captchaToken: body.captchaToken,
       submittedAt: new Date().toISOString(),
     }),

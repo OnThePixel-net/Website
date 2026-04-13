@@ -24,11 +24,6 @@ export default function RedeemPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!session) {
-      setError("Please login with Discord first.");
-      return;
-    }
-
     if (!code.trim()) {
       setError("Please enter your redemption code.");
       return;
@@ -125,7 +120,7 @@ export default function RedeemPage() {
             Gib deinen Code und deinen Minecraft-Benutzernamen ein, um deine Belohnung zu erhalten.
           </p>
 
-          {/* Discord auth bar */}
+          {/* Discord auth bar (optional) */}
           <div className="mb-6 flex items-center justify-between bg-white/5 border border-white/10 rounded-lg px-4 py-3">
             {session ? (
               <>
@@ -142,7 +137,7 @@ export default function RedeemPage() {
               </>
             ) : (
               <>
-                <span className="text-sm text-gray-400">Discord login erforderlich</span>
+                <span className="text-sm text-gray-400">Optional: Mit Discord verknüpfen</span>
                 <button
                   onClick={() => signIn("discord")}
                   className="flex items-center gap-2 px-3 py-1.5 bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm rounded-md transition-colors font-medium"
@@ -215,7 +210,7 @@ export default function RedeemPage() {
 
             <button
               type="submit"
-              disabled={isSubmitting || !captchaToken || !session}
+              disabled={isSubmitting || !captchaToken}
               className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Wird eingelöst..." : "Code einlösen"}
