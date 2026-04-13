@@ -24,11 +24,6 @@ export default function RedeemPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!session) {
-      setError("Please login with Discord first.");
-      return;
-    }
-
     if (!code.trim()) {
       setError("Please enter your redemption code.");
       return;
@@ -94,15 +89,15 @@ export default function RedeemPage() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold mb-4">Code erfolgreich eingelöst!</h1>
+          <h1 className="text-2xl font-bold mb-4">Code redeemed successfully!</h1>
           <p className="text-gray-400 mb-8">
-            Dein Code wurde erfolgreich eingelöst. Die Belohnung wird bald auf deinem Konto gutgeschrieben.
+            Your code has been redeemed. The reward will be credited to your account shortly.
           </p>
           <Link
             href="/"
             className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
-            Zurück zur Startseite
+            Back to Home
           </Link>
         </div>
       </section>
@@ -117,15 +112,15 @@ export default function RedeemPage() {
             href="/"
             className="inline-block mb-6 text-sm text-gray-400 hover:text-green-400 transition-colors duration-200"
           >
-            ← Zurück zur Startseite
+            ← Back to Home
           </Link>
 
-          <h1 className="text-2xl font-bold mb-2">Code einlösen</h1>
+          <h1 className="text-2xl font-bold mb-2">Redeem a Code</h1>
           <p className="text-gray-400 mb-6">
-            Gib deinen Code und deinen Minecraft-Benutzernamen ein, um deine Belohnung zu erhalten.
+            Enter your code and Minecraft username to claim your reward.
           </p>
 
-          {/* Discord auth bar */}
+          {/* Discord auth bar (optional) */}
           <div className="mb-6 flex items-center justify-between bg-white/5 border border-white/10 rounded-lg px-4 py-3">
             {session ? (
               <>
@@ -138,11 +133,11 @@ export default function RedeemPage() {
                     {session.user?.name}
                   </span>
                 </div>
-                <span className="text-xs text-[#5865F2] font-medium">Discord verifiziert ✓</span>
+                <span className="text-xs text-[#5865F2] font-medium">Discord verified ✓</span>
               </>
             ) : (
               <>
-                <span className="text-sm text-gray-400">Discord login erforderlich</span>
+                <span className="text-sm text-gray-400">Optional: Link your Discord</span>
                 <button
                   onClick={() => signIn("discord")}
                   className="flex items-center gap-2 px-3 py-1.5 bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm rounded-md transition-colors font-medium"
@@ -157,7 +152,7 @@ export default function RedeemPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-white mb-1.5">
-                Code <span className="text-red-400" title="Pflichtfeld">*</span>
+                Code <span className="text-red-400" title="Required">*</span>
               </label>
               <input
                 type="text"
@@ -166,14 +161,14 @@ export default function RedeemPage() {
                   setCode(e.target.value);
                   if (error) setError(null);
                 }}
-                placeholder="z.B. PIXEL-XXXX-XXXX"
+                placeholder="e.g. PIXEL-XXXX-XXXX"
                 className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:border-green-500 focus:outline-none text-white placeholder-gray-600 transition-colors font-mono"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-white mb-1.5">
-                Minecraft-Benutzername <span className="text-red-400" title="Pflichtfeld">*</span>
+                Minecraft Username <span className="text-red-400" title="Required">*</span>
               </label>
               <input
                 type="text"
@@ -182,14 +177,14 @@ export default function RedeemPage() {
                   setMinecraftUsername(e.target.value);
                   if (error) setError(null);
                 }}
-                placeholder="DeinMinecraftName"
+                placeholder="YourMinecraftName"
                 className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:border-green-500 focus:outline-none text-white placeholder-gray-600 transition-colors"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-white mb-1.5">
-                Sicherheitsüberprüfung <span className="text-red-400" title="Pflichtfeld">*</span>
+                Security Verification <span className="text-red-400" title="Required">*</span>
               </label>
               <HCaptcha
                 ref={captchaRef}
@@ -201,7 +196,7 @@ export default function RedeemPage() {
                 onExpire={() => setCaptchaToken(null)}
                 onError={() => {
                   setCaptchaToken(null);
-                  setError("Captcha-Fehler. Bitte versuche es erneut.");
+                  setError("Captcha error. Please try again.");
                 }}
                 theme="dark"
               />
@@ -215,10 +210,10 @@ export default function RedeemPage() {
 
             <button
               type="submit"
-              disabled={isSubmitting || !captchaToken || !session}
+              disabled={isSubmitting || !captchaToken}
               className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? "Wird eingelöst..." : "Code einlösen"}
+              {isSubmitting ? "Redeeming..." : "Redeem Code"}
             </button>
           </form>
         </div>
