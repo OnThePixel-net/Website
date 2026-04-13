@@ -40,9 +40,18 @@ export async function POST(req: NextRequest) {
     }),
   });
 
-  const data = await response.json().catch(() => ({
-    message: "Redemption failed",
-  }));
+  const rawText = await response.text().catch(() => "");
+
+  let data: Record<string, unknown>;
+  try {
+    data = JSON.parse(rawText);
+  } catch {
+    // External API returned non-JSON — surface status and raw body for debugging
+    return NextResponse.json(
+      { message: `External API error (${response.status})`, raw: rawText },
+      { status: response.status || 502 }
+    );
+  }
 
   if (!response.ok) {
     return NextResponse.json(data, { status: response.status });
