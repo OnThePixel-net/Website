@@ -40,10 +40,13 @@ export async function POST(req: NextRequest) {
     }),
   });
 
+  const data = await response.json().catch(() => ({
+    message: "Redemption failed",
+  }));
+
   if (!response.ok) {
-    const err = await response.json().catch(() => ({ message: "Redemption failed" }));
-    return NextResponse.json(err, { status: response.status });
+    return NextResponse.json(data, { status: response.status });
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json(data);
 }
