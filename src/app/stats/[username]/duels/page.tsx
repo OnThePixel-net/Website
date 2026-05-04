@@ -105,9 +105,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export async function generateStaticParams() {
-  return [];
-}
+export const dynamic = "force-dynamic";
 
 export default async function DuelsKitsPage({ params }: PageProps) {
   const { username } = await params;
