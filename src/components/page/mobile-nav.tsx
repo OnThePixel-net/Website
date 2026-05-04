@@ -7,7 +7,6 @@ import { Menu } from "lucide-react";
 import Link, { LinkProps } from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
-import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -46,9 +45,6 @@ export function MobileNav() {
           </MobileLink>
           <Link href="https://discord.onthepixel.net">{t.nav.discord}</Link>
           <Link href="https://x.com/onthepixelnet">{t.nav.twitter}</Link>
-          <div className="mt-3">
-            <LanguageSwitcher />
-          </div>
         </div>
       </SheetContent>
     </Sheet>

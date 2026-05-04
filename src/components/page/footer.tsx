@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import CookieSettingsButton from "@/components/cookie-settings-button";
+import { LanguageSwitcher } from "@/components/page/LanguageSwitcher";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
 import {
   IconBrandX,
@@ -273,18 +274,21 @@ export default function Footer() {
             </Link>
           </div>
         </div>
-        <div className="mt-8 flex w-full flex-col items-center justify-between border-t border-slate-800 pt-8 md:flex-row">
+        <div className="mt-8 flex w-full flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 md:flex-row">
           <p className="mb-4 text-sm text-gray-400 md:mb-0">
             Copyright &copy; 2022-{new Date().getFullYear()} OnThePixel.net® -{" "}
             {t.footer.copyright}
             <CookieSettingsButton />
           </p>
-          <Button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="rounded-full bg-white px-6 py-2 font-semibold text-black transition-colors hover:bg-gray-200"
-          >
-            {t.footer.backToTop}
-          </Button>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher />
+            <Button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="rounded-full bg-white px-6 py-2 font-semibold text-black transition-colors hover:bg-gray-200"
+            >
+              {t.footer.backToTop}
+            </Button>
+          </div>
         </div>
       </div>
     </footer>

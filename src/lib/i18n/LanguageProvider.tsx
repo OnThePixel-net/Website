@@ -16,7 +16,9 @@ import {
   translations,
 } from "./translations";
 
+export const LOCALE_COOKIE = "otp.locale";
 const STORAGE_KEY = "otp.locale";
+const ONE_YEAR = 60 * 60 * 24 * 365;
 
 type LanguageContextValue = {
   locale: Locale;
@@ -26,12 +28,24 @@ type LanguageContextValue = {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-function isLocale(value: string | null | undefined): value is Locale {
+export function isLocale(value: string | null | undefined): value is Locale {
   return !!value && (SUPPORTED_LOCALES as readonly string[]).includes(value);
+}
+
+function readCookieLocale(): Locale | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie
+    .split("; ")
+    .find((c) => c.startsWith(`${LOCALE_COOKIE}=`));
+  if (!match) return null;
+  const value = decodeURIComponent(match.split("=")[1] ?? "");
+  return isLocale(value) ? value : null;
 }
 
 function detectInitialLocale(): Locale {
   if (typeof window === "undefined") return DEFAULT_LOCALE;
+  const cookieLocale = readCookieLocale();
+  if (cookieLocale) return cookieLocale;
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     if (isLocale(stored)) return stored;
@@ -43,12 +57,26 @@ function detectInitialLocale(): Locale {
   return DEFAULT_LOCALE;
 }
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
+function writeCookieLocale(locale: Locale) {
+  if (typeof document === "undefined") return;
+  document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${ONE_YEAR}; samesite=lax`;
+}
+
+export function LanguageProvider({
+  children,
+  initialLocale,
+}: {
+  children: React.ReactNode;
+  initialLocale?: Locale;
+}) {
+  const [locale, setLocaleState] = useState<Locale>(
+    initialLocale ?? DEFAULT_LOCALE,
+  );
 
   useEffect(() => {
+    if (initialLocale) return;
     setLocaleState(detectInitialLocale());
-  }, []);
+  }, [initialLocale]);
 
   useEffect(() => {
     if (typeof document !== "undefined") {
@@ -58,6 +86,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
+    writeCookieLocale(next);
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
     } catch {

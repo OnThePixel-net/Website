@@ -3,7 +3,6 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { MainNav } from "./main-nav";
 import { MobileNav } from "./mobile-nav";
-import { LanguageSwitcher } from "./LanguageSwitcher";
 import { RiDiscordLine } from "react-icons/ri";
 
 export function SiteHeader() {
@@ -12,8 +11,7 @@ export function SiteHeader() {
       <div className="container flex h-14 max-w-screen-2xl items-center">
         <MainNav />
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <nav className="flex items-center gap-2">
-            <LanguageSwitcher className="hidden sm:inline-flex" />
+          <nav className="flex items-center">
             <Link
               href="https://discord.com/invite/Dpx3eK9t3z"
               target="_blank"
