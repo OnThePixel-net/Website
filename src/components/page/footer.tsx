@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import CookieSettingsButton from "@/components/cookie-settings-button";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 import {
   IconBrandX,
   IconBrandDiscord,
@@ -11,6 +12,7 @@ import {
 } from "@tabler/icons-react";
 
 export default function Footer() {
+  const t = useTranslations();
   return (
     <footer className="px-4 py-12 md:px-6">
       <div className="container mx-auto">
@@ -28,7 +30,7 @@ export default function Footer() {
               </Link>
             </div>
             <h2 className="mb-2 text-xl font-bold">OnThePixel.net®</h2>
-            <div className="mb-4 text-sm">Follow Us</div>
+            <div className="mb-4 text-sm">{t.footer.followUs}</div>
             <div className="flex space-x-4">
               <Link
                 href="https://x.com/onthepixelnet"
@@ -69,14 +71,14 @@ export default function Footer() {
             </div>
           </div>
           <div>
-            <h3 className="mb-2 font-semibold">OnThePixel</h3>
+            <h3 className="mb-2 font-semibold">{t.footer.sectionOnThePixel}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/about"
                   className="text-gray-400 hover:text-green-500"
                 >
-                  About us
+                  {t.footer.aboutUs}
                 </Link>
               </li>
               <li>
@@ -84,15 +86,15 @@ export default function Footer() {
                   href="/team"
                   className="text-gray-400 hover:text-green-500"
                 >
-                  Meet the Team
+                  {t.footer.meetTheTeam}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/creators"
                   className="text-gray-400 hover:text-green-500"
-                >  
-                  Creators
+                >
+                  {t.footer.creators}
                 </Link>
               </li>
               <li>
@@ -100,20 +102,20 @@ export default function Footer() {
                   href="/tntrun"
                   className="text-gray-400 hover:text-green-500"
                 >
-                  TNT Run
+                  {t.footer.tntRun}
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="mb-2 font-semibold">Resources</h3>
+            <h3 className="mb-2 font-semibold">{t.footer.sectionResources}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/leaderboard"
                   className="text-gray-400 hover:text-green-500"
                 >
-                  Leaderboard
+                  {t.footer.leaderboard}
                 </Link>
               </li>
               <li>
@@ -121,7 +123,7 @@ export default function Footer() {
                   href="/statistics"
                   className="text-gray-400 hover:text-green-500"
                 >
-                  Statistics
+                  {t.footer.statistics}
                 </Link>
               </li>
               <li>
@@ -131,7 +133,7 @@ export default function Footer() {
                   target="_blank"
                   className="text-gray-400 hover:text-green-500"
                 >
-                  Status
+                  {t.footer.status}
                 </Link>
               </li>
               <li>
@@ -139,7 +141,7 @@ export default function Footer() {
                   href="/imprint"
                   className="text-gray-400 hover:text-green-500"
                 >
-                  Imprint
+                  {t.footer.imprint}
                 </Link>
               </li>
               <li>
@@ -147,13 +149,13 @@ export default function Footer() {
                   href="/privacy"
                   className="text-gray-400 hover:text-green-500"
                 >
-                  Privacy Policy
+                  {t.footer.privacy}
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="mb-2 font-semibold">Follow Us</h3>
+            <h3 className="mb-2 font-semibold">{t.footer.sectionFollowUs}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -273,15 +275,15 @@ export default function Footer() {
         </div>
         <div className="mt-8 flex w-full flex-col items-center justify-between border-t border-slate-800 pt-8 md:flex-row">
           <p className="mb-4 text-sm text-gray-400 md:mb-0">
-            Copyright &copy; 2022-{new Date().getFullYear()} OnThePixel.net® -
-            All Rights Reserved. - Not affiliated with Mojang or Microsoft!
+            Copyright &copy; 2022-{new Date().getFullYear()} OnThePixel.net® -{" "}
+            {t.footer.copyright}
             <CookieSettingsButton />
           </p>
           <Button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="rounded-full bg-white px-6 py-2 font-semibold text-black transition-colors hover:bg-gray-200"
           >
-            Back to Top
+            {t.footer.backToTop}
           </Button>
         </div>
       </div>

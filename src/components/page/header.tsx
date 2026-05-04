@@ -3,8 +3,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { FaCopy } from "react-icons/fa6";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 export default function Header() {
+  const t = useTranslations();
   function copyToClipboard(text: string) {
     navigator.clipboard.writeText(text);
   }
@@ -46,23 +48,23 @@ export default function Header() {
         >
           OnThePixel.net
         </h1>
-        <p className="mb-8 text-center">Join now - Don&#39;t play alone!</p>
+        <p className="mb-8 text-center">{t.hero.tagline}</p>
         <div className="flex space-x-4">
           <Link href="/leaderboard">
             <Button className="flex h-12 w-36 items-center bg-green-700 px-4 py-2 text-lg text-white transition-transform duration-500 hover:scale-105 sm:w-40 sm:px-6 sm:text-xl md:w-48 md:text-2xl">
-              LEADERBOARD
+              {t.hero.leaderboard}
             </Button>
           </Link>
           <Button
             className="flex size-12 items-center rounded bg-green-700 px-4 py-2"
             onClick={() => copyToClipboard("OnThePixel.net")}
-            aria-label="Copy server address"
+            aria-label={t.hero.copyAddress}
           >
             <FaCopy className="size-20 text-white" aria-hidden="true" />
           </Button>
           <Link href="https://discord.onthepixel.net">
             <Button className="flex h-12 w-36 items-center bg-green-700 px-4 py-2 text-lg text-white transition-transform duration-500 hover:scale-105 sm:w-40 sm:px-6 sm:text-xl md:w-48 md:text-2xl">
-              DISCORD
+              {t.hero.discord}
             </Button>
           </Link>
         </div>
