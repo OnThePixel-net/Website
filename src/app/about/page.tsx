@@ -17,12 +17,26 @@ import {
 } from "@tabler/icons-react";
 import type { Metadata } from "next";
 import { getServerLocale } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
 
-export const metadata: Metadata = {
-  title: "About — OnThePixel.net",
-  description:
-    "Learn about OnThePixel.net — a Minecraft network built by players for players. Fast-paced minigames, a thriving community.",
-};
+const COPY = {
+  en: {
+    title: "About",
+    description:
+      "Learn about OnThePixel.net — a Minecraft network built by players for players. Fast-paced minigames, a thriving community.",
+  },
+  de: {
+    title: "Über uns",
+    description:
+      "Erfahre mehr über OnThePixel.net — ein Minecraft-Netzwerk von Spielern für Spieler. Schnelle Minigames, eine lebendige Community.",
+  },
+} as const;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const { title, description } = COPY[locale];
+  return buildLocalizedMetadata({ locale, path: "/about", title, description });
+}
 
 interface Game {
   name: string;

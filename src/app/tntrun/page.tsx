@@ -1,5 +1,26 @@
+import type { Metadata } from "next";
 import TopPage from "@/components/page/top";
 import { getServerLocale } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+
+const META_COPY = {
+  en: {
+    title: "TNT Run",
+    description:
+      "Run for your life as the floor disappears beneath your feet. Be the last player standing on OnThePixel.net.",
+  },
+  de: {
+    title: "TNT Run",
+    description:
+      "Lauf um dein Leben, während der Boden unter deinen Füßen verschwindet. Sei der letzte Spieler auf OnThePixel.net.",
+  },
+} as const;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const { title, description } = META_COPY[locale];
+  return buildLocalizedMetadata({ locale, path: "/tntrun", title, description });
+}
 
 export default async function Page() {
   const locale = await getServerLocale();

@@ -2,12 +2,27 @@ import Link from "next/link";
 import React from "react";
 import TopPage from "@/components/page/top";
 import type { Metadata } from "next";
-import { getServerTranslations } from "@/lib/i18n/server";
+import { getServerLocale, getServerTranslations } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
 
-export const metadata: Metadata = {
-  title: "Apply — OnThePixel.net",
-  description: "Join the OnThePixel.net team! Apply as a Builder, Supporter or Java Developer and help shape the server.",
-};
+const META_COPY = {
+  en: {
+    title: "Apply",
+    description:
+      "Join the OnThePixel.net team! Apply as a Builder, Supporter or Java Developer and help shape the server.",
+  },
+  de: {
+    title: "Bewerben",
+    description:
+      "Werde Teil des OnThePixel.net-Teams! Bewirb dich als Builder, Supporter oder Java-Developer und gestalte den Server mit.",
+  },
+} as const;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const { title, description } = META_COPY[locale];
+  return buildLocalizedMetadata({ locale, path: "/apply", title, description });
+}
 
 interface Position {
   id: number;

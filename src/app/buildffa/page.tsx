@@ -1,5 +1,26 @@
+import type { Metadata } from "next";
 import TopPage from "@/components/page/top";
 import { getServerLocale } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+
+const META_COPY = {
+  en: {
+    title: "BuildFFA",
+    description:
+      "Free-for-all combat with building. Endless rounds with kit changes, map rotations and item drops on OnThePixel.net.",
+  },
+  de: {
+    title: "BuildFFA",
+    description:
+      "Free-for-All-Kämpfe mit Bauen. Endlose Runden mit Kit-Wechseln, Map-Rotationen und Item-Drops auf OnThePixel.net.",
+  },
+} as const;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const { title, description } = META_COPY[locale];
+  return buildLocalizedMetadata({ locale, path: "/buildffa", title, description });
+}
 
 export default async function Page() {
   const locale = await getServerLocale();

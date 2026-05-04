@@ -1,12 +1,28 @@
 import React from "react";
 import type { Metadata } from "next";
 import Creators, { Creator, LiveStatus } from "@/components/page/creators";
-
-export const metadata: Metadata = {
-  title: "Creators — OnThePixel.net",
-  description: "Our content creators — streamers and YouTubers playing on OnThePixel.net. Watch them live or catch their latest videos.",
-};
 import TopPage from "@/components/page/top";
+import { getServerLocale } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+
+const META_COPY = {
+  en: {
+    title: "Creators",
+    description:
+      "Our content creators — streamers and YouTubers playing on OnThePixel.net. Watch them live or catch their latest videos.",
+  },
+  de: {
+    title: "Creators",
+    description:
+      "Unsere Content-Creators — Streamer und YouTuber, die auf OnThePixel.net spielen. Schau ihnen live zu oder entdecke ihre neuesten Videos.",
+  },
+} as const;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const { title, description } = META_COPY[locale];
+  return buildLocalizedMetadata({ locale, path: "/creators", title, description });
+}
 
 async function getCreatorsData() {
   try {

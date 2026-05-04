@@ -4,6 +4,7 @@ import TopPage from "@/components/page/top";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerTranslations, getServerLocale } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
 import {
   DATE_LOCALES,
   DIRECTUS_LOCALES,
@@ -135,15 +136,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ? undefined
       : findTranslationFor(url, DIRECTUS_LOCALES[locale], allTr);
   const item = applyTranslation(base, tr);
-  return {
-    title: `${item.title} — OnThePixel.net`,
-    description: item.short_description ?? item.text.slice(0, 160),
-    openGraph: {
-      title: item.title,
-      description: item.short_description ?? item.text.slice(0, 160),
-      images: item.icon ? [`https://cdn.onthepixel.net/${item.icon}`] : [],
-    },
-  };
+  const description = item.short_description ?? item.text.slice(0, 160);
+  return buildLocalizedMetadata({
+    locale,
+    path: `/news/${url}`,
+    title: item.title,
+    description,
+    image: item.icon ? `https://cdn.onthepixel.net/${item.icon}` : undefined,
+  });
 }
 
 export default async function NewsPage({ params }: PageProps) {

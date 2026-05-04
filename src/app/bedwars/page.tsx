@@ -1,5 +1,26 @@
+import type { Metadata } from "next";
 import TopPage from "@/components/page/top";
 import { getServerLocale } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+
+const META_COPY = {
+  en: {
+    title: "BedWars",
+    description:
+      "Protect your bed and destroy your enemies' beds! Team-based PvP combat with strategic resource management on OnThePixel.net.",
+  },
+  de: {
+    title: "BedWars",
+    description:
+      "Beschütze dein Bett und zerstöre die Betten deiner Gegner! Team-basierte PvP-Kämpfe mit strategischem Ressourcenmanagement auf OnThePixel.net.",
+  },
+} as const;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const { title, description } = META_COPY[locale];
+  return buildLocalizedMetadata({ locale, path: "/bedwars", title, description });
+}
 
 export default async function Page() {
   const locale = await getServerLocale();

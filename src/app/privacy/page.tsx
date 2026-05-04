@@ -1,6 +1,27 @@
 import React from "react";
+import type { Metadata } from "next";
 import TopPage from "@/components/page/top";
 import { getServerLocale } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+
+const META_COPY = {
+  en: {
+    title: "Privacy Policy",
+    description:
+      "How OnThePixel.net collects, uses and protects your personal data — GDPR-compliant privacy policy.",
+  },
+  de: {
+    title: "Datenschutz",
+    description:
+      "Wie OnThePixel.net deine personenbezogenen Daten erhebt, nutzt und schützt — DSGVO-konforme Datenschutzerklärung.",
+  },
+} as const;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const { title, description } = META_COPY[locale];
+  return buildLocalizedMetadata({ locale, path: "/privacy", title, description });
+}
 
 export default async function Privacy() {
   const locale = await getServerLocale();

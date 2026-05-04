@@ -3,13 +3,27 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getServerTranslations } from "@/lib/i18n/server";
+import { getServerLocale, getServerTranslations } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
 
-export const metadata: Metadata = {
-  title: "Side Quests – OnThePixel.net",
-  description:
-    "Explore the side projects and open-source tools built by the OnThePixel team.",
-};
+const META_COPY = {
+  en: {
+    title: "Side Quests",
+    description:
+      "Explore the side projects and open-source tools built by the OnThePixel team.",
+  },
+  de: {
+    title: "Side Quests",
+    description:
+      "Entdecke die Nebenprojekte und Open-Source-Tools des OnThePixel-Teams.",
+  },
+} as const;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const { title, description } = META_COPY[locale];
+  return buildLocalizedMetadata({ locale, path: "/sidequests", title, description });
+}
 
 interface SideQuest {
   id: number;
