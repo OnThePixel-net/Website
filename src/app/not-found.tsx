@@ -1,8 +1,11 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 export default function NotFound() {
+  const t = useTranslations();
   return (
     <div
       key="1"
@@ -46,12 +49,12 @@ export default function NotFound() {
           404
         </h1>
         <p className="mb-8 text-center">
-          Some things aren&apos;t meant to last forever.
+          {t.notFound.tagline}
         </p>
         <div className="flex space-x-4">
           <Link href="/">
             <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
-              HOME
+              {t.notFound.home}
             </Button>
           </Link>
         </div>

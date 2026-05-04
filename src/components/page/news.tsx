@@ -1,5 +1,11 @@
 import React from "react";
 import Link from "next/link";
+import { getServerTranslations } from "@/lib/i18n/server";
+import {
+  DATE_LOCALES,
+  DIRECTUS_LOCALES,
+  Locale,
+} from "@/lib/i18n/translations";
 
 interface NewsItem {
   title: string;
@@ -9,11 +15,19 @@ interface NewsItem {
   icon: string | null;
 }
 
-function formatDate(dateStr: string): string {
+interface NewsTranslation {
+  News_url: string;
+  languages_code: string;
+  title?: string | null;
+  short_description?: string | null;
+  text?: string | null;
+}
+
+function formatDate(dateStr: string, locale: Locale): string {
   try {
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return dateStr;
-    return d.toLocaleDateString("en-US", {
+    return d.toLocaleDateString(DATE_LOCALES[locale], {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -33,10 +47,12 @@ function NewsCard({
   item,
   index,
   featured,
+  locale,
 }: {
   item: NewsItem;
   index: number;
   featured?: boolean;
+  locale: Locale;
 }) {
   const fallback = FALLBACK_GRADIENTS[index % FALLBACK_GRADIENTS.length];
 
@@ -87,7 +103,7 @@ function NewsCard({
               className="rounded-md bg-black/50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-green-400 backdrop-blur-sm"
               style={{ fontFamily: "'Syne', sans-serif" }}
             >
-              {formatDate(item.date)}
+              {formatDate(item.date, locale)}
             </span>
           </div>
         </div>
@@ -137,8 +153,53 @@ async function getNews(): Promise<NewsItem[]> {
   }
 }
 
+async function getNewsTranslations(
+  languageCode: string,
+): Promise<Map<string, NewsTranslation>> {
+  try {
+    const response = await fetch(
+      `https://cms.onthepixel.net/items/News_translations?filter%5Blanguages_code%5D%5B_eq%5D=${encodeURIComponent(languageCode)}`,
+      { next: { revalidate: 300 } },
+    );
+    if (!response.ok) return new Map();
+    const data = await response.json();
+    const map = new Map<string, NewsTranslation>();
+    for (const tr of (data.data || []) as NewsTranslation[]) {
+      if (tr.News_url) map.set(tr.News_url, tr);
+    }
+    return map;
+  } catch {
+    return new Map();
+  }
+}
+
+function applyTranslation(
+  item: NewsItem,
+  tr: NewsTranslation | undefined,
+): NewsItem {
+  if (!tr) return item;
+  return {
+    ...item,
+    title: tr.title?.trim() ? tr.title : item.title,
+    short_description: tr.short_description?.trim()
+      ? tr.short_description
+      : item.short_description,
+  };
+}
+
 export default async function News() {
-  const newsItems = await getNews();
+  const { locale, t } = await getServerTranslations();
+  const directusLocale = DIRECTUS_LOCALES[locale];
+
+  const [baseItems, translationMap] = await Promise.all([
+    getNews(),
+    locale === "en"
+      ? Promise.resolve(new Map<string, NewsTranslation>())
+      : getNewsTranslations(directusLocale),
+  ]);
+  const newsItems = baseItems.map((item) =>
+    applyTranslation(item, translationMap.get(item.url)),
+  );
   const featured = newsItems[0] ?? null;
   const rest = newsItems.slice(1, 3);
 
@@ -152,23 +213,30 @@ export default async function News() {
               className="text-3xl font-bold tracking-tight text-white"
               style={{ fontFamily: "'Syne', sans-serif" }}
             >
-              NEWS
+              {t.news.heading}
             </h2>
           </div>
 
           {newsItems.length === 0 ? (
             <div className="rounded-xl border border-white/5 bg-white/[0.02] px-6 py-12 text-center">
               <p className="text-sm text-white/30" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                No news available at the moment.
+                {t.news.empty}
               </p>
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              {featured && <NewsCard item={featured} index={0} featured />}
+              {featured && (
+                <NewsCard item={featured} index={0} featured locale={locale} />
+              )}
               {rest.length > 0 && (
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {rest.map((item, i) => (
-                    <NewsCard key={i} item={item} index={i + 1} />
+                    <NewsCard
+                      key={i}
+                      item={item}
+                      index={i + 1}
+                      locale={locale}
+                    />
                   ))}
                 </div>
               )}
