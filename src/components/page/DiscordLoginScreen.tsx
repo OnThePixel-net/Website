@@ -1,5 +1,7 @@
+"use client";
 import Link from "next/link";
 import SignInButton from "./SignInButton";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 const DiscordIcon = () => (
   <svg className="w-8 h-8 text-[#5865F2]" viewBox="0 0 127.14 96.36" fill="currentColor">
@@ -13,6 +15,7 @@ interface DiscordLoginScreenProps {
 }
 
 export default function DiscordLoginScreen({ position, callbackUrl }: DiscordLoginScreenProps) {
+  const t = useTranslations();
   return (
     <section className="bg-gray-950 min-h-screen">
       <div className="container mx-auto px-4 py-10">
@@ -21,17 +24,17 @@ export default function DiscordLoginScreen({ position, callbackUrl }: DiscordLog
             href="/apply"
             className="inline-block mb-6 text-sm text-gray-400 hover:text-green-400 transition-colors duration-200"
           >
-            ← Back to Positions
+            ← {t.discordLogin.backToPositions}
           </Link>
           <div className="bg-white/5 rounded-lg p-8 text-center">
             <div className="w-16 h-16 bg-[#5865F2]/20 rounded-full flex items-center justify-center mx-auto mb-5">
               <DiscordIcon />
             </div>
-            <h1 className="text-2xl font-bold mb-3">Discord Login erforderlich</h1>
+            <h1 className="text-2xl font-bold mb-3">{t.discordLogin.title}</h1>
             <p className="text-gray-400 mb-6">
-              Um dich als{" "}
-              <span className="text-white font-medium">{position}</span> zu bewerben,
-              musst du dich zuerst mit deinem Discord-Konto anmelden.
+              {t.discordLogin.messageBefore}
+              <span className="text-white font-medium">{position}</span>
+              {t.discordLogin.messageAfter}
             </p>
             <SignInButton callbackUrl={callbackUrl} />
           </div>

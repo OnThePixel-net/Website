@@ -158,6 +158,226 @@ export const translations = {
         "The richest players on OnThePixel.net ranked by their total Pixels.",
       colPixels: "Pixels",
     },
+    leaderboardTable: {
+      colHash: "#",
+      colPlayer: "Player",
+      empty: "No players found.",
+      loadError: "Failed to load leaderboard data. Please try again later.",
+    },
+    apply: {
+      heading: "JOIN OUR TEAM",
+      intro:
+        "Become part of the OnThePixel.net team! Click on an open position to apply.",
+      empty: "No positions available at the moment.",
+      open: "OPEN",
+      closed: "CLOSED",
+      applyNow: "Apply now",
+      builderDesc:
+        "Create stunning worlds and game maps for our Minecraft server.",
+      supporterDesc:
+        "Help players with questions, handle support tickets and keep the server friendly.",
+      developerDesc:
+        "Develop plugins and features for our Minecraft server.",
+    },
+    applyClosed: {
+      backToPositions: "Back to Positions",
+      titleSuffix: "Applications Closed",
+      message:
+        "We're not currently accepting {position} applications. Check back later or follow us on Discord for updates.",
+      viewAll: "View All Positions",
+    },
+    applicationForm: {
+      backToPositions: "Back to Positions",
+      titleSuffix: "Application",
+      intro: "Fill out the form below — we'll get back to you as soon as possible.",
+      discordVerified: "Discord verified",
+      discordRequired: "Discord login required",
+      login: "Login",
+      required: "Required",
+      securityVerification: "Security Verification",
+      submitting: "Submitting...",
+      submit: "Submit Application",
+      submittedTitle: "Application Submitted!",
+      submittedMessage:
+        "Thank you for your interest! We'll review your application and get back to you as soon as possible.",
+      backToHome: "Back to Home",
+      errors: {
+        loginRequired: "Please login with Discord first.",
+        fillField: "Please fill out: {label}",
+        captchaRequired: "Please complete the captcha verification.",
+        captchaError: "Captcha error. Please try again.",
+        submitFailed: "Failed to submit. Please try again.",
+      },
+    },
+    builderForm: {
+      labelUsername: "Minecraft Username",
+      placeholderUsername: "Your current IGN",
+      labelPortfolio: "Portfolio Links",
+      placeholderPortfolio:
+        "Links to your builds (PMC, Imgur, Planet Minecraft...)",
+      descriptionPortfolio: "Share links where we can see your work",
+      labelMotivation: "Why do you want to join?",
+      placeholderMotivation:
+        "Tell us about yourself and why you want to be part of the team...",
+    },
+    developerForm: {
+      labelUsername: "Minecraft Username",
+      placeholderUsername: "Your current IGN",
+      labelGithub: "GitHub / Portfolio",
+      placeholderGithub: "https://github.com/yourname",
+      descriptionGithub:
+        "Link to your GitHub profile or any other portfolio",
+      labelMotivation: "Why do you want to join?",
+      placeholderMotivation:
+        "Tell us about your Java/Spigot experience and what you'd like to contribute...",
+    },
+    supporterForm: {
+      labelUsername: "Minecraft Username",
+      placeholderUsername: "Your current IGN",
+      labelWhy: "Why do you want to be a Supporter?",
+      placeholderWhy:
+        "Tell us why you'd like to join the support team...",
+      labelExperience: "Previous Experience",
+      placeholderExperience:
+        "Have you been a moderator or supporter before? Describe your experience...",
+    },
+    discordLogin: {
+      backToPositions: "Back to Positions",
+      title: "Discord Login Required",
+      messageBefore: "To apply as ",
+      messageAfter:
+        ", you first need to sign in with your Discord account.",
+      signIn: "Sign in with Discord",
+    },
+    headerAuth: {
+      logout: "Logout",
+      login: "Login",
+    },
+    redeem: {
+      backToHome: "Back to Home",
+      title: "Redeem a Code",
+      intro: "Enter your code and Minecraft username to claim your reward.",
+      discordVerified: "Discord verified",
+      discordOptional: "Optional: Link your Discord",
+      login: "Login",
+      labelCode: "Code",
+      placeholderCode: "e.g. PIXEL-XXXX-XXXX",
+      labelUsername: "Minecraft Username",
+      placeholderUsername: "YourMinecraftName",
+      labelSecurity: "Security Verification",
+      required: "Required",
+      submitting: "Redeeming...",
+      submit: "Redeem Code",
+      submittedTitle: "Code redeemed successfully!",
+      submittedMessage:
+        "Your code has been redeemed. The reward will be credited to your account shortly.",
+      errors: {
+        codeRequired: "Please enter your redemption code.",
+        usernameRequired: "Please enter your Minecraft username.",
+        captchaRequired: "Please complete the captcha verification.",
+        captchaError: "Captcha error. Please try again.",
+        submitFailed: "Failed to redeem. Please try again.",
+      },
+    },
+    sidequests: {
+      heading: "OUR SIDE QUESTS",
+      intro:
+        "Explore the exciting projects and initiatives that power OnThePixel.net. From cutting-edge security solutions to performance optimizations, discover the technology that makes our server exceptional.",
+      empty: "No side quests found.",
+      technologies: "Technologies:",
+      viewProject: "View Project",
+      contributeTitle: "Want to Contribute?",
+      contributeText:
+        "Are you a talented developer interested in contributing to OnThePixel's projects? We're always looking for passionate individuals to join our development team. Apply now and become part of the team!",
+      applyNow: "Apply Now",
+      statusCompleted: "Completed",
+      statusInProgress: "In Progress",
+      statusPlanned: "Planned",
+    },
+    team: {
+      heading: "TEAM",
+      empty: "No team members available.",
+      memberFallback: "MEMBER",
+      joinTitle: "Want to join the team?",
+      joinText:
+        "We're always looking for passionate people to help build OnThePixel.net.",
+      applyNow: "Apply now",
+    },
+    creators: {
+      heading: "CREATORS",
+      liveNow: "LIVE NOW",
+      live: "LIVE",
+      watching: "watching",
+      watchStream: "Watch Stream",
+      allCreators: "ALL CREATORS",
+      creatorRole: "CREATOR",
+      followers: "Followers",
+      empty: "No creators available.",
+      onPlatform: "{name} on {platform}",
+    },
+    playerStatistics: {
+      heading: "STATISTICS",
+      intro: "Search for any player on OnThePixel.net",
+      placeholder: "Minecraft username...",
+      search: "Search",
+      genericError: "Something went wrong. Please try again.",
+      notFoundTitle: "Player not found",
+      notFoundText:
+        "{name} has never played on OnThePixel.net, or the username is incorrect.",
+      emptyTitle: "Search for a player",
+      emptyText: "Enter a Minecraft username above to see their stats",
+      memberFallback: "Member",
+      firstJoined: "First joined",
+      lastOnline: "Last online",
+      playtime: "Playtime",
+      balance: "Balance",
+      bedwarsTitle: "BedWars",
+      duelsTitle: "Duels",
+      tntrunTitle: "TNT Run",
+      buildffaTitle: "BuildFFA",
+      comingSoonBadge: "Coming Soon",
+      comingSoonText: "Statistics not yet available",
+      elo: "ELO",
+      wins: "Wins",
+      losses: "Losses",
+      gamesPlayed: "Games Played",
+      winRate: "Win Rate",
+      kdRatio: "K/D Ratio",
+      winStreak: "Win Streak",
+      kills: "Kills",
+      deaths: "Deaths",
+      viewAllKits: "View all {count} kits",
+    },
+    cookieConsent: {
+      title: "Cookie Consent",
+      paragraph1:
+        "OnThePixel.net uses cookies and similar technologies to enhance your browsing experience, analyze site traffic, and provide personalized content.",
+      paragraph2:
+        'By clicking "Accept All", you consent to the use of cookies on our website. You can change your preferences at any time by clicking "Customize" or manage your preferences in your browser settings.',
+      decline: "Decline",
+      customize: "Customize",
+      acceptAll: "Accept All",
+    },
+    cookieSettings: {
+      title: "Cookie Settings",
+      description: "Manage your cookie preferences",
+      essentialLabel: "Essential Cookies",
+      essentialDesc:
+        "Required for the website to function properly. Cannot be disabled.",
+      analyticsLabel: "Analytics Cookies",
+      analyticsDesc:
+        "Help us understand how visitors interact with our website.",
+      howWeUseTitle: "How we use cookies",
+      howWeUseText:
+        "OnThePixel.net uses cookies to enhance your experience, analyze site usage, and assist in our marketing efforts. We use Vercel Analytics to collect information about how visitors use our website. This data is anonymized and helps us improve our services.",
+      reset: "Reset Preferences",
+      cancel: "Cancel",
+      save: "Save Preferences",
+      buttonLabel: "Cookie Settings",
+    },
+    playercount: {
+      online: "Online players",
+    },
   },
   de: {
     nav: {
@@ -296,6 +516,233 @@ export const translations = {
       description:
         "Die wohlhabendsten Spieler auf OnThePixel.net, sortiert nach ihrem gesamten Pixel-Guthaben.",
       colPixels: "Pixels",
+    },
+    leaderboardTable: {
+      colHash: "#",
+      colPlayer: "Spieler",
+      empty: "Keine Spieler gefunden.",
+      loadError:
+        "Bestenliste konnte nicht geladen werden. Bitte versuche es später erneut.",
+    },
+    apply: {
+      heading: "WERDE TEIL DES TEAMS",
+      intro:
+        "Werde Teil des OnThePixel.net-Teams! Klicke auf eine offene Position, um dich zu bewerben.",
+      empty: "Aktuell sind keine Stellen verfügbar.",
+      open: "OFFEN",
+      closed: "GESCHLOSSEN",
+      applyNow: "Jetzt bewerben",
+      builderDesc:
+        "Erschaffe beeindruckende Welten und Spielkarten für unseren Minecraft-Server.",
+      supporterDesc:
+        "Hilf Spielern bei Fragen, bearbeite Support-Tickets und sorge für eine freundliche Atmosphäre auf dem Server.",
+      developerDesc:
+        "Entwickle Plugins und Funktionen für unseren Minecraft-Server.",
+    },
+    applyClosed: {
+      backToPositions: "Zurück zu den Positionen",
+      titleSuffix: "Bewerbungen geschlossen",
+      message:
+        "Wir nehmen aktuell keine Bewerbungen für die Position {position} an. Schaue später noch einmal vorbei oder folge uns auf Discord für Neuigkeiten.",
+      viewAll: "Alle Positionen ansehen",
+    },
+    applicationForm: {
+      backToPositions: "Zurück zu den Positionen",
+      titleSuffix: "Bewerbung",
+      intro:
+        "Fülle das Formular unten aus — wir melden uns so schnell wie möglich bei dir.",
+      discordVerified: "Discord verifiziert",
+      discordRequired: "Discord-Anmeldung erforderlich",
+      login: "Anmelden",
+      required: "Pflichtfeld",
+      securityVerification: "Sicherheitsüberprüfung",
+      submitting: "Wird gesendet...",
+      submit: "Bewerbung absenden",
+      submittedTitle: "Bewerbung gesendet!",
+      submittedMessage:
+        "Vielen Dank für dein Interesse! Wir prüfen deine Bewerbung und melden uns so schnell wie möglich bei dir.",
+      backToHome: "Zurück zur Startseite",
+      errors: {
+        loginRequired: "Bitte melde dich zuerst mit Discord an.",
+        fillField: "Bitte fülle das Feld aus: {label}",
+        captchaRequired: "Bitte schließe die Captcha-Überprüfung ab.",
+        captchaError: "Captcha-Fehler. Bitte versuche es erneut.",
+        submitFailed:
+          "Senden fehlgeschlagen. Bitte versuche es erneut.",
+      },
+    },
+    builderForm: {
+      labelUsername: "Minecraft-Benutzername",
+      placeholderUsername: "Dein aktueller Benutzername",
+      labelPortfolio: "Portfolio-Links",
+      placeholderPortfolio:
+        "Links zu deinen Bauten (PMC, Imgur, Planet Minecraft...)",
+      descriptionPortfolio: "Teile Links, unter denen wir deine Arbeit ansehen können",
+      labelMotivation: "Warum möchtest du beitreten?",
+      placeholderMotivation:
+        "Erzähle uns etwas über dich und warum du Teil des Teams werden möchtest...",
+    },
+    developerForm: {
+      labelUsername: "Minecraft-Benutzername",
+      placeholderUsername: "Dein aktueller Benutzername",
+      labelGithub: "GitHub / Portfolio",
+      placeholderGithub: "https://github.com/deinname",
+      descriptionGithub:
+        "Link zu deinem GitHub-Profil oder einem anderen Portfolio",
+      labelMotivation: "Warum möchtest du beitreten?",
+      placeholderMotivation:
+        "Erzähle uns von deiner Erfahrung mit Java/Spigot und was du beitragen möchtest...",
+    },
+    supporterForm: {
+      labelUsername: "Minecraft-Benutzername",
+      placeholderUsername: "Dein aktueller Benutzername",
+      labelWhy: "Warum möchtest du Supporter werden?",
+      placeholderWhy:
+        "Erzähle uns, warum du dem Support-Team beitreten möchtest...",
+      labelExperience: "Bisherige Erfahrung",
+      placeholderExperience:
+        "Warst du bereits Moderator oder Supporter? Beschreibe deine Erfahrung...",
+    },
+    discordLogin: {
+      backToPositions: "Zurück zu den Positionen",
+      title: "Discord-Anmeldung erforderlich",
+      messageBefore: "Um dich als ",
+      messageAfter:
+        " zu bewerben, musst du dich zuerst mit deinem Discord-Konto anmelden.",
+      signIn: "Mit Discord anmelden",
+    },
+    headerAuth: {
+      logout: "Abmelden",
+      login: "Anmelden",
+    },
+    redeem: {
+      backToHome: "Zurück zur Startseite",
+      title: "Code einlösen",
+      intro:
+        "Gib deinen Code und deinen Minecraft-Benutzernamen ein, um deine Belohnung zu erhalten.",
+      discordVerified: "Discord verifiziert",
+      discordOptional: "Optional: Discord verknüpfen",
+      login: "Anmelden",
+      labelCode: "Code",
+      placeholderCode: "z. B. PIXEL-XXXX-XXXX",
+      labelUsername: "Minecraft-Benutzername",
+      placeholderUsername: "DeinMinecraftName",
+      labelSecurity: "Sicherheitsüberprüfung",
+      required: "Pflichtfeld",
+      submitting: "Wird eingelöst...",
+      submit: "Code einlösen",
+      submittedTitle: "Code erfolgreich eingelöst!",
+      submittedMessage:
+        "Dein Code wurde eingelöst. Die Belohnung wird in Kürze deinem Konto gutgeschrieben.",
+      errors: {
+        codeRequired: "Bitte gib deinen Einlösecode ein.",
+        usernameRequired: "Bitte gib deinen Minecraft-Benutzernamen ein.",
+        captchaRequired: "Bitte schließe die Captcha-Überprüfung ab.",
+        captchaError: "Captcha-Fehler. Bitte versuche es erneut.",
+        submitFailed:
+          "Einlösen fehlgeschlagen. Bitte versuche es erneut.",
+      },
+    },
+    sidequests: {
+      heading: "UNSERE SIDE QUESTS",
+      intro:
+        "Entdecke die spannenden Projekte und Initiativen hinter OnThePixel.net. Von modernen Sicherheitslösungen bis zu Performance-Optimierungen — sieh dir die Technik an, die unseren Server besonders macht.",
+      empty: "Keine Side Quests gefunden.",
+      technologies: "Technologien:",
+      viewProject: "Projekt ansehen",
+      contributeTitle: "Möchtest du mitwirken?",
+      contributeText:
+        "Bist du eine talentierte Entwicklerin oder ein talentierter Entwickler und möchtest zu den Projekten von OnThePixel beitragen? Wir sind immer auf der Suche nach engagierten Personen für unser Entwicklerteam. Bewirb dich jetzt und werde Teil des Teams!",
+      applyNow: "Jetzt bewerben",
+      statusCompleted: "Abgeschlossen",
+      statusInProgress: "In Bearbeitung",
+      statusPlanned: "Geplant",
+    },
+    team: {
+      heading: "TEAM",
+      empty: "Aktuell sind keine Teammitglieder verfügbar.",
+      memberFallback: "MITGLIED",
+      joinTitle: "Möchtest du dem Team beitreten?",
+      joinText:
+        "Wir sind immer auf der Suche nach engagierten Menschen, die OnThePixel.net mitgestalten möchten.",
+      applyNow: "Jetzt bewerben",
+    },
+    creators: {
+      heading: "CREATORS",
+      liveNow: "JETZT LIVE",
+      live: "LIVE",
+      watching: "Zuschauer",
+      watchStream: "Stream ansehen",
+      allCreators: "ALLE CREATORS",
+      creatorRole: "CREATOR",
+      followers: "Follower",
+      empty: "Aktuell sind keine Creators verfügbar.",
+      onPlatform: "{name} auf {platform}",
+    },
+    playerStatistics: {
+      heading: "STATISTIKEN",
+      intro: "Suche nach einem beliebigen Spieler auf OnThePixel.net",
+      placeholder: "Minecraft-Benutzername...",
+      search: "Suchen",
+      genericError:
+        "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      notFoundTitle: "Spieler nicht gefunden",
+      notFoundText:
+        "{name} hat noch nie auf OnThePixel.net gespielt oder der Benutzername ist falsch.",
+      emptyTitle: "Suche nach einem Spieler",
+      emptyText:
+        "Gib oben einen Minecraft-Benutzernamen ein, um die Statistiken zu sehen",
+      memberFallback: "Mitglied",
+      firstJoined: "Erstmals beigetreten",
+      lastOnline: "Zuletzt online",
+      playtime: "Spielzeit",
+      balance: "Guthaben",
+      bedwarsTitle: "BedWars",
+      duelsTitle: "Duels",
+      tntrunTitle: "TNT Run",
+      buildffaTitle: "BuildFFA",
+      comingSoonBadge: "Demnächst",
+      comingSoonText: "Statistiken sind noch nicht verfügbar",
+      elo: "ELO",
+      wins: "Siege",
+      losses: "Niederlagen",
+      gamesPlayed: "Gespielte Spiele",
+      winRate: "Siegquote",
+      kdRatio: "K/D-Verhältnis",
+      winStreak: "Siegesserie",
+      kills: "Kills",
+      deaths: "Tode",
+      viewAllKits: "Alle {count} Kits ansehen",
+    },
+    cookieConsent: {
+      title: "Cookie-Hinweis",
+      paragraph1:
+        "OnThePixel.net verwendet Cookies und ähnliche Technologien, um dein Surferlebnis zu verbessern, den Datenverkehr zu analysieren und personalisierte Inhalte bereitzustellen.",
+      paragraph2:
+        'Mit einem Klick auf „Alle akzeptieren" stimmst du der Verwendung von Cookies auf unserer Website zu. Du kannst deine Einstellungen jederzeit über „Anpassen" ändern oder in deinen Browser-Einstellungen verwalten.',
+      decline: "Ablehnen",
+      customize: "Anpassen",
+      acceptAll: "Alle akzeptieren",
+    },
+    cookieSettings: {
+      title: "Cookie-Einstellungen",
+      description: "Verwalte deine Cookie-Einstellungen",
+      essentialLabel: "Essentielle Cookies",
+      essentialDesc:
+        "Erforderlich, damit die Website ordnungsgemäß funktioniert. Können nicht deaktiviert werden.",
+      analyticsLabel: "Analyse-Cookies",
+      analyticsDesc:
+        "Helfen uns zu verstehen, wie Besucher mit unserer Website interagieren.",
+      howWeUseTitle: "Wie wir Cookies verwenden",
+      howWeUseText:
+        "OnThePixel.net verwendet Cookies, um dein Erlebnis zu verbessern, die Website-Nutzung zu analysieren und unsere Marketing-Aktivitäten zu unterstützen. Wir nutzen Vercel Analytics, um Informationen darüber zu erfassen, wie Besucher unsere Website nutzen. Diese Daten werden anonymisiert und helfen uns, unseren Service zu verbessern.",
+      reset: "Einstellungen zurücksetzen",
+      cancel: "Abbrechen",
+      save: "Einstellungen speichern",
+      buttonLabel: "Cookie-Einstellungen",
+    },
+    playercount: {
+      online: "Spieler online",
     },
   },
 } as const;

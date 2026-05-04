@@ -2,6 +2,7 @@ import Link from "next/link";
 import React from "react";
 import TopPage from "@/components/page/top";
 import type { Metadata } from "next";
+import { getServerTranslations } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
   title: "Apply — OnThePixel.net",
@@ -20,12 +21,6 @@ const POSITION_ROUTES: Record<string, string> = {
   "Java Developer": "/apply/developer",
 };
 
-const POSITION_DESCRIPTIONS: Record<string, string> = {
-  "Builder": "Create stunning worlds and game maps for our Minecraft server.",
-  "Supporter": "Help players with questions, handle support tickets and keep the server friendly.",
-  "Java Developer": "Develop plugins and features for our Minecraft server.",
-};
-
 async function getPositions(): Promise<Position[]> {
   try {
     const res = await fetch("https://cms.onthepixel.net/items/Apply", {
@@ -39,26 +34,33 @@ async function getPositions(): Promise<Position[]> {
 }
 
 export default async function ApplyPage() {
-  const positions = await getPositions();
+  const [positions, { t }] = await Promise.all([
+    getPositions(),
+    getServerTranslations(),
+  ]);
+
+  const descriptions: Record<string, string> = {
+    "Builder": t.apply.builderDesc,
+    "Supporter": t.apply.supporterDesc,
+    "Java Developer": t.apply.developerDesc,
+  };
 
   return (
     <>
       <TopPage />
       <section className="bg-gray-950 pt-36">
         <div className="container mx-auto px-4 py-10">
-          <h1 className="text-2xl font-bold mb-5">JOIN OUR TEAM</h1>
-          <p className="mb-8">
-            Become part of the OnThePixel.net team! Click on an open position to apply.
-          </p>
+          <h1 className="text-2xl font-bold mb-5">{t.apply.heading}</h1>
+          <p className="mb-8">{t.apply.intro}</p>
 
           {positions.length === 0 ? (
-            <div className="text-gray-400">No positions available at the moment.</div>
+            <div className="text-gray-400">{t.apply.empty}</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {positions.map((position) => {
                 const isOpen = position.status === "open";
                 const route = POSITION_ROUTES[position.name];
-                const description = POSITION_DESCRIPTIONS[position.name] ?? "";
+                const description = descriptions[position.name] ?? "";
 
                 const card = (
                   <div
@@ -78,7 +80,7 @@ export default async function ApplyPage() {
                               : "bg-gray-500/20 text-gray-400 border-gray-500/30"
                           }`}
                         >
-                          {isOpen ? "OPEN" : "CLOSED"}
+                          {isOpen ? t.apply.open : t.apply.closed}
                         </span>
                       </div>
                       <p className="text-sm text-gray-300 flex-1">{description}</p>
@@ -89,7 +91,7 @@ export default async function ApplyPage() {
                             : "invisible"
                         }`}
                       >
-                        Apply now →
+                        {t.apply.applyNow} →
                       </span>
                     </div>
                   </div>

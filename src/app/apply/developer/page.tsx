@@ -2,28 +2,7 @@ import React from "react";
 import Link from "next/link";
 import TopPage from "@/components/page/top";
 import ApplicationForm, { ApplicationField } from "@/components/page/ApplicationForm";
-
-const fields: ApplicationField[] = [
-  {
-    id: "minecraft_username",
-    label: "Minecraft Username",
-    type: "text",
-    placeholder: "Your current IGN",
-  },
-  {
-    id: "github",
-    label: "GitHub / Portfolio",
-    type: "text",
-    placeholder: "https://github.com/yourname",
-    description: "Link to your GitHub profile or any other portfolio",
-  },
-  {
-    id: "motivation",
-    label: "Why do you want to join?",
-    type: "textarea",
-    placeholder: "Tell us about your Java/Spigot experience and what you'd like to contribute...",
-  },
-];
+import { getServerTranslations } from "@/lib/i18n/server";
 
 async function isPositionOpen(name: string): Promise<boolean> {
   try {
@@ -37,7 +16,32 @@ async function isPositionOpen(name: string): Promise<boolean> {
 }
 
 export default async function DeveloperApplicationPage() {
-  const open = await isPositionOpen("Java Developer");
+  const [open, { t }] = await Promise.all([
+    isPositionOpen("Java Developer"),
+    getServerTranslations(),
+  ]);
+
+  const fields: ApplicationField[] = [
+    {
+      id: "minecraft_username",
+      label: t.developerForm.labelUsername,
+      type: "text",
+      placeholder: t.developerForm.placeholderUsername,
+    },
+    {
+      id: "github",
+      label: t.developerForm.labelGithub,
+      type: "text",
+      placeholder: t.developerForm.placeholderGithub,
+      description: t.developerForm.descriptionGithub,
+    },
+    {
+      id: "motivation",
+      label: t.developerForm.labelMotivation,
+      type: "textarea",
+      placeholder: t.developerForm.placeholderMotivation,
+    },
+  ];
 
   return (
     <>
@@ -51,7 +55,8 @@ export default async function DeveloperApplicationPage() {
   );
 }
 
-function ClosedNotice({ position }: { position: string }) {
+async function ClosedNotice({ position }: { position: string }) {
+  const { t } = await getServerTranslations();
   return (
     <section className="bg-gray-950 min-h-screen">
       <div className="container mx-auto px-4 py-10">
@@ -60,18 +65,20 @@ function ClosedNotice({ position }: { position: string }) {
             href="/apply"
             className="inline-block mb-6 text-sm text-gray-400 hover:text-green-400 transition-colors duration-200"
           >
-            ← Back to Positions
+            ← {t.applyClosed.backToPositions}
           </Link>
           <div className="bg-white/5 rounded-lg p-8 text-center">
-            <h1 className="text-2xl font-bold mb-3">{position} Applications Closed</h1>
+            <h1 className="text-2xl font-bold mb-3">
+              {position} {t.applyClosed.titleSuffix}
+            </h1>
             <p className="text-gray-400 mb-6">
-              We&apos;re not currently accepting {position} applications. Check back later or follow us on Discord for updates.
+              {t.applyClosed.message.replace("{position}", position)}
             </p>
             <Link
               href="/apply"
               className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
-              View All Positions
+              {t.applyClosed.viewAll}
             </Link>
           </div>
         </div>
