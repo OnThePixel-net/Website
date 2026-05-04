@@ -383,6 +383,21 @@ export const translations = {
     playercount: {
       online: "Online players",
     },
+    duelsKits: {
+      back: "Back to {name}'s Stats",
+      headingSuffix: "DUELS",
+      kitsPlayed: "{count} kits played",
+      totalGames: "{count} total games",
+      elo: "ELO",
+      winRate: "Win Rate",
+      winsLosses: "Wins / Losses",
+      bestStreak: "Best Streak",
+      kits: "KITS",
+      notYetPlayed: "NOT YET PLAYED",
+      bestStreakLine: "Best streak: {value}",
+      games: "games",
+      noGamesYet: "No games yet",
+    },
   },
   de: {
     nav: {
@@ -753,6 +768,21 @@ export const translations = {
     },
     playercount: {
       online: "Spieler online",
+    },
+    duelsKits: {
+      back: "Zurück zu den Stats von {name}",
+      headingSuffix: "DUELS",
+      kitsPlayed: "{count} Kits gespielt",
+      totalGames: "{count} Spiele insgesamt",
+      elo: "ELO",
+      winRate: "Siegquote",
+      winsLosses: "Siege / Niederlagen",
+      bestStreak: "Beste Serie",
+      kits: "KITS",
+      notYetPlayed: "NOCH NICHT GESPIELT",
+      bestStreakLine: "Beste Serie: {value}",
+      games: "Spiele",
+      noGamesYet: "Noch keine Spiele",
     },
   },
 } as const;

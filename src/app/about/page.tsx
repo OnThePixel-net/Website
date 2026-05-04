@@ -16,6 +16,7 @@ import {
   IconStar,
 } from "@tabler/icons-react";
 import type { Metadata } from "next";
+import { getServerLocale } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
   title: "About — OnThePixel.net",
@@ -23,36 +24,187 @@ export const metadata: Metadata = {
     "Learn about OnThePixel.net — a Minecraft network built by players for players. Fast-paced minigames, a thriving community.",
 };
 
-const GAMES = [
-  {
-    name: "Duels",
-    description: "1v1 PvP battles to prove who's the best fighter on the server.",
-    color: "#ef4444",
-    glow: "rgba(239,68,68,0.2)",
-    status: "live",
-  },
-  {
-    name: "BuildFFA",
-    description: "Build and fight at the same time — creativity meets combat.",
-    color: "#f59e0b",
-    glow: "rgba(245,158,11,0.2)",
-    status: "live",
-  },
-  {
-    name: "TNT Run",
-    description: "Keep running or fall through the ground — every step counts.",
-    color: "#8b5cf6",
-    glow: "rgba(139,92,246,0.2)",
-    status: "live",
-  },
-  {
-    name: "BedWars",
-    description: "Protect your bed, destroy theirs. Classic team strategy.",
-    color: "#00de6d",
-    glow: "rgba(0,222,109,0.2)",
-    status: "soon",
-  },
-] as const;
+interface Game {
+  name: string;
+  description: string;
+  color: string;
+  glow: string;
+  status: "live" | "soon";
+}
+
+interface Value {
+  title: string;
+  description: string;
+}
+
+interface AboutCopy {
+  taglineLine1: string;
+  taglineLine2: string;
+  underConstruction: string;
+  whoWeAreLabel: string;
+  whoWeAreTitle: string;
+  whoWeAreP1: string;
+  whoWeAreP2: string;
+  meetTheTeam: string;
+  joinUs: string;
+  whatWeOfferLabel: string;
+  ourMinigamesTitle: string;
+  comingSoonBadge: string;
+  liveBadge: string;
+  readyToPlayTitle: string;
+  readyToPlayText1: string;
+  readyToPlayText2: string;
+  joinDiscord: string;
+  values: Value[];
+  games: Game[];
+}
+
+const COPY_EN: AboutCopy = {
+  taglineLine1: "A Minecraft network built by players, for players.",
+  taglineLine2:
+    "Fast-paced minigames, a thriving community — all on one server.",
+  underConstruction: "Under Construction",
+  whoWeAreLabel: "Who we are",
+  whoWeAreTitle: "A server made with passion",
+  whoWeAreP1:
+    "OnThePixel.net started as a small project between friends who wanted a Minecraft server that actually feels polished. What began as a passion project grew into a full network with thousands of players.",
+  whoWeAreP2:
+    "Our team is made up of developers, builders, supporters and content creators — all working together to make every login memorable.",
+  meetTheTeam: "Meet the Team",
+  joinUs: "Join Us",
+  whatWeOfferLabel: "What we offer",
+  ourMinigamesTitle: "Our Minigames",
+  comingSoonBadge: "Coming Soon",
+  liveBadge: "Live",
+  readyToPlayTitle: "Ready to play?",
+  readyToPlayText1: "Join on ",
+  readyToPlayText2: " — Java Edition 1.21.8+",
+  joinDiscord: "Join Discord",
+  values: [
+    {
+      title: "Community First",
+      description:
+        "Everything we build is for the players. Your feedback shapes the server.",
+    },
+    {
+      title: "Passion for Minecraft",
+      description:
+        "We're a team of Minecraft enthusiasts who pour their heart into every update.",
+    },
+    {
+      title: "Quality over Quantity",
+      description:
+        "We'd rather ship one great minigame than five mediocre ones.",
+    },
+  ],
+  games: [
+    {
+      name: "Duels",
+      description:
+        "1v1 PvP battles to prove who's the best fighter on the server.",
+      color: "#ef4444",
+      glow: "rgba(239,68,68,0.2)",
+      status: "live",
+    },
+    {
+      name: "BuildFFA",
+      description:
+        "Build and fight at the same time — creativity meets combat.",
+      color: "#f59e0b",
+      glow: "rgba(245,158,11,0.2)",
+      status: "live",
+    },
+    {
+      name: "TNT Run",
+      description:
+        "Keep running or fall through the ground — every step counts.",
+      color: "#8b5cf6",
+      glow: "rgba(139,92,246,0.2)",
+      status: "live",
+    },
+    {
+      name: "BedWars",
+      description: "Protect your bed, destroy theirs. Classic team strategy.",
+      color: "#00de6d",
+      glow: "rgba(0,222,109,0.2)",
+      status: "soon",
+    },
+  ],
+};
+
+const COPY_DE: AboutCopy = {
+  taglineLine1: "Ein Minecraft-Netzwerk von Spielern für Spieler.",
+  taglineLine2:
+    "Schnelle Minigames, eine lebendige Community — alles auf einem Server.",
+  underConstruction: "In Arbeit",
+  whoWeAreLabel: "Wer wir sind",
+  whoWeAreTitle: "Ein Server mit Leidenschaft gebaut",
+  whoWeAreP1:
+    "OnThePixel.net begann als kleines Projekt unter Freunden, die einen Minecraft-Server wollten, der wirklich durchdacht wirkt. Aus dem Herzensprojekt ist ein vollständiges Netzwerk mit tausenden Spielern geworden.",
+  whoWeAreP2:
+    "Unser Team besteht aus Entwicklern, Buildern, Supportern und Content Creators — alle arbeiten zusammen, damit jeder Login besonders bleibt.",
+  meetTheTeam: "Lerne das Team kennen",
+  joinUs: "Werde Teil",
+  whatWeOfferLabel: "Was wir bieten",
+  ourMinigamesTitle: "Unsere Minigames",
+  comingSoonBadge: "Demnächst",
+  liveBadge: "Live",
+  readyToPlayTitle: "Bereit zu spielen?",
+  readyToPlayText1: "Spiele auf ",
+  readyToPlayText2: " — Java Edition 1.21.8+",
+  joinDiscord: "Discord beitreten",
+  values: [
+    {
+      title: "Community zuerst",
+      description:
+        "Alles, was wir bauen, ist für die Spieler. Dein Feedback prägt den Server.",
+    },
+    {
+      title: "Leidenschaft für Minecraft",
+      description:
+        "Wir sind ein Team aus Minecraft-Enthusiasten, die ihr Herz in jedes Update stecken.",
+    },
+    {
+      title: "Qualität vor Quantität",
+      description:
+        "Lieber ein großartiges Minigame veröffentlichen als fünf mittelmäßige.",
+    },
+  ],
+  games: [
+    {
+      name: "Duels",
+      description:
+        "1-gegen-1-PvP-Kämpfe — finde heraus, wer der beste Kämpfer auf dem Server ist.",
+      color: "#ef4444",
+      glow: "rgba(239,68,68,0.2)",
+      status: "live",
+    },
+    {
+      name: "BuildFFA",
+      description:
+        "Bauen und Kämpfen zugleich — Kreativität trifft auf Kampf.",
+      color: "#f59e0b",
+      glow: "rgba(245,158,11,0.2)",
+      status: "live",
+    },
+    {
+      name: "TNT Run",
+      description:
+        "Weiterlaufen oder durch den Boden fallen — jeder Schritt zählt.",
+      color: "#8b5cf6",
+      glow: "rgba(139,92,246,0.2)",
+      status: "live",
+    },
+    {
+      name: "BedWars",
+      description:
+        "Beschütze dein Bett, zerstöre die der anderen. Klassische Team-Strategie.",
+      color: "#00de6d",
+      glow: "rgba(0,222,109,0.2)",
+      status: "soon",
+    },
+  ],
+};
 
 const GAME_ICONS = [
   <IconSword key="sword" size={28} />,
@@ -61,33 +213,20 @@ const GAME_ICONS = [
   <IconTrophy key="trophy" size={28} />,
 ];
 
-const VALUES = [
-  {
-    title: "Community First",
-    description: "Everything we build is for the players. Your feedback shapes the server.",
-  },
-  {
-    title: "Passion for Minecraft",
-    description: "We're a team of Minecraft enthusiasts who pour their heart into every update.",
-  },
-  {
-    title: "Quality over Quantity",
-    description: "We'd rather ship one great minigame than five mediocre ones.",
-  },
-] as const;
-
 const VALUE_ICONS = [
   <IconUsers key="users" size={24} />,
   <IconHeart key="heart" size={24} />,
   <IconStar key="star" size={24} />,
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const locale = await getServerLocale();
+  const c = locale === "de" ? COPY_DE : COPY_EN;
+
   return (
     <>
       <TopPage />
       <section className="min-h-screen bg-gray-950">
-
         {/* Hero */}
         <div className="relative overflow-hidden bg-gray-950 py-20 px-4">
           <div
@@ -122,13 +261,12 @@ export default function AboutPage() {
               className="mx-auto max-w-xl text-lg text-white/50 md:text-xl"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              A Minecraft network built by players, for players.
-              Fast-paced minigames, a thriving community — all on one server.
+              {c.taglineLine1} {c.taglineLine2}
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <div className="flex items-center gap-2 rounded-full bg-yellow-500/10 px-4 py-2 text-sm font-semibold text-yellow-400 ring-1 ring-yellow-500/20">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-yellow-400" />
-                Under Construction
+                {c.underConstruction}
               </div>
               <div className="rounded-full bg-white/5 px-4 py-2 text-sm text-white/40 ring-1 ring-white/10">
                 play.onthepixel.net
@@ -146,47 +284,44 @@ export default function AboutPage() {
                   className="mb-2 text-xs font-bold uppercase tracking-widest text-green-400"
                   style={{ fontFamily: "'Syne', sans-serif" }}
                 >
-                  Who we are
+                  {c.whoWeAreLabel}
                 </p>
                 <h2
                   className="mb-4 text-3xl font-bold text-white md:text-4xl"
                   style={{ fontFamily: "'Syne', sans-serif" }}
                 >
-                  A server made with passion
+                  {c.whoWeAreTitle}
                 </h2>
                 <p
                   className="mb-4 leading-relaxed text-white/50"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  OnThePixel.net started as a small project between friends who wanted
-                  a Minecraft server that actually feels polished. What began as a
-                  passion project grew into a full network with thousands of players.
+                  {c.whoWeAreP1}
                 </p>
                 <p
                   className="leading-relaxed text-white/50"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  Our team is made up of developers, builders, supporters and content
-                  creators — all working together to make every login memorable.
+                  {c.whoWeAreP2}
                 </p>
                 <div className="mt-6 flex gap-3">
                   <Link
                     href="/team"
                     className="inline-flex items-center gap-2 rounded-lg bg-green-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-600"
                   >
-                    Meet the Team
+                    {c.meetTheTeam}
                   </Link>
                   <Link
                     href="/apply"
                     className="inline-flex items-center gap-2 rounded-lg bg-white/5 px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 transition-colors hover:bg-white/10"
                   >
-                    Join Us
+                    {c.joinUs}
                   </Link>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
-                {VALUES.map((v, i) => (
+                {c.values.map((v, i) => (
                   <div
                     key={i}
                     className="flex items-start gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-5"
@@ -223,31 +358,22 @@ export default function AboutPage() {
                 className="mb-2 text-xs font-bold uppercase tracking-widest text-green-400"
                 style={{ fontFamily: "'Syne', sans-serif" }}
               >
-                What we offer
+                {c.whatWeOfferLabel}
               </p>
               <h2
                 className="text-3xl font-bold text-white md:text-4xl"
                 style={{ fontFamily: "'Syne', sans-serif" }}
               >
-                Our Minigames
+                {c.ourMinigamesTitle}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {GAMES.map((game, i) => {
-                const CardWrapper = "href" in game
-                  ? ({ children }: { children: React.ReactNode }) => (
-                      <Link href={(game as { href: string }).href} className="group relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] p-6 transition-all duration-300 hover:border-white/10 hover:bg-white/[0.05] block">
-                        {children}
-                      </Link>
-                    )
-                  : ({ children }: { children: React.ReactNode }) => (
-                      <div className="group relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] p-6 transition-all duration-300 hover:border-white/10 hover:bg-white/[0.05]">
-                        {children}
-                      </div>
-                    );
-                return (
-                <CardWrapper key={i}>
+              {c.games.map((game, i) => (
+                <div
+                  key={i}
+                  className="group relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] p-6 transition-all duration-300 hover:border-white/10 hover:bg-white/[0.05]"
+                >
                   <div
                     className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                     style={{
@@ -259,14 +385,14 @@ export default function AboutPage() {
                       <span style={{ color: game.color }}>{GAME_ICONS[i]}</span>
                       {game.status === "soon" ? (
                         <span className="rounded-full bg-white/5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white/30">
-                          Coming Soon
+                          {c.comingSoonBadge}
                         </span>
                       ) : (
                         <span
                           className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest"
                           style={{ background: game.glow, color: game.color }}
                         >
-                          Live
+                          {c.liveBadge}
                         </span>
                       )}
                     </div>
@@ -283,9 +409,8 @@ export default function AboutPage() {
                       {game.description}
                     </p>
                   </div>
-                </CardWrapper>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -297,15 +422,15 @@ export default function AboutPage() {
               className="mb-4 text-3xl font-bold text-white md:text-4xl"
               style={{ fontFamily: "'Syne', sans-serif" }}
             >
-              Ready to play?
+              {c.readyToPlayTitle}
             </h2>
             <p
               className="mb-8 text-white/45"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Join on{" "}
-              <span className="font-mono text-green-400">play.onthepixel.net</span>{" "}
-              — Java Edition 1.21.8+
+              {c.readyToPlayText1}
+              <span className="font-mono text-green-400">play.onthepixel.net</span>
+              {c.readyToPlayText2}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link
@@ -315,7 +440,7 @@ export default function AboutPage() {
                 className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-indigo-500"
               >
                 <IconBrandDiscord size={20} />
-                Join Discord
+                {c.joinDiscord}
               </Link>
               <Link
                 href="https://youtube.com/@thebestminecraftserver"
@@ -347,7 +472,6 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
-
       </section>
     </>
   );

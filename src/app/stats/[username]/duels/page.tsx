@@ -4,6 +4,7 @@ import Image from "next/image";
 import TopPage from "@/components/page/top";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { getServerTranslations } from "@/lib/i18n/server";
 
 interface DuelMode {
   wins: number;
@@ -110,7 +111,10 @@ export async function generateStaticParams() {
 
 export default async function DuelsKitsPage({ params }: PageProps) {
   const { username } = await params;
-  const data = await getDuelsData(username);
+  const [data, { t }] = await Promise.all([
+    getDuelsData(username),
+    getServerTranslations(),
+  ]);
 
   if (!data) notFound();
 
@@ -134,7 +138,7 @@ export default async function DuelsKitsPage({ params }: PageProps) {
             href={`/stats/${username}`}
             className="inline-flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-green-400 mb-8"
           >
-            ← Back to {username}&apos;s Stats
+            ← {t.duelsKits.back.replace("{name}", username)}
           </Link>
 
           {/* Header */}
@@ -148,10 +152,11 @@ export default async function DuelsKitsPage({ params }: PageProps) {
             />
             <div>
               <h1 className="text-3xl font-bold text-white">
-                {username.toUpperCase()} — DUELS
+                {username.toUpperCase()} — {t.duelsKits.headingSuffix}
               </h1>
               <p className="text-sm text-gray-400 mt-0.5">
-                {playedModes.length} kits played · {data.overall.total_games} total games
+                {t.duelsKits.kitsPlayed.replace("{count}", String(playedModes.length))} ·{" "}
+                {t.duelsKits.totalGames.replace("{count}", String(data.overall.total_games))}
               </p>
             </div>
           </div>
@@ -159,7 +164,7 @@ export default async function DuelsKitsPage({ params }: PageProps) {
           {/* Overall stats — same card style as team apply CTA */}
           <div className="mb-10 p-6 bg-white/10 rounded-lg border-l-4 border-green-500 grid grid-cols-2 sm:grid-cols-4 gap-6">
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">ELO</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{t.duelsKits.elo}</p>
               <p
                 className="text-2xl font-bold"
                 style={{ color: overallColor, textShadow: `0 0 10px ${overallColor}` }}
@@ -168,15 +173,15 @@ export default async function DuelsKitsPage({ params }: PageProps) {
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Win Rate</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{t.duelsKits.winRate}</p>
               <p className="text-2xl font-bold text-white">{data.overall.win_rate.toFixed(1)}%</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Wins / Losses</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{t.duelsKits.winsLosses}</p>
               <p className="text-2xl font-bold text-white">{data.overall.wins} / {data.overall.losses}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Best Streak</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{t.duelsKits.bestStreak}</p>
               <p className="text-2xl font-bold text-white">{data.overall.bestWinStreak}</p>
             </div>
           </div>
@@ -184,7 +189,7 @@ export default async function DuelsKitsPage({ params }: PageProps) {
           {/* Played kits */}
           {playedModes.length > 0 && (
             <div className="mb-10">
-              <h2 className="text-xl font-bold text-white mb-4">KITS</h2>
+              <h2 className="text-xl font-bold text-white mb-4">{t.duelsKits.kits}</h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {playedModes.map((mode) => {
                   const total = mode.wins + mode.losses;
@@ -206,7 +211,7 @@ export default async function DuelsKitsPage({ params }: PageProps) {
                         </p>
                         {mode.bestWinStreak > 0 && (
                           <p className="text-xs text-gray-500 mt-0.5">
-                            Best streak: {mode.bestWinStreak}
+                            {t.duelsKits.bestStreakLine.replace("{value}", String(mode.bestWinStreak))}
                           </p>
                         )}
                       </div>
@@ -219,7 +224,7 @@ export default async function DuelsKitsPage({ params }: PageProps) {
                         >
                           {mode.elo} ELO
                         </p>
-                        <p className="text-xs text-gray-500">{total} games</p>
+                        <p className="text-xs text-gray-500">{total} {t.duelsKits.games}</p>
                       </div>
                     </div>
                   );
@@ -231,7 +236,7 @@ export default async function DuelsKitsPage({ params }: PageProps) {
           {/* Unplayed kits */}
           {unplayedModes.length > 0 && (
             <div>
-              <h2 className="text-xl font-bold text-white mb-4">NOT YET PLAYED</h2>
+              <h2 className="text-xl font-bold text-white mb-4">{t.duelsKits.notYetPlayed}</h2>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                 {unplayedModes.map((mode) => (
                   <div
@@ -239,7 +244,7 @@ export default async function DuelsKitsPage({ params }: PageProps) {
                     className="m-1 rounded-md bg-white/5 p-4 opacity-40"
                   >
                     <p className="font-bold text-white">{KIT_LABELS[mode.key] ?? mode.key}</p>
-                    <p className="text-sm text-gray-400">No games yet</p>
+                    <p className="text-sm text-gray-400">{t.duelsKits.noGamesYet}</p>
                   </div>
                 ))}
               </div>
