@@ -6,12 +6,12 @@ import Footer from "@/components/page/footer";
 import { SiteHeader } from "@/components/page/site-header";
 import { AnalyticsProvider } from "@/components/analytics-provider";
 import SessionProvider from "@/components/SessionProvider";
+import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import {
-  LanguageProvider,
+  DEFAULT_LOCALE,
   LOCALE_COOKIE,
   isLocale,
-} from "@/lib/i18n/LanguageProvider";
-import { DEFAULT_LOCALE } from "@/lib/i18n/translations";
+} from "@/lib/i18n/translations";
 
 const inter = Inter({ subsets: ["latin"] });
 const syne = Syne({
