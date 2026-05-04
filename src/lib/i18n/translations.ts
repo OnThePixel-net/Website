@@ -379,6 +379,7 @@ export const translations = {
       cancel: "Cancel",
       save: "Save Preferences",
       buttonLabel: "Cookie Settings",
+      alwaysActive: "Always Active",
     },
     playercount: {
       online: "Online players",
@@ -765,6 +766,7 @@ export const translations = {
       cancel: "Abbrechen",
       save: "Einstellungen speichern",
       buttonLabel: "Cookie-Einstellungen",
+      alwaysActive: "Immer aktiv",
     },
     playercount: {
       online: "Spieler online",
