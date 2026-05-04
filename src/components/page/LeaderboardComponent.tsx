@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 interface LeaderboardItem {
   position: number;
@@ -29,6 +30,7 @@ export default function LeaderboardComponent({
   endpoint,
   statColumns,
 }: LeaderboardProps) {
+  const t = useTranslations();
   const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +73,7 @@ export default function LeaderboardComponent({
       setError(null);
     } catch (err) {
       console.error("Error fetching leaderboard:", err);
-      setError("Failed to load leaderboard data. Please try again later.");
+      setError(t.leaderboardTable.loadError);
     } finally {
       setLoading(false);
     }
@@ -95,8 +97,8 @@ export default function LeaderboardComponent({
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-800">
-                  <th className="px-4 py-2 text-left">#</th>
-                  <th className="px-4 py-2 text-left">Player</th>
+                  <th className="px-4 py-2 text-left">{t.leaderboardTable.colHash}</th>
+                  <th className="px-4 py-2 text-left">{t.leaderboardTable.colPlayer}</th>
                   {statColumns.map((column) => (
                     <th key={column.key} className="px-4 py-2 text-right">
                       {column.label}
@@ -170,7 +172,7 @@ export default function LeaderboardComponent({
                       colSpan={2 + statColumns.length}
                       className="px-4 py-8 text-center text-gray-400"
                     >
-                      No players found.
+                      {t.leaderboardTable.empty}
                     </td>
                   </tr>
                 )}

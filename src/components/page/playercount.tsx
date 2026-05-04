@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 export default function PlayerCount() {
+  const t = useTranslations();
   const [onlinePlayers, setOnlinePlayers] = useState(0);
   const [pingEnabled, setPingEnabled] = useState(true);
 
@@ -26,7 +28,7 @@ export default function PlayerCount() {
         <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
       </span>
       <p>
-        Online players: <span>{onlinePlayers}</span>
+        {t.playercount.online}: <span>{onlinePlayers}</span>
       </p>
     </div>
   );

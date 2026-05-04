@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
 import { Inter, Syne, DM_Sans } from "next/font/google";
-import { cookies } from "next/headers";
 import "./globals.css";
 import Footer from "@/components/page/footer";
 import { SiteHeader } from "@/components/page/site-header";
 import { AnalyticsProvider } from "@/components/analytics-provider";
 import SessionProvider from "@/components/SessionProvider";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
-import {
-  DEFAULT_LOCALE,
-  LOCALE_COOKIE,
-  isLocale,
-} from "@/lib/i18n/translations";
+import { getServerLocale } from "@/lib/i18n/server";
 
 const inter = Inter({ subsets: ["latin"] });
 const syne = Syne({
@@ -38,9 +33,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const stored = cookieStore.get(LOCALE_COOKIE)?.value;
-  const initialLocale = isLocale(stored) ? stored : DEFAULT_LOCALE;
+  const initialLocale = await getServerLocale();
 
   return (
     <html lang={initialLocale}>

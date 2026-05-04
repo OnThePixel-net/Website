@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription }
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAnalytics } from "@/hooks/use-analytics";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 type CookieSettingsProps = {
   isOpen: boolean;
@@ -12,6 +13,7 @@ type CookieSettingsProps = {
 };
 
 export default function CookieSettings({ isOpen, onClose }: CookieSettingsProps) {
+  const t = useTranslations();
   const { preferences, updatePreferences, resetPreferences } = useAnalytics();
   const [analyticsEnabled, setAnalyticsEnabled] = useState(preferences.analytics);
   
@@ -32,50 +34,47 @@ export default function CookieSettings({ isOpen, onClose }: CookieSettingsProps)
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-lg border-green-700/30 bg-gray-900">
         <CardHeader>
-          <CardTitle>Cookie Settings</CardTitle>
-          <CardDescription>Manage your cookie preferences</CardDescription>
+          <CardTitle>{t.cookieSettings.title}</CardTitle>
+          <CardDescription>{t.cookieSettings.description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="essential" className="text-base font-medium">Essential Cookies</Label>
-                <p className="text-sm text-gray-400">Required for the website to function properly. Cannot be disabled.</p>
+                <Label htmlFor="essential" className="text-base font-medium">{t.cookieSettings.essentialLabel}</Label>
+                <p className="text-sm text-gray-400">{t.cookieSettings.essentialDesc}</p>
               </div>
               <Switch id="essential" checked disabled />
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="analytics" className="text-base font-medium">Analytics Cookies</Label>
-                <p className="text-sm text-gray-400">Help us understand how visitors interact with our website.</p>
+                <Label htmlFor="analytics" className="text-base font-medium">{t.cookieSettings.analyticsLabel}</Label>
+                <p className="text-sm text-gray-400">{t.cookieSettings.analyticsDesc}</p>
               </div>
-              <Switch 
-                id="analytics" 
-                checked={analyticsEnabled} 
-                onCheckedChange={setAnalyticsEnabled} 
+              <Switch
+                id="analytics"
+                checked={analyticsEnabled}
+                onCheckedChange={setAnalyticsEnabled}
               />
             </div>
           </div>
-          
+
           <div className="rounded-md bg-gray-800/50 p-4">
-            <h4 className="font-medium mb-2">How we use cookies</h4>
-            <p className="text-sm text-gray-400">
-              OnThePixel.net uses cookies to enhance your experience, analyze site usage, and assist in our marketing efforts. 
-              We use Vercel Analytics to collect information about how visitors use our website. This data is anonymized and helps us improve our services.
-            </p>
+            <h4 className="font-medium mb-2">{t.cookieSettings.howWeUseTitle}</h4>
+            <p className="text-sm text-gray-400">{t.cookieSettings.howWeUseText}</p>
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={handleReset} className="border-gray-700 hover:bg-gray-800">
-            Reset Preferences
+            {t.cookieSettings.reset}
           </Button>
           <div className="flex space-x-2">
             <Button variant="outline" onClick={onClose} className="border-gray-700 hover:bg-gray-800">
-              Cancel
+              {t.cookieSettings.cancel}
             </Button>
             <Button onClick={handleSave} className="bg-green-700 hover:bg-green-600">
-              Save Preferences
+              {t.cookieSettings.save}
             </Button>
           </div>
         </CardFooter>

@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { FaCookieBite } from "react-icons/fa";
 import CookieSettings from "@/components/cookie-settings";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 export default function CookieConsent() {
+  const t = useTranslations();
   const [isVisible, setIsVisible] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -56,39 +58,33 @@ export default function CookieConsent() {
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center text-xl">
                 <FaCookieBite className="mr-2 text-green-500" />
-                Cookie Consent
+                {t.cookieConsent.title}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-gray-300">
-              <p>
-                OnThePixel.net uses cookies and similar technologies to enhance your browsing experience, analyze site traffic, 
-                and provide personalized content.
-              </p>
-              <p className="mt-2">
-                By clicking "Accept All", you consent to the use of cookies on our website. You can change your preferences 
-                at any time by clicking "Customize" or manage your preferences in your browser settings.
-              </p>
+              <p>{t.cookieConsent.paragraph1}</p>
+              <p className="mt-2">{t.cookieConsent.paragraph2}</p>
             </CardContent>
             <CardFooter className="flex flex-col space-y-2 sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0 pt-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleDecline}
                 className="w-full sm:w-auto border-gray-700 hover:bg-gray-800 hover:text-white"
               >
-                Decline
+                {t.cookieConsent.decline}
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleCustomize}
                 className="w-full sm:w-auto border-gray-700 hover:bg-gray-800 hover:text-white"
               >
-                Customize
+                {t.cookieConsent.customize}
               </Button>
-              <Button 
+              <Button
                 onClick={handleAccept}
                 className="w-full sm:w-auto bg-green-700 hover:bg-green-600 text-white"
               >
-                Accept All
+                {t.cookieConsent.acceptAll}
               </Button>
             </CardFooter>
           </Card>
