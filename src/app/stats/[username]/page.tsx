@@ -8,12 +8,10 @@ interface PageProps {
   }>;
 }
 
-// WICHTIG: Entferne "export const dynamicParams = true;"
-// Für Static Export nur leere generateStaticParams
-export async function generateStaticParams() {
-  // Leere Liste - keine Seiten werden vorab generiert
-  return [];
-}
+// The page is rendered on-demand for each requested username — the root
+// layout already reads the locale cookie/header and so the whole tree is
+// dynamic.
+export const dynamic = "force-dynamic";
 
 const StatisticsPage: React.FC<PageProps> = async ({ params }) => {
   const { username } = await params;

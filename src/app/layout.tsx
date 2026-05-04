@@ -28,6 +28,12 @@ export const metadata: Metadata = {
     "Explore the exciting world of OnThePixel.net! Engage in thrilling minigames like Duels and BuildFFA. Dive into the pixelated fun today!",
 };
 
+// The layout reads the locale cookie/header on every request, so the whole
+// app must be rendered dynamically. Without this, routes that declare
+// `generateStaticParams` (e.g. /stats/[username]) try to prerender and
+// crash with DYNAMIC_SERVER_USAGE.
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: {
