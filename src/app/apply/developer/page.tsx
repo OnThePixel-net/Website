@@ -1,8 +1,27 @@
 import React from "react";
 import Link from "next/link";
+import type { Metadata } from "next";
 import TopPage from "@/components/page/top";
 import ApplicationForm, { ApplicationField } from "@/components/page/ApplicationForm";
-import { getServerTranslations } from "@/lib/i18n/server";
+import { getServerLocale, getServerTranslations } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+
+const META_COPY = {
+  en: {
+    title: "Apply as Java Developer",
+    description: "Apply to join the OnThePixel.net team as a Java Developer.",
+  },
+  de: {
+    title: "Als Java-Developer bewerben",
+    description: "Bewirb dich als Java-Developer im OnThePixel.net-Team.",
+  },
+} as const;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const { title, description } = META_COPY[locale];
+  return buildLocalizedMetadata({ locale, path: "/apply/developer", title, description });
+}
 
 async function isPositionOpen(name: string): Promise<boolean> {
   try {

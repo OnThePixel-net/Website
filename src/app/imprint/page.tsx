@@ -1,6 +1,25 @@
 import React from "react";
+import type { Metadata } from "next";
 import TopPage from "@/components/page/top";
 import { getServerLocale } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+
+const META_COPY = {
+  en: {
+    title: "Legal Notice",
+    description: "Legal notice and provider information for OnThePixel.net.",
+  },
+  de: {
+    title: "Impressum",
+    description: "Impressum und Anbieterkennzeichnung von OnThePixel.net.",
+  },
+} as const;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const { title, description } = META_COPY[locale];
+  return buildLocalizedMetadata({ locale, path: "/imprint", title, description });
+}
 
 export default async function ImprintPage() {
   const locale = await getServerLocale();
