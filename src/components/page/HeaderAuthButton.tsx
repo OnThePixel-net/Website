@@ -2,6 +2,7 @@
 
 import { signIn, signOut } from "next-auth/react";
 import Image from "next/image";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 interface HeaderAuthButtonProps {
   user?: {
@@ -17,6 +18,7 @@ const DiscordIcon = () => (
 );
 
 export default function HeaderAuthButton({ user }: HeaderAuthButtonProps) {
+  const t = useTranslations();
   if (user) {
     return (
       <div className="flex items-center gap-2">
@@ -34,7 +36,7 @@ export default function HeaderAuthButton({ user }: HeaderAuthButtonProps) {
           onClick={() => signOut()}
           className="text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded hover:bg-white/10"
         >
-          Logout
+          {t.headerAuth.logout}
         </button>
       </div>
     );
@@ -46,7 +48,7 @@ export default function HeaderAuthButton({ user }: HeaderAuthButtonProps) {
       className="flex items-center gap-2 px-3 py-1.5 bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm rounded-md transition-colors font-medium"
     >
       <DiscordIcon />
-      <span>Login</span>
+      <span>{t.headerAuth.login}</span>
     </button>
   );
 }

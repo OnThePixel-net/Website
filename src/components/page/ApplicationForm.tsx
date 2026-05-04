@@ -4,6 +4,7 @@ import React, { useState, useRef } from "react";
 import Link from "next/link";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useSession, signIn } from "next-auth/react";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 export interface ApplicationField {
   id: string;
@@ -30,6 +31,7 @@ export default function ApplicationForm({
   fields,
   apiEndpoint,
 }: ApplicationFormProps) {
+  const t = useTranslations();
   const { data: session } = useSession();
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -47,19 +49,21 @@ export default function ApplicationForm({
     e.preventDefault();
 
     if (!session) {
-      setError("Please login with Discord first.");
+      setError(t.applicationForm.errors.loginRequired);
       return;
     }
 
     for (const field of fields) {
       if (!formData[field.id]?.trim()) {
-        setError(`Please fill out: ${field.label}`);
+        setError(
+          t.applicationForm.errors.fillField.replace("{label}", field.label),
+        );
         return;
       }
     }
 
     if (!captchaToken) {
-      setError("Please complete the captcha verification.");
+      setError(t.applicationForm.errors.captchaRequired);
       return;
     }
 
@@ -84,7 +88,7 @@ export default function ApplicationForm({
       setIsSubmitted(true);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to submit. Please try again."
+        err instanceof Error ? err.message : t.applicationForm.errors.submitFailed,
       );
       setCaptchaToken(null);
       captchaRef.current?.resetCaptcha();
@@ -112,15 +116,13 @@ export default function ApplicationForm({
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold mb-4">Application Submitted!</h1>
-          <p className="text-gray-400 mb-8">
-            Thank you for your interest! We&apos;ll review your application and get back to you as soon as possible.
-          </p>
+          <h1 className="text-2xl font-bold mb-4">{t.applicationForm.submittedTitle}</h1>
+          <p className="text-gray-400 mb-8">{t.applicationForm.submittedMessage}</p>
           <Link
             href="/"
             className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
-            Back to Home
+            {t.applicationForm.backToHome}
           </Link>
         </div>
       </section>
@@ -135,13 +137,13 @@ export default function ApplicationForm({
             href="/apply"
             className="inline-block mb-6 text-sm text-gray-400 hover:text-green-400 transition-colors duration-200"
           >
-            ← Back to Positions
+            ← {t.applicationForm.backToPositions}
           </Link>
 
-          <h1 className="text-2xl font-bold mb-2">{position} Application</h1>
-          <p className="text-gray-400 mb-6">
-            Fill out the form below — we'll get back to you as soon as possible.
-          </p>
+          <h1 className="text-2xl font-bold mb-2">
+            {position} {t.applicationForm.titleSuffix}
+          </h1>
+          <p className="text-gray-400 mb-6">{t.applicationForm.intro}</p>
 
           {/* Discord auth bar */}
           <div className="mb-6 flex items-center justify-between bg-white/5 border border-white/10 rounded-lg px-4 py-3">
@@ -156,17 +158,17 @@ export default function ApplicationForm({
                     {session.user?.name}
                   </span>
                 </div>
-                <span className="text-xs text-[#5865F2] font-medium">Discord verifiziert ✓</span>
+                <span className="text-xs text-[#5865F2] font-medium">{t.applicationForm.discordVerified} ✓</span>
               </>
             ) : (
               <>
-                <span className="text-sm text-gray-400">Discord login erforderlich</span>
+                <span className="text-sm text-gray-400">{t.applicationForm.discordRequired}</span>
                 <button
                   onClick={() => signIn("discord")}
                   className="flex items-center gap-2 px-3 py-1.5 bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm rounded-md transition-colors font-medium"
                 >
                   <DiscordIcon />
-                  Login
+                  {t.applicationForm.login}
                 </button>
               </>
             )}
@@ -177,7 +179,7 @@ export default function ApplicationForm({
               <div key={field.id}>
                 <label className="block text-sm font-medium text-white mb-1.5">
                   {field.label}{" "}
-                  <span className="text-red-400" title="Required">*</span>
+                  <span className="text-red-400" title={t.applicationForm.required}>*</span>
                 </label>
                 {field.description && (
                   <p className="text-xs text-gray-500 mb-1.5">{field.description}</p>
@@ -204,8 +206,8 @@ export default function ApplicationForm({
 
             <div>
               <label className="block text-sm font-medium text-white mb-1.5">
-                Security Verification{" "}
-                <span className="text-red-400" title="Required">*</span>
+                {t.applicationForm.securityVerification}{" "}
+                <span className="text-red-400" title={t.applicationForm.required}>*</span>
               </label>
               <HCaptcha
                 ref={captchaRef}
@@ -217,7 +219,7 @@ export default function ApplicationForm({
                 onExpire={() => setCaptchaToken(null)}
                 onError={() => {
                   setCaptchaToken(null);
-                  setError("Captcha error. Please try again.");
+                  setError(t.applicationForm.errors.captchaError);
                 }}
                 theme="dark"
               />
@@ -234,7 +236,7 @@ export default function ApplicationForm({
               disabled={isSubmitting || !captchaToken || !session}
               className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? "Submitting..." : "Submit Application"}
+              {isSubmitting ? t.applicationForm.submitting : t.applicationForm.submit}
             </button>
           </form>
         </div>

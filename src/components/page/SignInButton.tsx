@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 const DiscordIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 127.14 96.36" fill="currentColor">
@@ -9,13 +10,14 @@ const DiscordIcon = () => (
 );
 
 export default function SignInButton({ callbackUrl }: { callbackUrl: string }) {
+  const t = useTranslations();
   return (
     <button
       onClick={() => signIn("discord", { callbackUrl })}
       className="inline-flex items-center gap-3 px-6 py-3 bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-lg transition-colors font-medium"
     >
       <DiscordIcon />
-      Mit Discord anmelden
+      {t.discordLogin.signIn}
     </button>
   );
 }

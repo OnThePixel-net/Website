@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 export default function Error({
   error,
@@ -10,6 +11,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations();
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -27,14 +29,14 @@ export default function Error({
         className="mb-3 text-2xl font-bold text-white md:text-3xl"
         style={{ fontFamily: "'Syne', sans-serif", color: "#00de6d", textShadow: "0 0 30px rgba(0,222,109,0.3)" }}
       >
-        Something went wrong
+        {t.error.heading}
       </h1>
 
       <p
         className="mb-8 max-w-sm text-white/40"
         style={{ fontFamily: "'DM Sans', sans-serif" }}
       >
-        An unexpected error occurred. Try again or return to the home page.
+        {t.error.description}
       </p>
 
       <div className="flex flex-wrap items-center justify-center gap-3">
@@ -43,14 +45,14 @@ export default function Error({
           className="rounded-lg bg-green-700 px-6 py-2.5 font-semibold text-white transition-colors hover:bg-green-600"
           style={{ fontFamily: "'Syne', sans-serif" }}
         >
-          Try again
+          {t.common.tryAgain}
         </button>
         <Link
           href="/"
           className="rounded-lg bg-white/5 px-6 py-2.5 font-semibold text-white ring-1 ring-white/10 transition-colors hover:bg-white/10"
           style={{ fontFamily: "'Syne', sans-serif" }}
         >
-          Go home
+          {t.error.goHome}
         </Link>
       </div>
     </section>

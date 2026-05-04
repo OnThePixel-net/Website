@@ -3,6 +3,12 @@ import Link from "next/link";
 import TopPage from "@/components/page/top";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { getServerTranslations, getServerLocale } from "@/lib/i18n/server";
+import {
+  DATE_LOCALES,
+  DIRECTUS_LOCALES,
+  Locale,
+} from "@/lib/i18n/translations";
 
 interface NewsItem {
   title: string;
@@ -13,15 +19,23 @@ interface NewsItem {
   short_description?: string;
 }
 
+interface NewsTranslation {
+  News_url: string;
+  languages_code: string;
+  title?: string | null;
+  short_description?: string | null;
+  text?: string | null;
+}
+
 interface PageProps {
   params: Promise<{ url: string }>;
 }
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string, locale: Locale): string {
   try {
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return dateStr;
-    return d.toLocaleDateString("en-US", {
+    return d.toLocaleDateString(DATE_LOCALES[locale], {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -66,10 +80,49 @@ async function getNewsItem(url: string): Promise<NewsItem | null> {
   }
 }
 
+async function getNewsTranslation(
+  url: string,
+  languageCode: string,
+): Promise<NewsTranslation | null> {
+  try {
+    const response = await fetch(
+      `https://cms.onthepixel.net/items/News_translations?filter%5B_and%5D%5B0%5D%5BNews_url%5D%5B_eq%5D=${encodeURIComponent(url)}&filter%5B_and%5D%5B1%5D%5Blanguages_code%5D%5B_eq%5D=${encodeURIComponent(languageCode)}`,
+      { next: { revalidate: 300 } },
+    );
+    if (!response.ok) return null;
+    const data = await response.json();
+    return (data.data?.[0] as NewsTranslation | undefined) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function applyTranslation(
+  item: NewsItem,
+  tr: NewsTranslation | null,
+): NewsItem {
+  if (!tr) return item;
+  return {
+    ...item,
+    title: tr.title?.trim() ? tr.title : item.title,
+    short_description: tr.short_description?.trim()
+      ? tr.short_description
+      : item.short_description,
+    text: tr.text?.trim() ? tr.text : item.text,
+  };
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { url } = await params;
-  const item = await getNewsItem(url);
-  if (!item) return { title: "News — OnThePixel.net" };
+  const locale = await getServerLocale();
+  const [base, tr] = await Promise.all([
+    getNewsItem(url),
+    locale === "en"
+      ? Promise.resolve(null)
+      : getNewsTranslation(url, DIRECTUS_LOCALES[locale]),
+  ]);
+  if (!base) return { title: "News — OnThePixel.net" };
+  const item = applyTranslation(base, tr);
   return {
     title: `${item.title} — OnThePixel.net`,
     description: item.short_description ?? item.text.slice(0, 160),
@@ -83,9 +136,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function NewsPage({ params }: PageProps) {
   const { url } = await params;
-  const newsItem = await getNewsItem(url);
+  const { locale, t } = await getServerTranslations();
+  const [base, tr] = await Promise.all([
+    getNewsItem(url),
+    locale === "en"
+      ? Promise.resolve(null)
+      : getNewsTranslation(url, DIRECTUS_LOCALES[locale]),
+  ]);
 
-  if (!newsItem) notFound();
+  if (!base) notFound();
+  const newsItem = applyTranslation(base, tr);
 
   const textLines = newsItem.text.split("\n");
 
@@ -100,8 +160,23 @@ export default async function NewsPage({ params }: PageProps) {
             className="mb-8 inline-flex items-center gap-1.5 text-sm text-white/40 transition-colors duration-200 hover:text-green-400"
             style={{ fontFamily: "'Syne', sans-serif" }}
           >
-            ← Back to News
+            ← {t.news.backToNews}
           </Link>
+
+          {locale !== "en" && !tr && (
+            <div
+              className="mb-6 flex flex-wrap items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-200"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              <span>{t.news.englishOnly}</span>
+              <Link
+                href={`/en/news/${url}`}
+                className="font-semibold text-yellow-100 underline decoration-yellow-300/50 underline-offset-2 transition-colors hover:text-white hover:decoration-white"
+              >
+                {t.news.readInEnglish}
+              </Link>
+            </div>
+          )}
 
           {/* Hero image */}
           <div className="relative mb-8 w-full overflow-hidden rounded-xl">
@@ -159,7 +234,7 @@ export default async function NewsPage({ params }: PageProps) {
                 className="text-sm text-white/35"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                {formatDate(newsItem.date)}
+                {formatDate(newsItem.date, locale)}
               </span>
             </div>
           </div>
@@ -203,7 +278,7 @@ export default async function NewsPage({ params }: PageProps) {
               className="inline-flex items-center gap-1.5 text-sm text-white/30 transition-colors duration-200 hover:text-green-400"
               style={{ fontFamily: "'Syne', sans-serif" }}
             >
-              ← Back to News
+              ← {t.news.backToNews}
             </Link>
           </div>
 
