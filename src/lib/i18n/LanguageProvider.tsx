@@ -10,13 +10,13 @@ import {
 } from "react";
 import {
   DEFAULT_LOCALE,
+  isLocale,
   Locale,
-  SUPPORTED_LOCALES,
+  LOCALE_COOKIE,
   Translations,
   translations,
 } from "./translations";
 
-export const LOCALE_COOKIE = "otp.locale";
 const STORAGE_KEY = "otp.locale";
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
@@ -27,10 +27,6 @@ type LanguageContextValue = {
 };
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
-
-export function isLocale(value: string | null | undefined): value is Locale {
-  return !!value && (SUPPORTED_LOCALES as readonly string[]).includes(value);
-}
 
 function readCookieLocale(): Locale | null {
   if (typeof document === "undefined") return null;
