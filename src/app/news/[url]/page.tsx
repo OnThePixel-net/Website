@@ -72,7 +72,7 @@ function parseMarkdownLinks(text: string) {
 async function getNewsItem(url: string): Promise<NewsItem | null> {
   try {
     const response = await fetch(
-      `https://cms.onthepixel.net/items/News?fields=*,translations.*&filter%5B_and%5D%5B0%5D%5Burl%5D%5B_eq%5D=${encodeURIComponent(url)}`,
+      `https://cms.onthepixel.net/items/News?filter%5Burl%5D%5B_eq%5D=${encodeURIComponent(url)}`,
       { next: { revalidate: 300 } },
     );
     if (!response.ok) return null;
@@ -83,11 +83,28 @@ async function getNewsItem(url: string): Promise<NewsItem | null> {
   }
 }
 
-function findTranslation(
-  item: NewsItem,
+async function getAllNewsTranslations(): Promise<NewsTranslation[]> {
+  try {
+    const response = await fetch(
+      "https://cms.onthepixel.net/items/News_translations",
+      { next: { revalidate: 300 } },
+    );
+    if (!response.ok) return [];
+    const data = await response.json();
+    return (data.data || []) as NewsTranslation[];
+  } catch {
+    return [];
+  }
+}
+
+function findTranslationFor(
+  url: string,
   languageCode: string,
+  list: NewsTranslation[],
 ): NewsTranslation | undefined {
-  return item.translations?.find((tr) => tr.languages_code === languageCode);
+  return list.find(
+    (tr) => tr.News_url === url && tr.languages_code === languageCode,
+  );
 }
 
 function applyTranslation(
@@ -108,12 +125,15 @@ function applyTranslation(
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { url } = await params;
   const locale = await getServerLocale();
-  const base = await getNewsItem(url);
+  const [base, allTr] = await Promise.all([
+    getNewsItem(url),
+    locale === "en" ? Promise.resolve([]) : getAllNewsTranslations(),
+  ]);
   if (!base) return { title: "News — OnThePixel.net" };
   const tr =
     locale === "en"
       ? undefined
-      : findTranslation(base, DIRECTUS_LOCALES[locale]);
+      : findTranslationFor(url, DIRECTUS_LOCALES[locale], allTr);
   const item = applyTranslation(base, tr);
   return {
     title: `${item.title} — OnThePixel.net`,
@@ -129,14 +149,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function NewsPage({ params }: PageProps) {
   const { url } = await params;
   const { locale, t } = await getServerTranslations();
-  const base = await getNewsItem(url);
+  const [base, allTr] = await Promise.all([
+    getNewsItem(url),
+    locale === "en" ? Promise.resolve([]) : getAllNewsTranslations(),
+  ]);
 
   if (!base) notFound();
 
   const tr =
     locale === "en"
       ? undefined
-      : findTranslation(base, DIRECTUS_LOCALES[locale]);
+      : findTranslationFor(url, DIRECTUS_LOCALES[locale], allTr);
 
   // Non-English locale + no translation: show confirmation page instead of
   // the article content.

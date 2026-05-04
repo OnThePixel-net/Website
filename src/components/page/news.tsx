@@ -141,10 +141,9 @@ function NewsCard({
 
 async function getNews(): Promise<NewsItem[]> {
   try {
-    const response = await fetch(
-      "https://cms.onthepixel.net/items/News?fields=*,translations.*",
-      { next: { revalidate: 300 } },
-    );
+    const response = await fetch("https://cms.onthepixel.net/items/News", {
+      next: { revalidate: 300 },
+    });
     if (!response.ok) return [];
     const data = await response.json();
     return (data.data || []).sort(
@@ -156,11 +155,18 @@ async function getNews(): Promise<NewsItem[]> {
   }
 }
 
-function findTranslation(
-  item: NewsItem,
-  languageCode: string,
-): NewsTranslation | undefined {
-  return item.translations?.find((tr) => tr.languages_code === languageCode);
+async function getAllNewsTranslations(): Promise<NewsTranslation[]> {
+  try {
+    const response = await fetch(
+      "https://cms.onthepixel.net/items/News_translations",
+      { next: { revalidate: 300 } },
+    );
+    if (!response.ok) return [];
+    const data = await response.json();
+    return (data.data || []) as NewsTranslation[];
+  } catch {
+    return [];
+  }
 }
 
 function applyTranslation(
@@ -181,9 +187,20 @@ export default async function News() {
   const { locale, t } = await getServerTranslations();
   const directusLocale = DIRECTUS_LOCALES[locale];
 
-  const baseItems = await getNews();
+  const [baseItems, allTranslations] = await Promise.all([
+    getNews(),
+    locale === "en" ? Promise.resolve([]) : getAllNewsTranslations(),
+  ]);
+
+  const trMap = new Map<string, NewsTranslation>();
+  for (const tr of allTranslations) {
+    if (tr.News_url && tr.languages_code === directusLocale) {
+      trMap.set(tr.News_url, tr);
+    }
+  }
+
   const newsItems = baseItems.map((item) =>
-    locale === "en" ? item : applyTranslation(item, findTranslation(item, directusLocale)),
+    locale === "en" ? item : applyTranslation(item, trMap.get(item.url)),
   );
   const featured = newsItems[0] ?? null;
   const rest = newsItems.slice(1, 3);
