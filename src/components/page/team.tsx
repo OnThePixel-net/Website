@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { getServerTranslations } from "@/lib/i18n/server";
 
 interface Rank {
   uuid: string;
@@ -31,7 +32,10 @@ async function getTeamMembers(): Promise<TeamMember[]> {
 }
 
 export default async function Team() {
-  const teamMembers = await getTeamMembers();
+  const [teamMembers, { t }] = await Promise.all([
+    getTeamMembers(),
+    getServerTranslations(),
+  ]);
 
   const sortedMembers = [...teamMembers].sort((a, b) => {
     const priorityA = a.Ranks ? a.Ranks.Priority : 999;
@@ -43,7 +47,7 @@ export default async function Team() {
     <section className="py-10 px-4 bg-gray-950">
       <div className="container mx-auto px-4 py-10">
         <h1 id="team" className="text-3xl font-bold mb-4 text-white">
-          TEAM
+          {t.team.heading}
         </h1>
         {sortedMembers.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
@@ -75,7 +79,7 @@ export default async function Team() {
                         {mainRank.Name.toUpperCase()}
                       </p>
                     ) : (
-                      <p className="text-sm text-gray-400">MEMBER</p>
+                      <p className="text-sm text-gray-400">{t.team.memberFallback}</p>
                     )}
                   </div>
                 </div>
@@ -83,7 +87,7 @@ export default async function Team() {
             })}
           </div>
         ) : (
-          <div className="text-gray-400">No team members available.</div>
+          <div className="text-gray-400">{t.team.empty}</div>
         )}
 
         <div className="mt-12 p-6 bg-white/10 rounded-lg border-l-4 border-green-500">
@@ -91,16 +95,14 @@ export default async function Team() {
             className="text-lg font-bold"
             style={{ color: "#00de6d", textShadow: "0 0 10px #00de6d" }}
           >
-            Want to join the team?
+            {t.team.joinTitle}
           </h2>
-          <p className="mt-2 text-gray-300">
-            We&apos;re always looking for passionate people to help build OnThePixel.net.
-          </p>
+          <p className="mt-2 text-gray-300">{t.team.joinText}</p>
           <Link
             href="/apply"
             className="inline-block mt-4 px-5 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg transition-colors font-medium"
           >
-            Apply now →
+            {t.team.applyNow} →
           </Link>
         </div>
       </div>

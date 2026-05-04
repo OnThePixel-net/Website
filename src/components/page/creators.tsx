@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 import {
   FaYoutube,
   FaTwitch,
@@ -88,6 +89,7 @@ const getStreamEmbedUrl = (creator: Creator, live: LiveStatus): string | null =>
 };
 
 export default function Creators({ initialCreators, initialFollowers, initialLiveStatus }: CreatorsProps) {
+  const t = useTranslations();
   const creators = initialCreators;
   const followersData = initialFollowers;
   const [liveStatus, setLiveStatus] = useState<Record<string, LiveStatus>>(initialLiveStatus);
@@ -140,7 +142,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
     <section className="py-10 px-4 bg-gray-950">
       <div className="container mx-auto px-4 py-10">
         <h1 id="creators" className="text-3xl font-bold mb-8 text-white">
-          CREATORS
+          {t.creators.heading}
         </h1>
 
         {/* Live Stream Preview Section */}
@@ -149,7 +151,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
             <div className="flex items-center gap-3 mb-6">
               <div className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold">
                 <span className="w-3 h-3 bg-white rounded-full animate-pulse"></span>
-                LIVE NOW
+                {t.creators.liveNow}
               </div>
               <div className="h-px flex-1 bg-gradient-to-r from-red-600 to-transparent"></div>
             </div>
@@ -178,7 +180,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                         <div className="text-center">
                           <div className="flex items-center justify-center gap-2 text-white mb-2">
                             <span className="w-4 h-4 bg-red-500 rounded-full animate-pulse"></span>
-                            <span className="text-xl font-bold">LIVE</span>
+                            <span className="text-xl font-bold">{t.creators.live}</span>
                           </div>
                           <p className="text-gray-300 text-sm">
                             {live?.platform?.toUpperCase()}
@@ -200,7 +202,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                           <p className="font-bold text-white truncate">{creator.Name}</p>
                           <p className="text-xs text-gray-400">
                             {live?.platform?.toUpperCase()}
-                            {live?.viewers && ` • ${formatFollowers(live.viewers)} watching`}
+                            {live?.viewers && ` • ${formatFollowers(live.viewers)} ${t.creators.watching}`}
                           </p>
                         </div>
                       </div>
@@ -218,7 +220,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                           rel="noopener noreferrer"
                           className="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
                         >
-                          Watch Stream
+                          {t.creators.watchStream}
                         </Link>
                       )}
                     </div>

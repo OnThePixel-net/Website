@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { getServerTranslations } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
   title: "Side Quests – OnThePixel.net",
@@ -39,27 +40,25 @@ const statusStyles: Record<string, string> = {
   planned: "bg-blue-600 text-white",
 };
 
-const statusLabels: Record<string, string> = {
-  completed: "Completed",
-  "in-progress": "In Progress",
-  planned: "Planned",
-};
-
 export default async function SideQuestsPage() {
-  const quests = await getSideQuests();
+  const [quests, { t }] = await Promise.all([
+    getSideQuests(),
+    getServerTranslations(),
+  ]);
+
+  const statusLabels: Record<string, string> = {
+    completed: t.sidequests.statusCompleted,
+    "in-progress": t.sidequests.statusInProgress,
+    planned: t.sidequests.statusPlanned,
+  };
 
   return (
     <>
       <TopPage />
       <section className="bg-gray-950 pt-36">
         <div className="container mx-auto px-4 py-10">
-          <h1 className="mb-5 text-2xl font-bold">OUR SIDE QUESTS</h1>
-          <p className="mb-8 text-gray-400">
-            Explore the exciting projects and initiatives that power
-            OnThePixel.net. From cutting-edge security solutions to performance
-            optimizations, discover the technology that makes our server
-            exceptional.
-          </p>
+          <h1 className="mb-5 text-2xl font-bold">{t.sidequests.heading}</h1>
+          <p className="mb-8 text-gray-400">{t.sidequests.intro}</p>
 
           {quests.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -89,7 +88,7 @@ export default async function SideQuestsPage() {
                   {quest.technologies && quest.technologies.length > 0 && (
                     <div className="mb-4">
                       <p className="mb-2 text-sm text-gray-400">
-                        Technologies:
+                        {t.sidequests.technologies}
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {quest.technologies.map((tech) => (
@@ -116,7 +115,7 @@ export default async function SideQuestsPage() {
                           size="sm"
                           className="bg-green-700 text-white hover:bg-green-600"
                         >
-                          View Project
+                          {t.sidequests.viewProject}
                         </Button>
                       </Link>
                     </div>
@@ -125,7 +124,7 @@ export default async function SideQuestsPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-400">No side quests found.</p>
+            <p className="text-gray-400">{t.sidequests.empty}</p>
           )}
 
           <div className="mt-12 rounded-lg border-l-4 border-green-500 bg-white/10 p-6">
@@ -133,18 +132,13 @@ export default async function SideQuestsPage() {
               className="text-lg font-bold"
               style={{ color: "#00de6d", textShadow: "0 0 10px #00de6d" }}
             >
-              Want to Contribute?
+              {t.sidequests.contributeTitle}
             </h2>
-            <p className="mt-2 text-gray-300">
-              Are you a talented developer interested in contributing to
-              OnThePixel's projects? We're always looking for passionate
-              individuals to join our development team. Apply now and become
-              part of the team!
-            </p>
+            <p className="mt-2 text-gray-300">{t.sidequests.contributeText}</p>
             <div className="mt-4">
               <Link href="/apply">
                 <Button className="bg-green-700 text-white hover:bg-green-600 transition-colors">
-                  Apply Now
+                  {t.sidequests.applyNow}
                 </Button>
               </Link>
             </div>

@@ -4,6 +4,7 @@ import React, { useState, useRef } from "react";
 import Link from "next/link";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useSession, signIn } from "next-auth/react";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 const DiscordIcon = () => (
   <svg className="w-4 h-4" viewBox="0 0 127.14 96.36" fill="currentColor">
@@ -12,6 +13,7 @@ const DiscordIcon = () => (
 );
 
 export default function RedeemPage() {
+  const t = useTranslations();
   const { data: session } = useSession();
   const [code, setCode] = useState("");
   const [minecraftUsername, setMinecraftUsername] = useState("");
@@ -25,17 +27,17 @@ export default function RedeemPage() {
     e.preventDefault();
 
     if (!code.trim()) {
-      setError("Please enter your redemption code.");
+      setError(t.redeem.errors.codeRequired);
       return;
     }
 
     if (!minecraftUsername.trim()) {
-      setError("Please enter your Minecraft username.");
+      setError(t.redeem.errors.usernameRequired);
       return;
     }
 
     if (!captchaToken) {
-      setError("Please complete the captcha verification.");
+      setError(t.redeem.errors.captchaRequired);
       return;
     }
 
@@ -61,7 +63,7 @@ export default function RedeemPage() {
       setIsSubmitted(true);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to redeem. Please try again."
+        err instanceof Error ? err.message : t.redeem.errors.submitFailed,
       );
       setCaptchaToken(null);
       captchaRef.current?.resetCaptcha();
@@ -89,15 +91,13 @@ export default function RedeemPage() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold mb-4">Code redeemed successfully!</h1>
-          <p className="text-gray-400 mb-8">
-            Your code has been redeemed. The reward will be credited to your account shortly.
-          </p>
+          <h1 className="text-2xl font-bold mb-4">{t.redeem.submittedTitle}</h1>
+          <p className="text-gray-400 mb-8">{t.redeem.submittedMessage}</p>
           <Link
             href="/"
             className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
-            Back to Home
+            {t.redeem.backToHome}
           </Link>
         </div>
       </section>
@@ -112,13 +112,11 @@ export default function RedeemPage() {
             href="/"
             className="inline-block mb-6 text-sm text-gray-400 hover:text-green-400 transition-colors duration-200"
           >
-            ← Back to Home
+            ← {t.redeem.backToHome}
           </Link>
 
-          <h1 className="text-2xl font-bold mb-2">Redeem a Code</h1>
-          <p className="text-gray-400 mb-6">
-            Enter your code and Minecraft username to claim your reward.
-          </p>
+          <h1 className="text-2xl font-bold mb-2">{t.redeem.title}</h1>
+          <p className="text-gray-400 mb-6">{t.redeem.intro}</p>
 
           {/* Discord auth bar (optional) */}
           <div className="mb-6 flex items-center justify-between bg-white/5 border border-white/10 rounded-lg px-4 py-3">
@@ -133,17 +131,17 @@ export default function RedeemPage() {
                     {session.user?.name}
                   </span>
                 </div>
-                <span className="text-xs text-[#5865F2] font-medium">Discord verified ✓</span>
+                <span className="text-xs text-[#5865F2] font-medium">{t.redeem.discordVerified} ✓</span>
               </>
             ) : (
               <>
-                <span className="text-sm text-gray-400">Optional: Link your Discord</span>
+                <span className="text-sm text-gray-400">{t.redeem.discordOptional}</span>
                 <button
                   onClick={() => signIn("discord")}
                   className="flex items-center gap-2 px-3 py-1.5 bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm rounded-md transition-colors font-medium"
                 >
                   <DiscordIcon />
-                  Login
+                  {t.redeem.login}
                 </button>
               </>
             )}
@@ -152,7 +150,7 @@ export default function RedeemPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-white mb-1.5">
-                Code <span className="text-red-400" title="Required">*</span>
+                {t.redeem.labelCode} <span className="text-red-400" title={t.redeem.required}>*</span>
               </label>
               <input
                 type="text"
@@ -161,14 +159,14 @@ export default function RedeemPage() {
                   setCode(e.target.value);
                   if (error) setError(null);
                 }}
-                placeholder="e.g. PIXEL-XXXX-XXXX"
+                placeholder={t.redeem.placeholderCode}
                 className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:border-green-500 focus:outline-none text-white placeholder-gray-600 transition-colors font-mono"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-white mb-1.5">
-                Minecraft Username <span className="text-red-400" title="Required">*</span>
+                {t.redeem.labelUsername} <span className="text-red-400" title={t.redeem.required}>*</span>
               </label>
               <input
                 type="text"
@@ -177,14 +175,14 @@ export default function RedeemPage() {
                   setMinecraftUsername(e.target.value);
                   if (error) setError(null);
                 }}
-                placeholder="YourMinecraftName"
+                placeholder={t.redeem.placeholderUsername}
                 className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:border-green-500 focus:outline-none text-white placeholder-gray-600 transition-colors"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-white mb-1.5">
-                Security Verification <span className="text-red-400" title="Required">*</span>
+                {t.redeem.labelSecurity} <span className="text-red-400" title={t.redeem.required}>*</span>
               </label>
               <HCaptcha
                 ref={captchaRef}
@@ -196,7 +194,7 @@ export default function RedeemPage() {
                 onExpire={() => setCaptchaToken(null)}
                 onError={() => {
                   setCaptchaToken(null);
-                  setError("Captcha error. Please try again.");
+                  setError(t.redeem.errors.captchaError);
                 }}
                 theme="dark"
               />
@@ -213,7 +211,7 @@ export default function RedeemPage() {
               disabled={isSubmitting || !captchaToken}
               className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? "Redeeming..." : "Redeem Code"}
+              {isSubmitting ? t.redeem.submitting : t.redeem.submit}
             </button>
           </form>
         </div>
