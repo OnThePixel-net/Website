@@ -76,6 +76,11 @@ export const translations = {
       notFoundTitle: "News — OnThePixel.net",
       englishOnly: "This article is only available in English.",
       readInEnglish: "Click here to read it in English.",
+      notTranslatedTitle: "Article not available in your language",
+      notTranslatedText:
+        "This article hasn't been translated yet. Would you like to read the English version?",
+      readInEnglishButton: "Read in English",
+      goBack: "Go back",
     },
     error: {
       heading: "Something went wrong",
@@ -431,6 +436,11 @@ export const translations = {
       notFoundTitle: "Neuigkeiten — OnThePixel.net",
       englishOnly: "Dieser Artikel ist nur auf Englisch verfügbar.",
       readInEnglish: "Klicke hier, um ihn auf Englisch zu lesen.",
+      notTranslatedTitle: "Artikel in deiner Sprache nicht verfügbar",
+      notTranslatedText:
+        "Dieser Artikel wurde noch nicht übersetzt. Möchtest du die englische Version lesen?",
+      readInEnglishButton: "Auf Englisch lesen",
+      goBack: "Zurück",
     },
     error: {
       heading: "Etwas ist schiefgelaufen",

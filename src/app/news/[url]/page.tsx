@@ -8,7 +8,17 @@ import {
   DATE_LOCALES,
   DIRECTUS_LOCALES,
   Locale,
+  translations,
 } from "@/lib/i18n/translations";
+
+interface NewsTranslation {
+  id?: number;
+  News_url?: string;
+  languages_code: string;
+  title?: string | null;
+  short_description?: string | null;
+  text?: string | null;
+}
 
 interface NewsItem {
   title: string;
@@ -17,14 +27,7 @@ interface NewsItem {
   url: string;
   icon: string | null;
   short_description?: string;
-}
-
-interface NewsTranslation {
-  News_url: string;
-  languages_code: string;
-  title?: string | null;
-  short_description?: string | null;
-  text?: string | null;
+  translations?: NewsTranslation[];
 }
 
 interface PageProps {
@@ -69,37 +72,27 @@ function parseMarkdownLinks(text: string) {
 async function getNewsItem(url: string): Promise<NewsItem | null> {
   try {
     const response = await fetch(
-      `https://cms.onthepixel.net/items/News?filter%5B_and%5D%5B0%5D%5Burl%5D%5B_eq%5D=${url}`,
-      { next: { revalidate: 300 } }
-    );
-    if (!response.ok) return null;
-    const data = await response.json();
-    return data.data?.[0] ?? null;
-  } catch {
-    return null;
-  }
-}
-
-async function getNewsTranslation(
-  url: string,
-  languageCode: string,
-): Promise<NewsTranslation | null> {
-  try {
-    const response = await fetch(
-      `https://cms.onthepixel.net/items/News_translations?filter%5B_and%5D%5B0%5D%5BNews_url%5D%5B_eq%5D=${encodeURIComponent(url)}&filter%5B_and%5D%5B1%5D%5Blanguages_code%5D%5B_eq%5D=${encodeURIComponent(languageCode)}`,
+      `https://cms.onthepixel.net/items/News?fields=*,translations.*&filter%5B_and%5D%5B0%5D%5Burl%5D%5B_eq%5D=${encodeURIComponent(url)}`,
       { next: { revalidate: 300 } },
     );
     if (!response.ok) return null;
     const data = await response.json();
-    return (data.data?.[0] as NewsTranslation | undefined) ?? null;
+    return (data.data?.[0] as NewsItem | undefined) ?? null;
   } catch {
     return null;
   }
 }
 
+function findTranslation(
+  item: NewsItem,
+  languageCode: string,
+): NewsTranslation | undefined {
+  return item.translations?.find((tr) => tr.languages_code === languageCode);
+}
+
 function applyTranslation(
   item: NewsItem,
-  tr: NewsTranslation | null,
+  tr: NewsTranslation | undefined,
 ): NewsItem {
   if (!tr) return item;
   return {
@@ -115,13 +108,12 @@ function applyTranslation(
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { url } = await params;
   const locale = await getServerLocale();
-  const [base, tr] = await Promise.all([
-    getNewsItem(url),
-    locale === "en"
-      ? Promise.resolve(null)
-      : getNewsTranslation(url, DIRECTUS_LOCALES[locale]),
-  ]);
+  const base = await getNewsItem(url);
   if (!base) return { title: "News — OnThePixel.net" };
+  const tr =
+    locale === "en"
+      ? undefined
+      : findTranslation(base, DIRECTUS_LOCALES[locale]);
   const item = applyTranslation(base, tr);
   return {
     title: `${item.title} — OnThePixel.net`,
@@ -137,16 +129,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function NewsPage({ params }: PageProps) {
   const { url } = await params;
   const { locale, t } = await getServerTranslations();
-  const [base, tr] = await Promise.all([
-    getNewsItem(url),
-    locale === "en"
-      ? Promise.resolve(null)
-      : getNewsTranslation(url, DIRECTUS_LOCALES[locale]),
-  ]);
+  const base = await getNewsItem(url);
 
   if (!base) notFound();
-  const newsItem = applyTranslation(base, tr);
 
+  const tr =
+    locale === "en"
+      ? undefined
+      : findTranslation(base, DIRECTUS_LOCALES[locale]);
+
+  // Non-English locale + no translation: show confirmation page instead of
+  // the article content.
+  if (locale !== "en" && !tr) {
+    return <NotTranslatedNotice url={url} t={t} />;
+  }
+
+  const newsItem = applyTranslation(base, tr);
   const textLines = newsItem.text.split("\n");
 
   return (
@@ -162,21 +160,6 @@ export default async function NewsPage({ params }: PageProps) {
           >
             ← {t.news.backToNews}
           </Link>
-
-          {locale !== "en" && !tr && (
-            <div
-              className="mb-6 flex flex-wrap items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-200"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              <span>{t.news.englishOnly}</span>
-              <Link
-                href={`/en/news/${url}`}
-                className="font-semibold text-yellow-100 underline decoration-yellow-300/50 underline-offset-2 transition-colors hover:text-white hover:decoration-white"
-              >
-                {t.news.readInEnglish}
-              </Link>
-            </div>
-          )}
 
           {/* Hero image */}
           <div className="relative mb-8 w-full overflow-hidden rounded-xl">
@@ -282,6 +265,71 @@ export default async function NewsPage({ params }: PageProps) {
             </Link>
           </div>
 
+        </div>
+      </section>
+    </>
+  );
+}
+
+function NotTranslatedNotice({
+  url,
+  t,
+}: {
+  url: string;
+  t: (typeof translations)[Locale];
+}) {
+  return (
+    <>
+      <TopPage />
+      <section className="bg-gray-950 min-h-screen">
+        <div className="container mx-auto max-w-2xl px-4 py-16">
+          <div className="rounded-xl border border-white/5 bg-white/[0.03] p-8 md:p-10 text-center">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-yellow-500/10 text-yellow-400 ring-1 ring-yellow-500/30">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-6"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v4" />
+                <path d="M12 16h.01" />
+              </svg>
+            </div>
+            <h1
+              className="mb-3 text-xl font-bold text-white md:text-2xl"
+              style={{ fontFamily: "'Syne', sans-serif" }}
+            >
+              {t.news.notTranslatedTitle}
+            </h1>
+            <p
+              className="mx-auto mb-8 max-w-md text-sm text-white/50 md:text-base"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {t.news.notTranslatedText}
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href={`/en/news/${url}`}
+                className="rounded-lg bg-green-700 px-6 py-2.5 font-semibold text-white transition-colors hover:bg-green-600"
+                style={{ fontFamily: "'Syne', sans-serif" }}
+              >
+                {t.news.readInEnglishButton}
+              </Link>
+              <Link
+                href="/#news"
+                className="rounded-lg bg-white/5 px-6 py-2.5 font-semibold text-white ring-1 ring-white/10 transition-colors hover:bg-white/10"
+                style={{ fontFamily: "'Syne', sans-serif" }}
+              >
+                {t.news.goBack}
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </>

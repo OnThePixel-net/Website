@@ -7,20 +7,22 @@ import {
   Locale,
 } from "@/lib/i18n/translations";
 
+interface NewsTranslation {
+  id?: number;
+  News_url?: string;
+  languages_code: string;
+  title?: string | null;
+  short_description?: string | null;
+  text?: string | null;
+}
+
 interface NewsItem {
   title: string;
   date: string;
   short_description: string;
   url: string;
   icon: string | null;
-}
-
-interface NewsTranslation {
-  News_url: string;
-  languages_code: string;
-  title?: string | null;
-  short_description?: string | null;
-  text?: string | null;
+  translations?: NewsTranslation[];
 }
 
 function formatDate(dateStr: string, locale: Locale): string {
@@ -139,38 +141,26 @@ function NewsCard({
 
 async function getNews(): Promise<NewsItem[]> {
   try {
-    const response = await fetch("https://cms.onthepixel.net/items/News", {
-      next: { revalidate: 300 },
-    });
+    const response = await fetch(
+      "https://cms.onthepixel.net/items/News?fields=*,translations.*",
+      { next: { revalidate: 300 } },
+    );
     if (!response.ok) return [];
     const data = await response.json();
     return (data.data || []).sort(
       (a: NewsItem, b: NewsItem) =>
-        new Date(b.date).getTime() - new Date(a.date).getTime()
+        new Date(b.date).getTime() - new Date(a.date).getTime(),
     );
   } catch {
     return [];
   }
 }
 
-async function getNewsTranslations(
+function findTranslation(
+  item: NewsItem,
   languageCode: string,
-): Promise<Map<string, NewsTranslation>> {
-  try {
-    const response = await fetch(
-      `https://cms.onthepixel.net/items/News_translations?filter%5Blanguages_code%5D%5B_eq%5D=${encodeURIComponent(languageCode)}`,
-      { next: { revalidate: 300 } },
-    );
-    if (!response.ok) return new Map();
-    const data = await response.json();
-    const map = new Map<string, NewsTranslation>();
-    for (const tr of (data.data || []) as NewsTranslation[]) {
-      if (tr.News_url) map.set(tr.News_url, tr);
-    }
-    return map;
-  } catch {
-    return new Map();
-  }
+): NewsTranslation | undefined {
+  return item.translations?.find((tr) => tr.languages_code === languageCode);
 }
 
 function applyTranslation(
@@ -191,14 +181,9 @@ export default async function News() {
   const { locale, t } = await getServerTranslations();
   const directusLocale = DIRECTUS_LOCALES[locale];
 
-  const [baseItems, translationMap] = await Promise.all([
-    getNews(),
-    locale === "en"
-      ? Promise.resolve(new Map<string, NewsTranslation>())
-      : getNewsTranslations(directusLocale),
-  ]);
+  const baseItems = await getNews();
   const newsItems = baseItems.map((item) =>
-    applyTranslation(item, translationMap.get(item.url)),
+    locale === "en" ? item : applyTranslation(item, findTranslation(item, directusLocale)),
   );
   const featured = newsItems[0] ?? null;
   const rest = newsItems.slice(1, 3);
