@@ -5,6 +5,7 @@ import Footer from "@/components/page/footer";
 import { SiteHeader } from "@/components/page/site-header";
 import { AnalyticsProvider } from "@/components/analytics-provider";
 import SessionProvider from "@/components/SessionProvider";
+import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 const syne = Syne({
@@ -38,11 +39,13 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} ${syne.variable} ${dmSans.variable} scroll-smooth bg-gray-950`}>
         <SessionProvider>
-          <AnalyticsProvider>
-            <SiteHeader />
-            <main>{children}</main>
-            <Footer />
-          </AnalyticsProvider>
+          <LanguageProvider>
+            <AnalyticsProvider>
+              <SiteHeader />
+              <main>{children}</main>
+              <Footer />
+            </AnalyticsProvider>
+          </LanguageProvider>
         </SessionProvider>
       </body>
     </html>

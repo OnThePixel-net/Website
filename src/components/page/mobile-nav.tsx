@@ -6,14 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import Link, { LinkProps } from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
+  const t = useTranslations();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" className="w-10 px-0 sm:hidden bg-gray-950" aria-label="Open menu">
+        <Button variant="outline" className="w-10 px-0 sm:hidden bg-gray-950" aria-label={t.nav.openMenu}>
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
@@ -27,22 +30,25 @@ export function MobileNav() {
         </MobileLink>
         <div className="flex flex-col gap-3 mt-3">
           <MobileLink onOpenChange={setOpen} href="/leaderboard">
-            Leaderboard
+            {t.nav.leaderboard}
           </MobileLink>
           <MobileLink onOpenChange={setOpen} href="/stats">
-            Statistics
+            {t.nav.statistics}
           </MobileLink>
           <MobileLink onOpenChange={setOpen} href="/team">
-            Team
+            {t.nav.team}
           </MobileLink>
           <MobileLink onOpenChange={setOpen} href="/creators">
-            Creators
+            {t.nav.creators}
           </MobileLink>
           <MobileLink onOpenChange={setOpen} href="/apply">
-            Apply
+            {t.nav.apply}
           </MobileLink>
-          <Link href="https://discord.onthepixel.net">Discord</Link>
-          <Link href="https://x.com/onthepixelnet">Twitter</Link>
+          <Link href="https://discord.onthepixel.net">{t.nav.discord}</Link>
+          <Link href="https://x.com/onthepixelnet">{t.nav.twitter}</Link>
+          <div className="mt-3">
+            <LanguageSwitcher />
+          </div>
         </div>
       </SheetContent>
     </Sheet>

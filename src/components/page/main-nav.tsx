@@ -2,9 +2,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 export function MainNav() {
   const pathname = usePathname();
+  const t = useTranslations();
   return (
     <nav className="flex items-center space-x-4 lg:space-x-6">
       <Link href="/" className="mr-6 flex items-center space-x-2">
@@ -19,7 +21,7 @@ export function MainNav() {
             : "text-foreground/60",
         )}
       >
-        Leaderboard
+        {t.nav.leaderboard}
       </Link>
       <Link
         href="/stats"
@@ -30,7 +32,7 @@ export function MainNav() {
             : "text-foreground/60",
         )}
       >
-        Statistics
+        {t.nav.statistics}
       </Link>
       <Link
         href="/team"
@@ -39,7 +41,7 @@ export function MainNav() {
           pathname === "/team" ? "text-foreground" : "text-foreground/60",
         )}
       >
-        Team
+        {t.nav.team}
       </Link>
       <Link
         href="/creators"
@@ -48,7 +50,7 @@ export function MainNav() {
           pathname === "/creators" ? "text-foreground" : "text-foreground/60",
         )}
       >
-        Creators
+        {t.nav.creators}
       </Link>
       <Link
         href="/apply"
@@ -57,7 +59,7 @@ export function MainNav() {
           pathname.startsWith("/apply") ? "text-foreground" : "text-foreground/60",
         )}
       >
-        Apply
+        {t.nav.apply}
       </Link>
     </nav>
   );
