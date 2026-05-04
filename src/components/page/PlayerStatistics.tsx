@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Search, Sword, Trophy, Target, Zap, Clock, TrendingUp, Award } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { DATE_LOCALES } from "@/lib/i18n/translations";
 
 interface DuelMode {
   wins: number;
@@ -89,13 +91,13 @@ const parseColorCode = (colorCode: string | undefined): string => {
   return "#AAAAAA";
 };
 
-const extractRankName = (rankString: string | undefined): string => {
-  if (!rankString) return "Member";
+const extractRankName = (rankString: string | undefined, fallback: string): string => {
+  if (!rankString) return fallback;
   const hexBracket = rankString.match(/&#[0-9a-fA-F]{6}\[([^\]]+)\]/);
   if (hexBracket) return hexBracket[1];
   const bracket = rankString.match(/\[([^\]]+)\]/);
   if (bracket) return bracket[1];
-  return rankString.replace(/[&§][0-9a-fA-Flmnokr]/g, "").replace(/&#[0-9a-fA-F]{6}/g, "").trim() || "Member";
+  return rankString.replace(/[&§][0-9a-fA-Flmnokr]/g, "").replace(/&#[0-9a-fA-F]{6}/g, "").trim() || fallback;
 };
 
 const formatPlaytime = (ms: number | undefined): string => {
@@ -108,12 +110,12 @@ const formatPlaytime = (ms: number | undefined): string => {
   return `${mins}m`;
 };
 
-const safeDate = (s: string | undefined): string => {
+const safeDate = (s: string | undefined, dateLocale: string): string => {
   if (!s) return "—";
   try {
     const d = new Date(s);
     if (isNaN(d.getTime())) return "—";
-    return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+    return d.toLocaleDateString(dateLocale, { year: "numeric", month: "short", day: "numeric" });
   } catch { return "—"; }
 };
 
@@ -141,6 +143,7 @@ function GameCard({ title, children }: { title: string; children: React.ReactNod
 }
 
 function ComingSoon({ title }: { title: string }) {
+  const { t } = useLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-white/[0.03] overflow-hidden">
       <div className="px-5 py-4 border-b border-white/5">
@@ -148,9 +151,9 @@ function ComingSoon({ title }: { title: string }) {
       </div>
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <span className="mb-3 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-amber-400 ring-1 ring-amber-500/20">
-          Coming Soon
+          {t.playerStatistics.comingSoonBadge}
         </span>
-        <p className="text-sm text-white/30">Statistics not yet available</p>
+        <p className="text-sm text-white/30">{t.playerStatistics.comingSoonText}</p>
       </div>
     </div>
   );
@@ -179,21 +182,22 @@ function Skeleton() {
 }
 
 function DuelsCard({ duels, username }: { duels: PlayerStats["stats"]["duels"]; username: string }) {
+  const { t } = useLanguage();
   const kitsPlayed = Object.values(duels.modes).filter((m) => m.wins + m.losses > 0).length;
 
   return (
     <div className="rounded-xl border border-white/5 bg-white/[0.03] overflow-hidden flex flex-col">
       <div className="px-5 py-4 border-b border-white/5">
-        <h3 className="font-bold text-white" style={{ fontFamily: "'Syne', sans-serif" }}>Duels</h3>
+        <h3 className="font-bold text-white" style={{ fontFamily: "'Syne', sans-serif" }}>{t.playerStatistics.duelsTitle}</h3>
       </div>
       <div className="p-5 space-y-2 flex-1">
-        <StatBox label="ELO" value={duels.elo} icon={<Trophy className="size-4" />} />
-        <StatBox label="Wins" value={duels.wins} icon={<Sword className="size-4" />} />
-        <StatBox label="Losses" value={duels.losses} />
-        <StatBox label="Games Played" value={duels.gamesPlayed} />
-        <StatBox label="Win Rate" value={`${duels.winRate.toFixed(1)}%`} icon={<TrendingUp className="size-4" />} />
-        <StatBox label="K/D Ratio" value={duels.kdr.toFixed(2)} />
-        <StatBox label="Win Streak" value={duels.winStreak} />
+        <StatBox label={t.playerStatistics.elo} value={duels.elo} icon={<Trophy className="size-4" />} />
+        <StatBox label={t.playerStatistics.wins} value={duels.wins} icon={<Sword className="size-4" />} />
+        <StatBox label={t.playerStatistics.losses} value={duels.losses} />
+        <StatBox label={t.playerStatistics.gamesPlayed} value={duels.gamesPlayed} />
+        <StatBox label={t.playerStatistics.winRate} value={`${duels.winRate.toFixed(1)}%`} icon={<TrendingUp className="size-4" />} />
+        <StatBox label={t.playerStatistics.kdRatio} value={duels.kdr.toFixed(2)} />
+        <StatBox label={t.playerStatistics.winStreak} value={duels.winStreak} />
       </div>
       {kitsPlayed > 0 && (
         <Link
@@ -201,7 +205,7 @@ function DuelsCard({ duels, username }: { duels: PlayerStats["stats"]["duels"]; 
           className="flex items-center justify-between border-t border-white/5 px-5 py-3 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-green-400 group"
         >
           <span className="text-xs font-semibold uppercase tracking-wide">
-            View all {kitsPlayed} kits
+            {t.playerStatistics.viewAllKits.replace("{count}", String(kitsPlayed))}
           </span>
           <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
         </Link>
@@ -212,6 +216,8 @@ function DuelsCard({ duels, username }: { duels: PlayerStats["stats"]["duels"]; 
 
 export default function PlayerStatistics({ initialUsername }: PlayerStatisticsProps) {
   const router = useRouter();
+  const { locale, t } = useLanguage();
+  const dateLocale = DATE_LOCALES[locale];
   const [username, setUsername] = useState(initialUsername || "");
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState(false);
@@ -232,7 +238,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
           uuid: "",
           firstLogin: "",
           lastLogin: "",
-          rank: { id: "Member", color: "#AAAAAA" },
+          rank: { id: t.playerStatistics.memberFallback, color: "#AAAAAA" },
         },
         stats: {
           playtime: { total: 0, pretty: "0m" },
@@ -275,7 +281,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
         if (d?.uuid) {
           playerData.playerinfo.uuid = d.uuid;
           playerData.playerinfo.rank = {
-            id: extractRankName(d.rank),
+            id: extractRankName(d.rank, t.playerStatistics.memberFallback),
             color: parseColorCode(d.rank),
           };
           playerFound = true;
@@ -334,11 +340,11 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
         router.push(`/stats/${name}`, { scroll: false });
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t.playerStatistics.genericError);
     } finally {
       setLoading(false);
     }
-  }, [router, initialUsername]);
+  }, [router, initialUsername, t]);
 
   useEffect(() => {
     if (initialUsername) fetchPlayerStats(initialUsername);
@@ -351,10 +357,8 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
         {/* Page header — same style as TEAM / CREATORS */}
         <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">STATISTICS</h1>
-            <p className="mt-1 text-sm text-white/40">
-              Search for any player on OnThePixel.net
-            </p>
+            <h1 className="text-3xl font-bold text-white">{t.playerStatistics.heading}</h1>
+            <p className="mt-1 text-sm text-white/40">{t.playerStatistics.intro}</p>
           </div>
 
           {/* Search bar — inline with heading on larger screens */}
@@ -366,7 +370,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchPlayerStats(username)}
-                placeholder="Minecraft username..."
+                placeholder={t.playerStatistics.placeholder}
                 className="w-full rounded-lg bg-white/5 border border-white/10 pl-10 pr-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/30 transition-all"
               />
             </div>
@@ -377,7 +381,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
             >
               {loading ? (
                 <div className="size-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : "Search"}
+              ) : t.playerStatistics.search}
             </button>
           </div>
         </div>
@@ -395,10 +399,16 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
               <Search className="size-6 text-white/30" />
             </div>
-            <h3 className="mb-2 text-base font-bold text-white">Player not found</h3>
+            <h3 className="mb-2 text-base font-bold text-white">{t.playerStatistics.notFoundTitle}</h3>
             <p className="text-sm text-white/40">
-              <span className="font-mono text-white/60">{username}</span> has never played on OnThePixel.net,
-              or the username is incorrect.
+              {t.playerStatistics.notFoundText.split("{name}").map((part, idx, arr) => (
+                <React.Fragment key={idx}>
+                  {part}
+                  {idx < arr.length - 1 && (
+                    <span className="font-mono text-white/60">{username}</span>
+                  )}
+                </React.Fragment>
+              ))}
             </p>
           </div>
         )}
@@ -440,25 +450,25 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <StatBox label="First joined" value={safeDate(stats.playerinfo.firstLogin)} icon={<Clock className="size-4" />} />
-                <StatBox label="Last online" value={safeDate(stats.playerinfo.lastLogin)} icon={<Clock className="size-4" />} />
-                <StatBox label="Playtime" value={stats.stats.playtime.pretty} icon={<Zap className="size-4" />} />
-                <StatBox label="Balance" value={`${stats.stats.balance.pixels.toLocaleString("en-US")} ✦`} icon={<Target className="size-4" />} />
+                <StatBox label={t.playerStatistics.firstJoined} value={safeDate(stats.playerinfo.firstLogin, dateLocale)} icon={<Clock className="size-4" />} />
+                <StatBox label={t.playerStatistics.lastOnline} value={safeDate(stats.playerinfo.lastLogin, dateLocale)} icon={<Clock className="size-4" />} />
+                <StatBox label={t.playerStatistics.playtime} value={stats.stats.playtime.pretty} icon={<Zap className="size-4" />} />
+                <StatBox label={t.playerStatistics.balance} value={`${stats.stats.balance.pixels.toLocaleString(dateLocale)} ✦`} icon={<Target className="size-4" />} />
               </div>
             </div>
 
             {/* Minigames */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <ComingSoon title="BedWars" />
+              <ComingSoon title={t.playerStatistics.bedwarsTitle} />
 
               <DuelsCard duels={stats.stats.duels} username={stats.playerinfo.username} />
 
-              <ComingSoon title="TNT Run" />
+              <ComingSoon title={t.playerStatistics.tntrunTitle} />
 
-              <GameCard title="BuildFFA">
-                <StatBox label="Kills" value={stats.stats.buildffa.kills} icon={<Sword className="size-4" />} />
-                <StatBox label="Deaths" value={stats.stats.buildffa.deaths} />
-                <StatBox label="K/D Ratio" value={stats.stats.buildffa.kdr.toFixed(2)} icon={<TrendingUp className="size-4" />} />
+              <GameCard title={t.playerStatistics.buildffaTitle}>
+                <StatBox label={t.playerStatistics.kills} value={stats.stats.buildffa.kills} icon={<Sword className="size-4" />} />
+                <StatBox label={t.playerStatistics.deaths} value={stats.stats.buildffa.deaths} />
+                <StatBox label={t.playerStatistics.kdRatio} value={stats.stats.buildffa.kdr.toFixed(2)} icon={<TrendingUp className="size-4" />} />
               </GameCard>
             </div>
           </div>
@@ -470,10 +480,8 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
               <Search className="size-6 text-white/30" />
             </div>
-            <h3 className="mb-2 text-base font-bold text-white">Search for a player</h3>
-            <p className="text-sm text-white/40">
-              Enter a Minecraft username above to see their stats
-            </p>
+            <h3 className="mb-2 text-base font-bold text-white">{t.playerStatistics.emptyTitle}</h3>
+            <p className="text-sm text-white/40">{t.playerStatistics.emptyText}</p>
           </div>
         )}
       </div>

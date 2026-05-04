@@ -234,7 +234,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
         {/* All Creators Section */}
         <div>
           <div className="flex items-center gap-3 mb-6">
-            <h2 className="text-xl font-bold text-white">ALL CREATORS</h2>
+            <h2 className="text-xl font-bold text-white">{t.creators.allCreators}</h2>
             <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
           </div>
 
@@ -258,7 +258,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                       />
                       <div className="ml-4 flex-1">
                         <p className="font-bold text-white">{creator.Name}</p>
-                        <p className="text-sm text-gray-400">CREATOR</p>
+                        <p className="text-sm text-gray-400">{t.creators.creatorRole}</p>
                       </div>
 
                       <div className="text-right">
@@ -267,7 +267,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                             <p className="text-lg font-bold text-white">
                               {formatFollowers(followerCount)}
                             </p>
-                            <p className="text-xs text-gray-400">Followers</p>
+                            <p className="text-xs text-gray-400">{t.creators.followers}</p>
                           </>
                         ) : null}
                       </div>
@@ -282,7 +282,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 rounded-md bg-white/5 hover:bg-white/20 transition-colors duration-200"
-                            title={`${creator.Name} auf ${platform.Icons}`}
+                            title={t.creators.onPlatform.replace("{name}", creator.Name).replace("{platform}", platform.Icons)}
                           >
                             {getIconComponent(platform.Icons)}
                           </Link>
@@ -294,7 +294,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
               })}
             </div>
           ) : (
-            <div className="text-gray-400">No creators available.</div>
+            <div className="text-gray-400">{t.creators.empty}</div>
           )}
         </div>
       </div>
