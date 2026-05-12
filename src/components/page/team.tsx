@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getServerTranslations } from "@/lib/i18n/server";
+import Reveal from "@/components/gsap/Reveal";
 
 interface Rank {
   uuid: string;
@@ -46,11 +47,19 @@ export default async function Team() {
   return (
     <section className="py-10 px-4 bg-gray-950">
       <div className="container mx-auto px-4 py-10">
-        <h1 id="team" className="text-3xl font-bold mb-4 text-white">
-          {t.team.heading}
-        </h1>
+        <Reveal direction="up">
+          <h1 id="team" className="text-3xl font-bold mb-4 text-white">
+            {t.team.heading}
+          </h1>
+        </Reveal>
         {sortedMembers.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <Reveal
+            staggerChildren
+            stagger={0.06}
+            duration={0.7}
+            distance={30}
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"
+          >
             {sortedMembers.map((member, index) => {
               const mainRank = member.Ranks;
 
@@ -85,12 +94,12 @@ export default async function Team() {
                 </div>
               );
             })}
-          </div>
+          </Reveal>
         ) : (
           <div className="text-gray-400">{t.team.empty}</div>
         )}
 
-        <div className="mt-12 p-6 bg-white/10 rounded-lg border-l-4 border-green-500">
+        <Reveal direction="up" delay={0.05} className="mt-12 p-6 bg-white/10 rounded-lg border-l-4 border-green-500">
           <h2
             className="text-lg font-bold"
             style={{ color: "#00de6d", textShadow: "0 0 10px #00de6d" }}
@@ -104,7 +113,7 @@ export default async function Team() {
           >
             {t.team.applyNow} →
           </Link>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

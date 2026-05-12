@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { getServerTranslations } from "@/lib/i18n/server";
+import Reveal from "@/components/gsap/Reveal";
 import {
   DATE_LOCALES,
   DIRECTUS_LOCALES,
@@ -209,7 +210,7 @@ export default async function News() {
     <>
       <section className="bg-gray-950 py-10 px-4">
         <div className="container mx-auto px-4 py-10">
-          <div className="mb-8">
+          <Reveal direction="up" className="mb-8">
             <h2
               id="news"
               className="text-3xl font-bold tracking-tight text-white"
@@ -217,7 +218,7 @@ export default async function News() {
             >
               {t.news.heading}
             </h2>
-          </div>
+          </Reveal>
 
           {newsItems.length === 0 ? (
             <div className="rounded-xl border border-white/5 bg-white/[0.02] px-6 py-12 text-center">
@@ -228,10 +229,18 @@ export default async function News() {
           ) : (
             <div className="flex flex-col gap-4">
               {featured && (
-                <NewsCard item={featured} index={0} featured locale={locale} />
+                <Reveal direction="up" distance={50} duration={0.9}>
+                  <NewsCard item={featured} index={0} featured locale={locale} />
+                </Reveal>
               )}
               {rest.length > 0 && (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <Reveal
+                  staggerChildren
+                  stagger={0.12}
+                  duration={0.8}
+                  distance={40}
+                  className="grid grid-cols-1 gap-4 md:grid-cols-2"
+                >
                   {rest.map((item, i) => (
                     <NewsCard
                       key={i}
@@ -240,7 +249,7 @@ export default async function News() {
                       locale={locale}
                     />
                   ))}
-                </div>
+                </Reveal>
               )}
             </div>
           )}
