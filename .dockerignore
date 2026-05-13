@@ -1,0 +1,16 @@
+.git
+.github
+node_modules
+.next
+.vercel
+.wrangler
+.open-next
+coverage
+*.log
+.env*
+!.env.example
+.vscode
+.idea
+.DS_Store
+README.md
+LICENSE
