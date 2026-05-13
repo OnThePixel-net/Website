@@ -41,20 +41,35 @@
 }
 
 ::-webkit-scrollbar {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.55rem;
+  height: 0.55rem;
   background-color: transparent;
-  position: fixed;
 }
 
 ::-webkit-scrollbar-track {
-  border-radius: 4px;
+  border-radius: 8px;
   background-color: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  border-radius: 4px;
-  background-color: #008b43;
+  border-radius: 8px;
+  background-image: linear-gradient(180deg, #00de6d 0%, #008b43 100%);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-image: linear-gradient(180deg, #1aff84 0%, #00a854 100%);
+}
+
+* {
+  scrollbar-color: #008b43 transparent;
+  scrollbar-width: thin;
+}
+
+::selection {
+  background-color: rgba(0, 222, 109, 0.35);
+  color: #fff;
 }
 
 .navbar-blur {
@@ -63,4 +78,13 @@
 
 .changelog a {
   @apply underline text-green-200;
+}
+
+@keyframes otp-shine {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
