@@ -100,7 +100,7 @@ export default function Header() {
             alt="Background Image"
             className="h-full w-full object-cover brightness-75 filter"
             height="1080"
-            src="/67971722-5ba1-4e3d-8788-c5a6ccbe042e"
+            src="/bc993216-3548-4e87-bb85-bfb349c3d3b3"
             width="1920"
           />
         </div>

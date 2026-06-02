@@ -8,7 +8,7 @@ export default function TopPage() {
         <Image
           alt="Background Image"
           className="object-cover w-full h-64 filter brightness-75"
-          src="/top.png"
+          src="https://cdn.onthepixel.net/67971722-5ba1-4e3d-8788-c5a6ccbe042e"
           width={1920}
           height={256}
           unoptimized
