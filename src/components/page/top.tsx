@@ -8,10 +8,9 @@ export default function TopPage() {
         <Image
           alt="Background Image"
           className="object-cover w-full h-64 filter brightness-75"
-          src="https://cdn.onthepixel.net/67971722-5ba1-4e3d-8788-c5a6ccbe042e"
+          src="/67971722-5ba1-4e3d-8788-c5a6ccbe042e"
           width={1920}
           height={256}
-          unoptimized
         />
         <div className="absolute inset-0">
           <div className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-transparent to-gray-950"></div>
