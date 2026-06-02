@@ -4,7 +4,12 @@ import TopPage from "@/components/page/top";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerTranslations, getServerLocale } from "@/lib/i18n/server";
-import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+import {
+  buildLocalizedMetadata,
+  SITE_NAME,
+  SITE_URL,
+  DEFAULT_OG_IMAGE,
+} from "@/lib/i18n/seo";
 import {
   DATE_LOCALES,
   DIRECTUS_LOCALES,
@@ -136,14 +141,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ? undefined
       : findTranslationFor(url, DIRECTUS_LOCALES[locale], allTr);
   const item = applyTranslation(base, tr);
-  const description = item.short_description ?? item.text.slice(0, 160);
+  const description = (item.short_description ?? item.text.slice(0, 160)).trim();
   return buildLocalizedMetadata({
     locale,
     path: `/news/${url}`,
     title: item.title,
     description,
-    image: item.icon ? `https://cdn.onthepixel.net/${item.icon}` : undefined,
+    type: "article",
+    publishedTime: toISODate(item.date),
+    image: item.icon
+      ? `https://cdn.onthepixel.net/${item.icon}?w=1200&h=630&fit=cover&auto=format`
+      : undefined,
+    imageAlt: item.title,
   });
+}
+
+function toISODate(dateStr: string): string | undefined {
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? undefined : d.toISOString();
 }
 
 export default async function NewsPage({ params }: PageProps) {
@@ -170,8 +185,43 @@ export default async function NewsPage({ params }: PageProps) {
   const newsItem = applyTranslation(base, tr);
   const textLines = newsItem.text.split("\n");
 
+  const canonicalUrl =
+    locale === "en"
+      ? `${SITE_URL}/news/${url}`
+      : `${SITE_URL}/${locale}/news/${url}`;
+  const articleImage = newsItem.icon
+    ? `https://cdn.onthepixel.net/${newsItem.icon}?w=1200&h=630&fit=cover&auto=format`
+    : DEFAULT_OG_IMAGE;
+  const publishedIso = toISODate(newsItem.date);
+  const articleDescription = (
+    newsItem.short_description ?? newsItem.text.slice(0, 160)
+  ).trim();
+
+  // NewsArticle structured data — enables rich results / Google News
+  // eligibility and lets crawlers associate the hero image with the article.
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: newsItem.title,
+    description: articleDescription,
+    image: [articleImage],
+    ...(publishedIso ? { datePublished: publishedIso, dateModified: publishedIso } : {}),
+    inLanguage: locale === "de" ? "de-DE" : "en-US",
+    mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+    author: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      logo: { "@type": "ImageObject", url: DEFAULT_OG_IMAGE },
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <TopPage />
       <section className="bg-gray-950 min-h-screen">
         <div className="container mx-auto max-w-3xl px-4 py-10">
@@ -193,6 +243,11 @@ export default async function NewsPage({ params }: PageProps) {
                 srcSet={`https://cdn.onthepixel.net/${newsItem.icon}?w=600&auto=format 600w, https://cdn.onthepixel.net/${newsItem.icon}?w=900&auto=format 900w, https://cdn.onthepixel.net/${newsItem.icon}?w=1400&auto=format 1400w`}
                 sizes="(max-width: 768px) 100vw, 768px"
                 alt={newsItem.title}
+                width={900}
+                height={506}
+                fetchPriority="high"
+                loading="eager"
+                decoding="async"
                 className="h-56 w-full object-cover md:h-72"
               />
             ) : (

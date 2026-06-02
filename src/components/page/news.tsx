@@ -74,6 +74,11 @@ function NewsCard({
               srcSet={`https://cdn.onthepixel.net/${item.icon}?w=400&auto=format 400w, https://cdn.onthepixel.net/${item.icon}?w=800&auto=format 800w, https://cdn.onthepixel.net/${item.icon}?w=1200&auto=format 1200w`}
               sizes="(max-width: 768px) 100vw, 50vw"
               alt={item.title}
+              width={800}
+              height={featured ? 450 : 320}
+              loading={featured ? "eager" : "lazy"}
+              fetchPriority={featured ? "high" : "auto"}
+              decoding="async"
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
