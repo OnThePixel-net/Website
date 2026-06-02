@@ -14,6 +14,10 @@ const HREFLANG_BY_LOCALE: Record<Locale, string> = {
  * Build a Metadata object with localized title/description, hreflang
  * language alternates and canonical URL. `path` should start with `/`
  * and not include a locale prefix.
+ *
+ * When `type` is "article", OpenGraph article metadata (published/modified
+ * time, author) is emitted so Google and social platforms treat the page
+ * as an article rather than a generic website.
  */
 export function buildLocalizedMetadata(opts: {
   locale: Locale;
@@ -21,9 +25,14 @@ export function buildLocalizedMetadata(opts: {
   title: string;
   description: string;
   image?: string;
+  imageAlt?: string;
+  type?: "website" | "article";
+  publishedTime?: string;
+  modifiedTime?: string;
 }): Metadata {
-  const { locale, path, title, description } = opts;
+  const { locale, path, title, description, type = "website" } = opts;
   const image = opts.image ?? DEFAULT_OG_IMAGE;
+  const imageAlt = opts.imageAlt ?? title;
   const cleanPath = path === "/" ? "" : path.replace(/\/$/, "");
 
   const canonical =
@@ -35,6 +44,39 @@ export function buildLocalizedMetadata(opts: {
       loc === "en" ? `${SITE_URL}${cleanPath || "/"}` : `${SITE_URL}/${loc}${cleanPath}`;
   }
 
+  // Explicit dimensions help crawlers and social platforms render the
+  // preview without re-fetching the image (and avoid cropping surprises).
+  const ogImage = {
+    url: image,
+    width: 1200,
+    height: 630,
+    alt: imageAlt,
+  };
+
+  const openGraph: NonNullable<Metadata["openGraph"]> =
+    type === "article"
+      ? {
+          title,
+          description,
+          url: canonical,
+          siteName: SITE_NAME,
+          locale: locale === "de" ? "de_DE" : "en_US",
+          type: "article",
+          publishedTime: opts.publishedTime,
+          modifiedTime: opts.modifiedTime ?? opts.publishedTime,
+          authors: [SITE_NAME],
+          images: [ogImage],
+        }
+      : {
+          title,
+          description,
+          url: canonical,
+          siteName: SITE_NAME,
+          locale: locale === "de" ? "de_DE" : "en_US",
+          type: "website",
+          images: [ogImage],
+        };
+
   return {
     title,
     description,
@@ -42,20 +84,12 @@ export function buildLocalizedMetadata(opts: {
       canonical,
       languages,
     },
-    openGraph: {
-      title,
-      description,
-      url: canonical,
-      siteName: SITE_NAME,
-      locale: locale === "de" ? "de_DE" : "en_US",
-      type: "website",
-      images: [{ url: image }],
-    },
+    openGraph,
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [image],
+      images: [{ url: image, alt: imageAlt }],
     },
   };
 }
