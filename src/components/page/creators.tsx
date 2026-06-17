@@ -246,49 +246,52 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                 return (
                   <div
                     key={index}
-                    className="m-1 flex flex-col rounded-md bg-white/10 p-6 transition-transform duration-300 hover:scale-105 relative"
+                    className="m-1 flex items-start gap-4 rounded-md bg-white/10 p-4 transition-transform duration-300 hover:scale-105 hover:bg-white/15 relative"
                   >
-                    <div className="flex items-center mb-4">
+                    <div className="relative shrink-0 rounded-lg overflow-hidden">
                       <Image
                         alt={creator.Minecraft_username}
                         src={`https://api.mcskin.me/pfp/${creator.Minecraft_username}`}
-                        width={40}
-                        height={40}
-                        className="rounded"
+                        width={64}
+                        height={64}
+                        className="rounded-lg object-cover"
                       />
-                      <div className="ml-4 flex-1">
-                        <p className="font-bold text-white">{creator.Name}</p>
-                        <p className="text-sm text-gray-400">{t.creators.creatorRole}</p>
-                      </div>
+                    </div>
 
-                      <div className="text-right">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-white truncate">{creator.Name}</p>
+                          <p className="text-sm text-gray-400">{t.creators.creatorRole}</p>
+                        </div>
+
                         {followerCount !== undefined ? (
-                          <>
+                          <div className="text-right shrink-0">
                             <p className="text-lg font-bold text-white">
                               {formatFollowers(followerCount)}
                             </p>
                             <p className="text-xs text-gray-400">{t.creators.followers}</p>
-                          </>
+                          </div>
                         ) : null}
                       </div>
-                    </div>
 
-                    {creator.Platforms && creator.Platforms.length > 0 && (
-                      <div className="flex flex-wrap gap-3 mt-auto">
-                        {creator.Platforms.map((platform, platformIndex) => (
-                          <Link
-                            key={platformIndex}
-                            href={platform.Link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 rounded-md bg-white/5 hover:bg-white/20 transition-colors duration-200"
-                            title={t.creators.onPlatform.replace("{name}", creator.Name).replace("{platform}", platform.Icons)}
-                          >
-                            {getIconComponent(platform.Icons)}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
+                      {creator.Platforms && creator.Platforms.length > 0 && (
+                        <div className="flex flex-wrap gap-3 mt-3">
+                          {creator.Platforms.map((platform, platformIndex) => (
+                            <Link
+                              key={platformIndex}
+                              href={platform.Link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 rounded-md bg-white/5 hover:bg-white/20 transition-colors duration-200"
+                              title={t.creators.onPlatform.replace("{name}", creator.Name).replace("{platform}", platform.Icons)}
+                            >
+                              {getIconComponent(platform.Icons)}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
