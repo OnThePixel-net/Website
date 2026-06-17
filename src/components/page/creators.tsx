@@ -251,7 +251,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                     <div className="flex items-center mb-4">
                       <Image
                         alt={creator.Minecraft_username}
-                        src={`https://mcskin.me/api/head/${creator.Minecraft_username}.png`}
+                        src={`https://api.mcskin.me/pfp/${creator.Minecraft_username}`}
                         width={40}
                         height={40}
                         className="rounded"
