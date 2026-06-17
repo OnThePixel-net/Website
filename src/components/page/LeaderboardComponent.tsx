@@ -141,7 +141,7 @@ export default function LeaderboardComponent({
                         <div className="flex items-center gap-2">
                           <Avatar className="h-8 w-8">
                             <AvatarImage
-                              src={`https://mcskin.me/api/head/${item.username}.png`}
+                              src={`https://api.mcskin.me/head/${item.username}.png`}
                               alt={item.username}
                             />
                             <AvatarFallback>
