@@ -71,7 +71,7 @@ export default async function Team() {
                   <div className="relative shrink-0 rounded-lg overflow-hidden">
                     <Image
                       alt={member.minecraft_username}
-                      src={`https://api.mcskin.me/pfp/${member.minecraft_username}.png?transparent=true`}
+                      src={`https://api.mcskin.me/pfp/${member.minecraft_username}`}
                       width={64}
                       height={64}
                       className="rounded-lg object-cover"

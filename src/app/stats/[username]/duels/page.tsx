@@ -142,7 +142,7 @@ export default async function DuelsKitsPage({ params }: PageProps) {
           {/* Header */}
           <div className="flex items-center gap-4 mb-4">
             <Image
-              src={`https://mcskin.me/api/pfp/${username}.png?transparent=true`}
+              src={`https://api.mcskin.me/pfp/${username}`}
               alt={username}
               width={56}
               height={56}

@@ -424,7 +424,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 mb-6">
                 <div className="shrink-0">
                   <Image
-                    src={`https://mcskin.me/api/pfp/${stats.playerinfo.username}.png?transparent=true`}
+                    src={`https://api.mcskin.me/pfp/${stats.playerinfo.username}`}
                     alt={stats.playerinfo.username}
                     width={80}
                     height={80}
