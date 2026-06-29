@@ -2,17 +2,14 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+import { Users, Search, ExternalLink, RefreshCw } from "lucide-react";
 import {
-  Users,
-  Search,
-  ExternalLink,
-  RefreshCw,
-  Youtube,
-  Twitch,
-  Instagram,
-  Twitter,
-  Globe,
-} from "lucide-react";
+  FaYoutube,
+  FaTwitch,
+  FaInstagram,
+  FaTwitter,
+  FaGlobe,
+} from "react-icons/fa";
 import AuthGuard from "../auth-guard";
 
 interface Platform {
@@ -27,16 +24,16 @@ interface Creator {
 }
 
 const PLATFORM_ICONS: Record<string, React.ReactNode> = {
-  youtube: <Youtube size={13} className="text-red-400" />,
-  twitch: <Twitch size={13} className="text-purple-400" />,
-  instagram: <Instagram size={13} className="text-pink-400" />,
-  twitter: <Twitter size={13} className="text-blue-400" />,
-  x_twitter: <Twitter size={13} className="text-blue-400" />,
+  youtube: <FaYoutube size={13} className="text-red-400" />,
+  twitch: <FaTwitch size={13} className="text-purple-400" />,
+  instagram: <FaInstagram size={13} className="text-pink-400" />,
+  twitter: <FaTwitter size={13} className="text-blue-400" />,
+  x_twitter: <FaTwitter size={13} className="text-blue-400" />,
 };
 
 function PlatformBadge({ platform }: { platform: Platform }) {
   const key = platform.Icons.toLowerCase();
-  const icon = PLATFORM_ICONS[key] ?? <Globe size={13} className="text-white/40" />;
+  const icon = PLATFORM_ICONS[key] ?? <FaGlobe size={13} className="text-white/40" />;
   return (
     <a
       href={platform.Link}
