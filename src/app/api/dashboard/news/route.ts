@@ -16,7 +16,10 @@ export async function GET() {
     const items = await getDb().select().from(schema.news).orderBy(desc(schema.news.published_at));
     return NextResponse.json({ data: items });
   } catch (e) {
-    return NextResponse.json({ error: String(e) }, { status: 500 });
+    const msg = e instanceof Error ? e.message : String(e);
+    const detail = (e as { cause?: unknown })?.cause;
+    console.error("[news GET]", e);
+    return NextResponse.json({ error: msg, detail: String(detail ?? "") }, { status: 500 });
   }
 }
 
