@@ -21,7 +21,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   if (!session) {
-    redirect("/api/auth/signin");
+    redirect("/dashboard/login");
   }
 
   const discordId = (session.user as { discordId?: string })?.discordId;
