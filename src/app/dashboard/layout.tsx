@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  Shield,
 } from "lucide-react";
 
 const navItems = [
@@ -117,21 +118,40 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
+
+  const isLoginPage = pathname === "/dashboard/login";
+  const isAuthenticated = status === "authenticated" && !!session;
+
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-950">
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {isAuthenticated && (
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      )}
 
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-white/5 bg-gray-950/80 px-4 backdrop-blur-md">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="rounded-md p-1.5 text-white/40 hover:text-white lg:hidden"
-          >
-            <Menu size={20} />
-          </button>
-        </header>
-        <main className="p-6">{children}</main>
+      <div className={isAuthenticated ? "lg:pl-64" : ""}>
+        {isAuthenticated && (
+          <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-white/5 bg-gray-950/80 px-4 backdrop-blur-md">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="rounded-md p-1.5 text-white/40 hover:text-white lg:hidden"
+            >
+              <Menu size={20} />
+            </button>
+            <div className="flex items-center gap-2 text-white/20 lg:hidden">
+              <Shield size={14} className="text-green-400/60" />
+              <span className="text-xs font-semibold" style={{ fontFamily: "'Syne', sans-serif" }}>
+                OTP <span className="text-green-400">Admin</span>
+              </span>
+            </div>
+          </header>
+        )}
+        <main className={isAuthenticated ? "p-6" : ""}>{children}</main>
       </div>
     </div>
   );

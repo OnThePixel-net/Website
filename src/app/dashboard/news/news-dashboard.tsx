@@ -146,114 +146,188 @@ function Editor({ initial, onSave, onCancel }: { initial: NewsItem | null; onSav
     }
   };
 
+  const wordCount = form.content.trim() ? form.content.trim().split(/\s+/).length : 0;
+  const charCount = form.content.length;
+
   return (
     <div>
-      <div className="mb-6 flex items-center gap-3">
-        <button onClick={onCancel} className="flex items-center gap-1.5 text-sm text-white/40 hover:text-white transition-colors">
-          <ChevronLeft size={16} /> Back
+      {/* Header */}
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button onClick={onCancel} className="flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 text-sm text-white/40 hover:border-white/20 hover:text-white transition-all">
+            <ChevronLeft size={15} /> Back
+          </button>
+          <span className="text-white/10">/</span>
+          <h1 className="text-xl font-bold text-white" style={{ fontFamily: "'Syne', sans-serif" }}>
+            {isNew ? "New Article" : "Edit Article"}
+          </h1>
+          {!isNew && (
+            <span className="rounded-full border border-yellow-500/20 bg-yellow-500/10 px-2.5 py-0.5 text-xs font-medium text-yellow-400">
+              Editing
+            </span>
+          )}
+        </div>
+        {/* Quick save top bar */}
+        <button type="button" onClick={handleSubmit} disabled={loading} className="hidden sm:flex items-center gap-2 rounded-xl bg-green-500 px-5 py-2 text-sm font-semibold text-black hover:bg-green-400 disabled:opacity-60 transition-colors">
+          {loading ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
+          {isNew ? "Publish" : "Save changes"}
         </button>
-        <span className="text-white/20">/</span>
-        <h1 className="text-xl font-bold text-white" style={{ fontFamily: "'Syne', sans-serif" }}>
-          {isNew ? "New Article" : "Edit Article"}
-        </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid gap-5 lg:grid-cols-3">
-        {/* Main */}
+      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-3">
+        {/* Main content area */}
         <div className="flex flex-col gap-5 lg:col-span-2">
-          <div className="rounded-xl border border-white/5 bg-white/[0.03] p-5">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-white/30">Content</p>
-            <div className="flex flex-col gap-4">
-              <Field label="Title *">
-                <Input value={form.title} onChange={(e) => handleTitleChange(e.target.value)} placeholder="Article headline…" />
-              </Field>
-              <Field label="Short description *">
-                <Textarea value={form.short_description} onChange={(e) => set("short_description", e.target.value)} rows={2} placeholder="Summary shown on the news list…" />
-              </Field>
-              <Field label="Full content">
-                <Textarea value={form.content} onChange={(e) => set("content", e.target.value)} rows={14} placeholder="Write the full article here…" style={{ fontFamily: "monospace", fontSize: "0.8rem" }} />
-              </Field>
+          {/* Title card */}
+          <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 shadow-sm">
+            <Field label="Headline *">
+              <input
+                value={form.title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                placeholder="Write an engaging headline…"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-lg font-semibold text-white outline-none placeholder-white/15 focus:border-green-500/40 focus:ring-1 focus:ring-green-500/20 transition-all"
+              />
+            </Field>
+          </div>
+
+          {/* Description card */}
+          <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/25">Teaser</p>
+              <span className="text-xs text-white/20">{form.short_description.length} chars</span>
+            </div>
+            <Textarea
+              value={form.short_description}
+              onChange={(e) => set("short_description", e.target.value)}
+              rows={3}
+              placeholder="Short summary shown on the news list and in previews…"
+            />
+          </div>
+
+          {/* Content card */}
+          <div className="rounded-2xl border border-white/5 bg-white/[0.02] shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between border-b border-white/5 px-6 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/25">Article body</p>
+              <div className="flex items-center gap-3 text-xs text-white/20">
+                <span>{wordCount} words</span>
+                <span className="text-white/10">·</span>
+                <span>{charCount} chars</span>
+              </div>
+            </div>
+            <div className="p-6">
+              <textarea
+                value={form.content}
+                onChange={(e) => set("content", e.target.value)}
+                rows={20}
+                placeholder="Write the full article here…"
+                className="w-full rounded-xl border border-white/8 bg-black/20 px-4 py-3 text-sm text-white/90 outline-none placeholder-white/15 focus:border-green-500/30 focus:ring-1 focus:ring-green-500/15 resize-y transition-all"
+                style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace", lineHeight: "1.7" }}
+              />
             </div>
           </div>
         </div>
 
-        {/* Sidebar */}
-        <div className="flex flex-col gap-4">
+        {/* Sidebar panels */}
+        <div className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
           {error && (
-            <div className="flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-300">
-              <AlertCircle size={15} className="mt-0.5 shrink-0" /> {error}
+            <div className="flex items-start gap-2.5 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-300">
+              <AlertCircle size={15} className="mt-0.5 shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
-          <div className="rounded-xl border border-white/5 bg-white/[0.03] p-5">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-white/30">Publish</p>
-            <div className="flex flex-col gap-4">
-              <Field label="Date *">
+          {/* Publish settings */}
+          <div className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden shadow-sm">
+            <div className="border-b border-white/5 px-5 py-3.5">
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/25">Publish</p>
+            </div>
+            <div className="flex flex-col gap-4 p-5">
+              <Field label="Publish date *">
                 <Input type="date" value={form.published_at} onChange={(e) => set("published_at", e.target.value)} />
               </Field>
               <Field label="URL slug *">
-                <div className="flex items-center overflow-hidden rounded-lg border border-white/10 bg-white/5 focus-within:border-green-500/40 focus-within:ring-1 focus-within:ring-green-500/20">
-                  <span className="shrink-0 pl-3 text-xs text-white/20">/news/</span>
+                <div className="flex items-center overflow-hidden rounded-lg border border-white/10 bg-white/5 focus-within:border-green-500/40 focus-within:ring-1 focus-within:ring-green-500/20 transition-all">
+                  <span className="shrink-0 border-r border-white/10 bg-white/5 px-3 py-2 text-xs text-white/20">/news/</span>
                   <input
                     type="text"
                     value={form.slug}
                     onChange={(e) => { setSlugTouched(true); set("slug", e.target.value); }}
                     placeholder="my-article"
-                    className="flex-1 bg-transparent py-2 pr-3 text-sm text-white outline-none placeholder-white/20"
+                    className="flex-1 bg-transparent py-2 px-3 text-sm text-white outline-none placeholder-white/20"
                   />
                 </div>
+                {form.slug && (
+                  <a
+                    href={`/news/${form.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-white/20 hover:text-green-400 transition-colors"
+                  >
+                    <ExternalLink size={11} /> Preview URL
+                  </a>
+                )}
               </Field>
             </div>
           </div>
 
-          <div className="rounded-xl border border-white/5 bg-white/[0.03] p-5">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-white/30">Cover image</p>
-            <Field label="Image URL">
-              <div className="flex items-center gap-2">
-                <div className="flex flex-1 items-center overflow-hidden rounded-lg border border-white/10 bg-white/5 focus-within:border-green-500/40 focus-within:ring-1 focus-within:ring-green-500/20">
+          {/* Cover image */}
+          <div className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden shadow-sm">
+            <div className="border-b border-white/5 px-5 py-3.5">
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/25">Cover image</p>
+            </div>
+            <div className="p-5">
+              {form.image_url && !imgError ? (
+                <div className="mb-4 group relative overflow-hidden rounded-xl border border-white/5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={form.image_url}
+                    alt="Preview"
+                    onError={() => setImgError(true)}
+                    className="h-36 w-full object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      onClick={() => { set("image_url", null); setImgError(false); }}
+                      className="flex items-center gap-1.5 rounded-lg bg-red-500/80 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-500 transition-colors"
+                    >
+                      <X size={12} /> Remove
+                    </button>
+                  </div>
+                </div>
+              ) : imgError ? (
+                <div className="mb-4 flex h-20 items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/5 text-xs text-red-400/60">
+                  <AlertCircle size={13} /> Could not load image
+                </div>
+              ) : null}
+
+              <Field label="Image URL">
+                <div className="flex items-center overflow-hidden rounded-lg border border-white/10 bg-white/5 focus-within:border-green-500/40 focus-within:ring-1 focus-within:ring-green-500/20 transition-all">
                   <LinkIcon size={13} className="ml-3 shrink-0 text-white/20" />
                   <input
                     type="url"
                     value={form.image_url ?? ""}
                     onChange={(e) => { set("image_url", e.target.value || null); setImgError(false); }}
-                    placeholder="https://example.com/image.jpg"
+                    placeholder="https://…"
                     className="flex-1 bg-transparent py-2 pl-2 pr-3 text-sm text-white outline-none placeholder-white/20"
                   />
+                  {form.image_url && (
+                    <button type="button" onClick={() => { set("image_url", null); setImgError(false); }} className="mr-2 rounded p-1 text-white/20 hover:text-white/60 transition-colors">
+                      <X size={13} />
+                    </button>
+                  )}
                 </div>
-                {form.image_url && (
-                  <button type="button" onClick={() => set("image_url", null)} className="rounded-lg border border-white/10 p-2 text-white/30 hover:text-white transition-colors">
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
-            </Field>
-
-            {form.image_url && (
-              <div className="mt-3 overflow-hidden rounded-lg border border-white/5">
-                {imgError ? (
-                  <div className="flex h-28 items-center justify-center gap-2 bg-white/5 text-xs text-white/30">
-                    <AlertCircle size={14} /> Could not load image
-                  </div>
-                ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={form.image_url}
-                    alt="Preview"
-                    onError={() => setImgError(true)}
-                    className="h-28 w-full object-cover"
-                  />
-                )}
-              </div>
-            )}
+              </Field>
+            </div>
           </div>
 
-          <div className="flex gap-2">
-            <button type="button" onClick={onCancel} className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 py-2.5 text-sm text-white/50 hover:bg-white/5 hover:text-white transition-colors">
-              <X size={15} /> Cancel
-            </button>
-            <button type="submit" disabled={loading} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-green-500 py-2.5 text-sm font-semibold text-black hover:bg-green-400 disabled:opacity-60 transition-colors">
+          {/* Action buttons */}
+          <div className="flex flex-col gap-2">
+            <button type="submit" disabled={loading} className="flex items-center justify-center gap-2 rounded-xl bg-green-500 py-3 text-sm font-semibold text-black hover:bg-green-400 disabled:opacity-60 transition-colors shadow-lg shadow-green-500/10">
               {loading ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-              {isNew ? "Publish" : "Save"}
+              {isNew ? "Publish article" : "Save changes"}
+            </button>
+            <button type="button" onClick={onCancel} className="flex items-center justify-center gap-2 rounded-xl border border-white/8 py-2.5 text-sm text-white/40 hover:bg-white/5 hover:text-white/70 transition-colors">
+              <X size={14} /> Discard
             </button>
           </div>
         </div>
