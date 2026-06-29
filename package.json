@@ -33,7 +33,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "gsap": "^3.15.0",
-    "lucide-react": "^1.21.0",
+    "lucide-react": "^1.22.0",
     "next": "^16.2.9",
     "next-auth": "^5.0.0-beta.30",
     "react": "^19.2.7",
@@ -57,7 +57,7 @@
     "eslint": "^10.6.0",
     "eslint-config-next": "^16.2.9",
     "eslint-plugin-drizzle": "^0.2.3",
-    "postcss": "^8.5.15",
+    "postcss": "^8.5.16",
     "prettier": "^3.9.1",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4.3.1",
@@ -71,7 +71,7 @@
     "yargs": "17.7.2",
     "yargs-parser": "21.1.1",
     "eslint-visitor-keys": "3.4.3",
-    "postcss": "^8.5.15",
+    "postcss": "^8.5.16",
     "ws": "^8.21.0"
   }
 }
