@@ -8,6 +8,7 @@ export const news = pgTable("news", {
   content: text("content").notNull().default(""),
   image_url: text("image_url"),
   published_at: text("published_at").notNull(),
+  author: text("author").notNull().default(""),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

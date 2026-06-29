@@ -16,7 +16,7 @@ export async function PATCH(
   const { id } = await params;
   try {
     const body = await req.json();
-    const { title, slug, short_description, content, image_url, published_at } = body;
+    const { title, slug, short_description, content, image_url, published_at, author } = body;
     const [item] = await getDb()
       .update(schema.news)
       .set({
@@ -26,6 +26,7 @@ export async function PATCH(
         ...(content !== undefined && { content }),
         ...(image_url !== undefined && { image_url }),
         ...(published_at !== undefined && { published_at }),
+        ...(author !== undefined && { author }),
         updated_at: new Date(),
       })
       .where(eq(schema.news.id, Number(id)))
