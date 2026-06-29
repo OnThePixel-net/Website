@@ -26,7 +26,7 @@ export async function PATCH(
         ...(content !== undefined && { content }),
         ...(image_url !== undefined && { image_url }),
         ...(published_at !== undefined && { published_at }),
-        updated_at: new Date().toISOString(),
+        updated_at: new Date(),
       })
       .where(eq(schema.news.id, Number(id)))
       .returning();

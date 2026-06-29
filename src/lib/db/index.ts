@@ -1,16 +1,17 @@
-import { createClient } from "@libsql/client/http";
-import { drizzle } from "drizzle-orm/libsql";
+import postgres from "postgres";
+import { drizzle } from "drizzle-orm/postgres-js";
 import * as schema from "./schema";
 
-function getClient() {
-  const url = process.env.TURSO_URL;
-  const authToken = process.env.TURSO_AUTH_TOKEN;
-  if (!url) throw new Error("TURSO_URL is not set");
-  return createClient({ url, authToken });
-}
+let _db: ReturnType<typeof drizzle> | null = null;
 
 export function getDb() {
-  return drizzle(getClient(), { schema });
+  if (!_db) {
+    const url = process.env.DATABASE_URL;
+    if (!url) throw new Error("DATABASE_URL is not set");
+    const client = postgres(url, { ssl: "require", max: 5 });
+    _db = drizzle(client, { schema });
+  }
+  return _db;
 }
 
 export { schema };
