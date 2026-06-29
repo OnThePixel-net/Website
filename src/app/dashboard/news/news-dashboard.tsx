@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ExternalLink,
   Link as LinkIcon,
+  User,
 } from "lucide-react";
 import AuthGuard from "../auth-guard";
 
@@ -28,6 +29,7 @@ interface NewsItem {
   content: string;
   image_url: string | null;
   published_at: string;
+  author: string;
 }
 
 const EMPTY: Omit<NewsItem, "id"> = {
@@ -37,6 +39,7 @@ const EMPTY: Omit<NewsItem, "id"> = {
   content: "",
   image_url: null,
   published_at: new Date().toISOString().slice(0, 10),
+  author: "",
 };
 
 function slugify(str: string) {
@@ -115,7 +118,7 @@ function Editor({ initial, onSave, onCancel }: { initial: NewsItem | null; onSav
   const isNew = !initial?.id;
   const [form, setForm] = useState<Omit<NewsItem, "id">>(
     initial
-      ? { title: initial.title, slug: initial.slug, short_description: initial.short_description, content: initial.content, image_url: initial.image_url, published_at: initial.published_at?.slice(0, 10) }
+      ? { title: initial.title, slug: initial.slug, short_description: initial.short_description, content: initial.content, image_url: initial.image_url, published_at: initial.published_at?.slice(0, 10), author: initial.author ?? "" }
       : { ...EMPTY },
   );
   const [loading, setLoading] = useState(false);
@@ -241,6 +244,18 @@ function Editor({ initial, onSave, onCancel }: { initial: NewsItem | null; onSav
               <p className="text-xs font-semibold uppercase tracking-wider text-white/25">Publish</p>
             </div>
             <div className="flex flex-col gap-4 p-5">
+              <Field label="Author">
+                <div className="flex items-center overflow-hidden rounded-lg border border-white/10 bg-white/5 focus-within:border-green-500/40 focus-within:ring-1 focus-within:ring-green-500/20 transition-all">
+                  <User size={13} className="ml-3 shrink-0 text-white/20" />
+                  <input
+                    type="text"
+                    value={form.author}
+                    onChange={(e) => set("author", e.target.value)}
+                    placeholder="Name des Autors…"
+                    className="flex-1 bg-transparent py-2 px-3 text-sm text-white outline-none placeholder-white/20"
+                  />
+                </div>
+              </Field>
               <Field label="Publish date *">
                 <Input type="date" value={form.published_at} onChange={(e) => set("published_at", e.target.value)} />
               </Field>
@@ -358,6 +373,15 @@ function NewsRow({ item, onEdit, onDelete }: { item: NewsItem; onEdit: (i: NewsI
       </td>
       <td className="px-3 py-3">
         <p className="line-clamp-2 text-xs text-white/40">{item.short_description}</p>
+      </td>
+      <td className="px-3 py-3 whitespace-nowrap">
+        {item.author ? (
+          <div className="flex items-center gap-1.5 text-xs text-white/50">
+            <User size={11} className="text-white/25" /> {item.author}
+          </div>
+        ) : (
+          <span className="text-xs text-white/15">—</span>
+        )}
       </td>
       <td className="px-3 py-3 whitespace-nowrap">
         <div className="flex items-center gap-1.5 text-xs text-white/40">
@@ -480,11 +504,12 @@ function NewsDashboardContent() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[680px]">
+            <table className="w-full min-w-[820px]">
               <thead>
                 <tr className="border-b border-white/5">
                   <th className="py-3 pl-4 pr-3 text-left text-xs font-medium uppercase tracking-wider text-white/30">Article</th>
                   <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/30">Description</th>
+                  <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/30">Author</th>
                   <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/30">Date</th>
                   <th className="py-3 pl-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-white/30">Actions</th>
                 </tr>
