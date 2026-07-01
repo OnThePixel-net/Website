@@ -269,12 +269,14 @@ export default async function NewsPage({ params }: PageProps) {
           <div className="mb-8 flex flex-wrap items-center gap-x-4 gap-y-2">
             {item.author && (
               <div className="flex items-center gap-2">
-                <div
-                  className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold uppercase text-black"
-                  style={{ background: "linear-gradient(135deg, #00de6d, #00b356)" }}
-                >
-                  {item.author.charAt(0)}
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`https://api.mcskin.me/pfp/${encodeURIComponent(item.author)}?size=128`}
+                  alt={item.author}
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 rounded-full object-cover"
+                />
                 <span
                   className="text-sm font-medium text-white/70"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
@@ -352,12 +354,14 @@ export default async function NewsPage({ params }: PageProps) {
           {/* Author card */}
           {item.author && (
             <div className="mt-8 flex items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.02] p-5">
-              <div
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold uppercase text-black"
-                style={{ background: "linear-gradient(135deg, #00de6d, #00b356)" }}
-              >
-                {item.author.charAt(0)}
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://api.mcskin.me/pfp/${encodeURIComponent(item.author)}?size=128`}
+                alt={item.author}
+                width={48}
+                height={48}
+                className="h-12 w-12 shrink-0 rounded-full object-cover"
+              />
               <div>
                 <p
                   className="text-xs font-semibold uppercase tracking-wider text-white/25"

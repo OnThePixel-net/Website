@@ -140,9 +140,19 @@ function NewsCard({
             {description}
           </p>
           {item.author && (
-            <p className="mt-auto pt-2 text-xs text-white/25" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              {item.author}
-            </p>
+            <div className="mt-auto flex items-center gap-1.5 pt-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://api.mcskin.me/pfp/${encodeURIComponent(item.author)}?size=64`}
+                alt={item.author}
+                width={16}
+                height={16}
+                className="h-4 w-4 rounded-full object-cover"
+              />
+              <p className="text-xs text-white/30" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                {item.author}
+              </p>
+            </div>
           )}
         </div>
       </article>
