@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getDb, schema } from "@/lib/db";
 import { ensureTable } from "@/lib/db/migrate";
-import { desc, eq } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 
 async function checkAuth() {
   const session = await auth();
