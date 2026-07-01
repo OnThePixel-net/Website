@@ -35,9 +35,10 @@ export default function CookieConsent() {
     localStorage.setItem("cookie-consent", "accepted");
     window.localStorage.setItem(
       "va-preferences",
-      JSON.stringify({ analytics: true, youtube: true }),
+      JSON.stringify({ analytics: true, youtube: true, twitch: true }),
     );
     window.dispatchEvent(new Event("youtube-consent-changed"));
+    window.dispatchEvent(new Event("twitch-consent-changed"));
     dismissBanner();
   };
 
@@ -45,9 +46,10 @@ export default function CookieConsent() {
     localStorage.setItem("cookie-consent", "declined");
     window.localStorage.setItem(
       "va-preferences",
-      JSON.stringify({ analytics: false, youtube: false }),
+      JSON.stringify({ analytics: false, youtube: false, twitch: false }),
     );
     window.dispatchEvent(new Event("youtube-consent-changed"));
+    window.dispatchEvent(new Event("twitch-consent-changed"));
     dismissBanner();
   };
 

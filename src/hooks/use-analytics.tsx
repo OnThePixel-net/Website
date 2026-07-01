@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 type AnalyticsPreferences = {
   analytics: boolean;
   youtube: boolean;
+  twitch: boolean;
 };
 
 export function useAnalytics() {
-  const [preferences, setPreferences] = useState<AnalyticsPreferences>({ analytics: false, youtube: false });
+  const [preferences, setPreferences] = useState<AnalyticsPreferences>({ analytics: false, youtube: false, twitch: false });
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -43,8 +44,9 @@ export function useAnalytics() {
   const resetPreferences = () => {
     localStorage.removeItem("va-preferences");
     localStorage.removeItem("cookie-consent");
-    setPreferences({ analytics: false, youtube: false });
+    setPreferences({ analytics: false, youtube: false, twitch: false });
     window.dispatchEvent(new Event("youtube-consent-changed"));
+    window.dispatchEvent(new Event("twitch-consent-changed"));
   };
 
   return {

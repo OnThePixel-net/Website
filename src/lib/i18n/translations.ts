@@ -375,6 +375,9 @@ export const translations = {
       youtubeLabel: "YouTube & Embedded Media",
       youtubeDesc:
         "Required to play embedded YouTube videos. Google/YouTube may set cookies and track your usage.",
+      twitchLabel: "Twitch Live Streams",
+      twitchDesc:
+        "Required to display embedded Twitch streams on the Creators page. Twitch/Amazon may set cookies and track your usage.",
       howWeUseTitle: "How we use cookies",
       howWeUseText:
         "OnThePixel.net uses cookies to enhance your experience, analyze site usage, and assist in our marketing efforts. We use Vercel Analytics to collect information about how visitors use our website. This data is anonymized and helps us improve our services.",
@@ -389,6 +392,13 @@ export const translations = {
       description:
         "To play this video, YouTube cookies will be set. Google may track your usage across sites.",
       accept: "Load video & accept cookies",
+      learnMore: "Learn more in our Privacy Policy",
+    },
+    twitchEmbed: {
+      title: "Twitch Live Stream",
+      description:
+        "To show this stream, Twitch cookies will be set. Amazon/Twitch may track your usage across sites.",
+      accept: "Load stream & accept cookies",
       learnMore: "Learn more in our Privacy Policy",
     },
     playercount: {
@@ -772,6 +782,9 @@ export const translations = {
       youtubeLabel: "YouTube & Eingebettete Medien",
       youtubeDesc:
         "Erforderlich zum Abspielen eingebetteter YouTube-Videos. Google/YouTube kann dabei Cookies setzen und dein Nutzungsverhalten verfolgen.",
+      twitchLabel: "Twitch Live-Streams",
+      twitchDesc:
+        "Erforderlich zur Anzeige eingebetteter Twitch-Streams auf der Creators-Seite. Twitch/Amazon kann dabei Cookies setzen und dein Nutzungsverhalten verfolgen.",
       howWeUseTitle: "Wie wir Cookies verwenden",
       howWeUseText:
         "OnThePixel.net verwendet Cookies, um dein Erlebnis zu verbessern, die Website-Nutzung zu analysieren und unsere Marketing-Aktivitäten zu unterstützen. Wir nutzen Vercel Analytics, um Informationen darüber zu erfassen, wie Besucher unsere Website nutzen. Diese Daten werden anonymisiert und helfen uns, unseren Service zu verbessern.",
@@ -786,6 +799,13 @@ export const translations = {
       description:
         "Zum Abspielen dieses Videos werden YouTube-Cookies gesetzt. Google kann dein Nutzungsverhalten seitenübergreifend verfolgen.",
       accept: "Video laden & Cookies akzeptieren",
+      learnMore: "Mehr in unserer Datenschutzerklärung",
+    },
+    twitchEmbed: {
+      title: "Twitch Live-Stream",
+      description:
+        "Zur Anzeige dieses Streams werden Twitch-Cookies gesetzt. Amazon/Twitch kann dein Nutzungsverhalten seitenübergreifend verfolgen.",
+      accept: "Stream laden & Cookies akzeptieren",
       learnMore: "Mehr in unserer Datenschutzerklärung",
     },
     playercount: {

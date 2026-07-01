@@ -157,6 +157,28 @@ function PrivacyEN() {
         </a>
       </p>
 
+      <h3 id="twitch" className="text-lg font-semibold mt-4 mb-2">3.8 Twitch Embedded Streams</h3>
+      <p>
+        The Creators page on this website may embed live Twitch streams. Twitch is a service of Twitch
+        Interactive, Inc., a subsidiary of Amazon.com, Inc., 350 Bush Street, 2nd Floor, San Francisco, CA
+        94104, USA (&quot;Twitch&quot;). Embedded streams are only loaded after you explicitly consent by clicking
+        the &quot;Load stream &amp; accept cookies&quot; button shown in place of the player.
+      </p>
+      <p className="mt-2">
+        Once you consent, the stream is embedded via an iframe connecting to{" "}
+        <strong>player.twitch.tv</strong>. Twitch and Amazon may set cookies and receive your IP address,
+        browser information, and the URL of the page you are visiting. This data may be transferred to
+        servers in the USA.
+      </p>
+      <p className="mt-2">
+        The legal basis for this processing is your consent (Art. 6(1)(a) GDPR). You can withdraw your
+        consent at any time via the Cookie Settings button in the footer. Twitch&apos;s privacy policy is
+        available at:{" "}
+        <a href="https://www.twitch.tv/p/legal/privacy-notice/" className="text-green-400 hover:text-green-300">
+          https://www.twitch.tv/p/legal/privacy-notice/
+        </a>
+      </p>
+
       <h2 className="text-xl font-semibold mt-8 mb-4">4. Legal Basis for Processing</h2>
       <p>We process your personal data on the following legal bases under the GDPR:</p>
       <ul className="list-disc pl-6 mt-2 mb-4 space-y-2">
@@ -390,6 +412,29 @@ function PrivacyDE() {
         Datenschutzerklärung von Google ist verfügbar unter:{" "}
         <a href="https://policies.google.com/privacy" className="text-green-400 hover:text-green-300">
           https://policies.google.com/privacy
+        </a>
+      </p>
+
+      <h3 id="twitch" className="text-lg font-semibold mt-4 mb-2">3.8 Eingebettete Twitch-Streams</h3>
+      <p>
+        Auf der Creators-Seite dieser Website können Live-Streams von Twitch eingebettet werden. Twitch ist
+        ein Dienst der Twitch Interactive, Inc., einem Tochterunternehmen der Amazon.com, Inc., 350 Bush
+        Street, 2nd Floor, San Francisco, CA 94104, USA („Twitch"). Eingebettete Streams werden erst
+        geladen, nachdem du explizit durch Klicken auf den Button „Stream laden &amp; Cookies akzeptieren"
+        im Player-Platzhalter zugestimmt hast.
+      </p>
+      <p className="mt-2">
+        Nach deiner Zustimmung wird der Stream über ein iframe von{" "}
+        <strong>player.twitch.tv</strong> eingebunden. Twitch und Amazon können dabei Cookies setzen und
+        deine IP-Adresse, Browser-Informationen sowie die URL der aufgerufenen Seite erhalten. Diese
+        Daten können auf Server in den USA übertragen werden.
+      </p>
+      <p className="mt-2">
+        Rechtsgrundlage dieser Verarbeitung ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Du kannst
+        deine Einwilligung jederzeit über den Button „Cookie-Einstellungen" im Footer widerrufen. Die
+        Datenschutzerklärung von Twitch ist verfügbar unter:{" "}
+        <a href="https://www.twitch.tv/p/legal/privacy-notice/" className="text-green-400 hover:text-green-300">
+          https://www.twitch.tv/p/legal/privacy-notice/
         </a>
       </p>
 

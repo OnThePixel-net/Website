@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
+import TwitchEmbed from "@/components/twitch-embed";
 import {
   FaYoutube,
   FaTwitch,
@@ -159,21 +160,20 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {liveCreators.map((creator, index) => {
                 const live = liveStatus[creator.Name];
-                const embedUrl = live ? getStreamEmbedUrl(creator, live) : null;
+                const firstPlatform = creator.Platforms?.[0];
+                const platformType = firstPlatform?.Icons?.toLowerCase();
+                const twitchChannel = platformType === "twitch"
+                  ? firstPlatform?.Link?.match(/twitch\.tv\/([^\/\?]+)/i)?.[1] ?? null
+                  : null;
 
                 return (
                   <div
                     key={`live-${index}`}
                     className="rounded-lg bg-white/10 overflow-hidden transition-transform duration-300 hover:scale-105"
                   >
-                    {embedUrl ? (
-                      <div className="aspect-video bg-black relative">
-                        <iframe
-                          src={embedUrl}
-                          className="w-full h-full"
-                          allowFullScreen
-                          frameBorder="0"
-                        ></iframe>
+                    {twitchChannel ? (
+                      <div className="aspect-video bg-black relative overflow-hidden">
+                        <TwitchEmbed channel={twitchChannel} />
                       </div>
                     ) : (
                       <div className="aspect-video bg-gradient-to-br from-red-900/50 to-purple-900/50 flex items-center justify-center">
