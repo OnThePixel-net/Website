@@ -306,16 +306,6 @@ export default async function NewsPage({ params }: PageProps) {
             </span>
           </div>
 
-          {/* Short description / lead */}
-          {resolved.short_description && (
-            <p
-              className="mb-8 rounded-xl border-l-2 border-green-500/40 bg-green-500/[0.04] px-5 py-4 text-base leading-relaxed text-white/60"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              {resolved.short_description}
-            </p>
-          )}
-
           {/* Article body */}
           <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 md:p-8">
             <div
