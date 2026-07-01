@@ -10,30 +10,27 @@ import {
   SITE_URL,
   DEFAULT_OG_IMAGE,
 } from "@/lib/i18n/seo";
-import {
-  DATE_LOCALES,
-  DIRECTUS_LOCALES,
-  Locale,
-  translations,
-} from "@/lib/i18n/translations";
+import { Locale, translations } from "@/lib/i18n/translations";
+import { getDb, schema } from "@/lib/db";
+import { ensureTable } from "@/lib/db/migrate";
+import { eq } from "drizzle-orm";
 
-interface NewsTranslation {
-  id?: number;
-  News_url?: string;
-  languages_code: string;
-  title?: string | null;
-  short_description?: string | null;
-  text?: string | null;
+interface Translation {
+  title: string;
+  short_description: string;
+  content: string;
 }
 
 interface NewsItem {
+  id: number;
   title: string;
-  text: string;
-  date: string;
-  url: string;
-  icon: string | null;
-  short_description?: string;
-  translations?: NewsTranslation[];
+  slug: string;
+  short_description: string;
+  content: string;
+  image_url: string | null;
+  published_at: string;
+  author: string;
+  translations: Record<string, Translation>;
 }
 
 interface PageProps {
@@ -44,7 +41,7 @@ function formatDate(dateStr: string, locale: Locale): string {
   try {
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return dateStr;
-    return d.toLocaleDateString(DATE_LOCALES[locale], {
+    return d.toLocaleDateString(locale === "de" ? "de-DE" : "en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -52,6 +49,11 @@ function formatDate(dateStr: string, locale: Locale): string {
   } catch {
     return dateStr;
   }
+}
+
+function estimateReadTime(text: string): number {
+  const words = text.trim().split(/\s+/).length;
+  return Math.max(1, Math.round(words / 200));
 }
 
 function parseMarkdownLinks(text: string) {
@@ -75,140 +77,115 @@ function parseMarkdownLinks(text: string) {
   return parts.length > 0 ? parts : [{ type: "text", content: text }];
 }
 
-async function getNewsItem(url: string): Promise<NewsItem | null> {
-  try {
-    const response = await fetch(
-      `https://cms.onthepixel.net/items/News?filter%5Burl%5D%5B_eq%5D=${encodeURIComponent(url)}`,
-      { next: { revalidate: 300 } },
-    );
-    if (!response.ok) return null;
-    const data = await response.json();
-    return (data.data?.[0] as NewsItem | undefined) ?? null;
-  } catch {
-    return null;
-  }
-}
-
-async function getAllNewsTranslations(): Promise<NewsTranslation[]> {
-  try {
-    const response = await fetch(
-      "https://cms.onthepixel.net/items/News_translations",
-      { next: { revalidate: 300 } },
-    );
-    if (!response.ok) return [];
-    const data = await response.json();
-    return (data.data || []) as NewsTranslation[];
-  } catch {
-    return [];
-  }
-}
-
-function findTranslationFor(
-  url: string,
-  languageCode: string,
-  list: NewsTranslation[],
-): NewsTranslation | undefined {
-  return list.find(
-    (tr) => tr.News_url === url && tr.languages_code === languageCode,
-  );
-}
-
-function applyTranslation(
-  item: NewsItem,
-  tr: NewsTranslation | undefined,
-): NewsItem {
-  if (!tr) return item;
-  return {
-    ...item,
-    title: tr.title?.trim() ? tr.title : item.title,
-    short_description: tr.short_description?.trim()
-      ? tr.short_description
-      : item.short_description,
-    text: tr.text?.trim() ? tr.text : item.text,
-  };
-}
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { url } = await params;
-  const locale = await getServerLocale();
-  const [base, allTr] = await Promise.all([
-    getNewsItem(url),
-    locale === "en" ? Promise.resolve([]) : getAllNewsTranslations(),
-  ]);
-  if (!base) return { title: "News — OnThePixel.net" };
-  const tr =
-    locale === "en"
-      ? undefined
-      : findTranslationFor(url, DIRECTUS_LOCALES[locale], allTr);
-  const item = applyTranslation(base, tr);
-  const description = (item.short_description ?? item.text.slice(0, 160)).trim();
-  return buildLocalizedMetadata({
-    locale,
-    path: `/news/${url}`,
-    title: item.title,
-    description,
-    type: "article",
-    publishedTime: toISODate(item.date),
-    image: item.icon
-      ? `https://cdn.onthepixel.net/${item.icon}?w=1200&h=630&fit=cover&auto=format`
-      : undefined,
-    imageAlt: item.title,
-  });
-}
-
 function toISODate(dateStr: string): string | undefined {
   const d = new Date(dateStr);
   return isNaN(d.getTime()) ? undefined : d.toISOString();
 }
 
+async function getNewsItem(slug: string): Promise<NewsItem | null> {
+  try {
+    await ensureTable();
+    const db = getDb();
+    const [item] = await db.select().from(schema.news).where(eq(schema.news.slug, slug)).limit(1);
+    if (!item) return null;
+
+    const trs = await db.select().from(schema.newsTranslations).where(eq(schema.newsTranslations.news_id, item.id));
+    return {
+      ...item,
+      translations: trs.reduce<Record<string, Translation>>(
+        (acc, tr) => {
+          acc[tr.language] = { title: tr.title, short_description: tr.short_description, content: tr.content };
+          return acc;
+        },
+        {},
+      ),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function resolveContent(item: NewsItem, locale: Locale): { title: string; short_description: string; content: string } {
+  if (locale === "en") {
+    return { title: item.title, short_description: item.short_description, content: item.content };
+  }
+  const tr = item.translations?.[locale];
+  return {
+    title: tr?.title?.trim() ? tr.title : item.title,
+    short_description: tr?.short_description?.trim() ? tr.short_description : item.short_description,
+    content: tr?.content?.trim() ? tr.content : item.content,
+  };
+}
+
+export async function generateStaticParams() {
+  try {
+    await ensureTable();
+    const db = getDb();
+    const items = await db.select({ slug: schema.news.slug }).from(schema.news);
+    return items.map((i) => ({ url: i.slug }));
+  } catch {
+    return [];
+  }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { url } = await params;
+  const locale = await getServerLocale();
+  const item = await getNewsItem(url);
+  if (!item) return { title: "News — OnThePixel.net" };
+
+  const resolved = resolveContent(item, locale);
+  const description = (resolved.short_description || resolved.content.slice(0, 160)).trim();
+
+  return buildLocalizedMetadata({
+    locale,
+    path: `/news/${url}`,
+    title: resolved.title,
+    description,
+    type: "article",
+    publishedTime: toISODate(item.published_at),
+    image: item.image_url ?? undefined,
+    imageAlt: resolved.title,
+  });
+}
+
 export default async function NewsPage({ params }: PageProps) {
   const { url } = await params;
   const { locale, t } = await getServerTranslations();
-  const [base, allTr] = await Promise.all([
-    getNewsItem(url),
-    locale === "en" ? Promise.resolve([]) : getAllNewsTranslations(),
-  ]);
+  const item = await getNewsItem(url);
 
-  if (!base) notFound();
+  if (!item) notFound();
 
-  const tr =
-    locale === "en"
-      ? undefined
-      : findTranslationFor(url, DIRECTUS_LOCALES[locale], allTr);
+  const hasTranslation = locale === "en" || !!(item.translations?.[locale]?.content?.trim() || item.translations?.[locale]?.title?.trim());
 
-  // Non-English locale + no translation: show confirmation page instead of
-  // the article content.
-  if (locale !== "en" && !tr) {
+  if (locale !== "en" && !hasTranslation) {
     return <NotTranslatedNotice url={url} t={t} />;
   }
 
-  const newsItem = applyTranslation(base, tr);
-  const textLines = newsItem.text.split("\n");
+  const resolved = resolveContent(item, locale);
+  const textLines = resolved.content.split("\n");
+  const readTime = estimateReadTime(resolved.content);
 
   const canonicalUrl =
     locale === "en"
       ? `${SITE_URL}/news/${url}`
       : `${SITE_URL}/${locale}/news/${url}`;
-  const articleImage = newsItem.icon
-    ? `https://cdn.onthepixel.net/${newsItem.icon}?w=1200&h=630&fit=cover&auto=format`
-    : DEFAULT_OG_IMAGE;
-  const publishedIso = toISODate(newsItem.date);
-  const articleDescription = (
-    newsItem.short_description ?? newsItem.text.slice(0, 160)
-  ).trim();
 
-  // NewsArticle structured data — enables rich results / Google News
-  // eligibility and lets crawlers associate the hero image with the article.
+  const articleDescription = (resolved.short_description || resolved.content.slice(0, 160)).trim();
+  const publishedIso = toISODate(item.published_at);
+
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
-    headline: newsItem.title,
+    headline: resolved.title,
     description: articleDescription,
-    image: [articleImage],
+    image: item.image_url ? [item.image_url] : [DEFAULT_OG_IMAGE],
     ...(publishedIso ? { datePublished: publishedIso, dateModified: publishedIso } : {}),
     inLanguage: locale === "de" ? "de-DE" : "en-US",
     mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
-    author: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    author: item.author
+      ? { "@type": "Person", name: item.author }
+      : { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,
@@ -226,6 +203,7 @@ export default async function NewsPage({ params }: PageProps) {
       <section className="bg-gray-950 min-h-screen">
         <div className="container mx-auto max-w-3xl px-4 py-10">
 
+          {/* Back link */}
           <Link
             href="/#news"
             className="mb-8 inline-flex items-center gap-1.5 text-sm text-white/40 transition-colors duration-200 hover:text-green-400"
@@ -235,24 +213,22 @@ export default async function NewsPage({ params }: PageProps) {
           </Link>
 
           {/* Hero image */}
-          <div className="relative mb-8 w-full overflow-hidden rounded-xl">
-            {newsItem.icon ? (
+          <div className="relative mb-8 w-full overflow-hidden rounded-2xl">
+            {item.image_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={`https://cdn.onthepixel.net/${newsItem.icon}?w=900&auto=format`}
-                srcSet={`https://cdn.onthepixel.net/${newsItem.icon}?w=600&auto=format 600w, https://cdn.onthepixel.net/${newsItem.icon}?w=900&auto=format 900w, https://cdn.onthepixel.net/${newsItem.icon}?w=1400&auto=format 1400w`}
-                sizes="(max-width: 768px) 100vw, 768px"
-                alt={newsItem.title}
+                src={item.image_url}
+                alt={resolved.title}
                 width={900}
                 height={506}
                 fetchPriority="high"
                 loading="eager"
                 decoding="async"
-                className="h-56 w-full object-cover md:h-72"
+                className="h-56 w-full object-cover md:h-80"
               />
             ) : (
               <div
-                className="relative h-56 w-full overflow-hidden md:h-72"
+                className="relative h-56 w-full overflow-hidden md:h-80"
                 style={{
                   background: "linear-gradient(135deg, #0d2b1a 0%, #0a3d1f 50%, #052910 100%)",
                 }}
@@ -274,42 +250,83 @@ export default async function NewsPage({ params }: PageProps) {
                 </div>
               </div>
             )}
-            <div className="absolute bottom-0 left-0 h-20 w-full bg-gradient-to-t from-gray-950 to-transparent" />
+            <div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-gray-950 to-transparent" />
           </div>
 
-          {/* Title + date */}
-          <div className="mb-8">
-            <h1
-              className="mb-3 text-2xl font-bold leading-snug md:text-3xl"
-              style={{
-                fontFamily: "'Syne', sans-serif",
-                color: "#00de6d",
-                textShadow: "0 0 30px rgba(0,222,109,0.25)",
-              }}
-            >
-              {newsItem.title}
-            </h1>
-            <div className="flex items-center gap-3">
-              <span className="inline-block h-px w-5 rounded-full bg-green-500/50" />
+          {/* Title */}
+          <h1
+            className="mb-5 text-2xl font-bold leading-snug md:text-4xl"
+            style={{
+              fontFamily: "'Syne', sans-serif",
+              color: "#00de6d",
+              textShadow: "0 0 30px rgba(0,222,109,0.25)",
+            }}
+          >
+            {resolved.title}
+          </h1>
+
+          {/* Meta row: author + date + read time */}
+          <div className="mb-8 flex flex-wrap items-center gap-x-4 gap-y-2">
+            {item.author && (
+              <div className="flex items-center gap-2">
+                <div
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold uppercase text-black"
+                  style={{ background: "linear-gradient(135deg, #00de6d, #00b356)" }}
+                >
+                  {item.author.charAt(0)}
+                </div>
+                <span
+                  className="text-sm font-medium text-white/70"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  {item.author}
+                </span>
+              </div>
+            )}
+            {item.author && (
+              <span className="h-4 w-px bg-white/10" />
+            )}
+            <div className="flex items-center gap-1.5">
+              <span className="inline-block h-px w-4 rounded-full bg-green-500/50" />
               <span
                 className="text-sm text-white/35"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                {formatDate(newsItem.date, locale)}
+                {formatDate(item.published_at, locale)}
               </span>
             </div>
+            <span className="h-4 w-px bg-white/10" />
+            <span
+              className="text-xs text-white/25"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {readTime} min read
+            </span>
           </div>
 
+          {/* Short description / lead */}
+          {resolved.short_description && (
+            <p
+              className="mb-8 rounded-xl border-l-2 border-green-500/40 bg-green-500/[0.04] px-5 py-4 text-base leading-relaxed text-white/60"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {resolved.short_description}
+            </p>
+          )}
+
           {/* Article body */}
-          <div className="rounded-xl border border-white/5 bg-white/[0.03] p-6 md:p-8">
+          <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 md:p-8">
             <div
-              className="leading-relaxed text-white/60"
+              className="leading-relaxed text-white/65"
               style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.9375rem" }}
             >
               {textLines.map((line, lineIndex) => {
+                if (line.trim() === "") {
+                  return <div key={lineIndex} className="h-4" />;
+                }
                 const parts = parseMarkdownLinks(line);
                 return (
-                  <React.Fragment key={lineIndex}>
+                  <p key={lineIndex} className="mb-2">
                     {parts.map((part, partIndex) => {
                       if (part.type === "link" && part.url && part.text) {
                         return (
@@ -326,12 +343,37 @@ export default async function NewsPage({ params }: PageProps) {
                       }
                       return <span key={partIndex}>{part.content}</span>;
                     })}
-                    {lineIndex < textLines.length - 1 && <br />}
-                  </React.Fragment>
+                  </p>
                 );
               })}
             </div>
           </div>
+
+          {/* Author card */}
+          {item.author && (
+            <div className="mt-8 flex items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.02] p-5">
+              <div
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold uppercase text-black"
+                style={{ background: "linear-gradient(135deg, #00de6d, #00b356)" }}
+              >
+                {item.author.charAt(0)}
+              </div>
+              <div>
+                <p
+                  className="text-xs font-semibold uppercase tracking-wider text-white/25"
+                  style={{ fontFamily: "'Syne', sans-serif" }}
+                >
+                  {locale === "de" ? "Geschrieben von" : "Written by"}
+                </p>
+                <p
+                  className="text-base font-semibold text-white"
+                  style={{ fontFamily: "'Syne', sans-serif" }}
+                >
+                  {item.author}
+                </p>
+              </div>
+            </div>
+          )}
 
           <div className="mt-8">
             <Link
