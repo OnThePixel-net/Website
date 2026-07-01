@@ -56,7 +56,7 @@ function estimateReadTime(text: string): number {
   return Math.max(1, Math.round(words / 200));
 }
 
-/* ── Block types (mirrored from dashboard) ─────────────────────────── */
+/* --- Block types (mirrored from dashboard) --- */
 type Block =
   | { id: string; type: "paragraph"; content: string }
   | { id: string; type: "heading"; level: 2 | 3; content: string }

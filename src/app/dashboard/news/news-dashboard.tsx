@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import AuthGuard from "../auth-guard";
 
-/* ── Block types ──────────────────────────────────────────────────────── */
+/* --- Block types --- */
 export type Block =
   | { id: string; type: "paragraph"; content: string }
   | { id: string; type: "heading"; level: 2 | 3; content: string }
@@ -58,7 +58,7 @@ function stringToBlocks(content: string): Block[] {
   return [{ id: makeId(), type: "paragraph", content }];
 }
 
-/* ── Types ────────────────────────────────────────────────────────────── */
+/* --- Types --- */
 type LangContent = {
   title: string;
   short_description: string;
@@ -111,7 +111,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-/* ── Block editor ─────────────────────────────────────────────────────── */
+/* --- Block editor --- */
 const BLOCK_TYPES: { type: Block["type"]; label: string; icon: React.ReactNode; description: string }[] = [
   { type: "paragraph", label: "Paragraph", icon: <Type size={14} />, description: "Fließtext mit Links" },
   { type: "heading", label: "Überschrift", icon: <span className="text-xs font-black">H</span>, description: "H2 oder H3 Überschrift" },
@@ -347,7 +347,7 @@ function BlockEditor({ blocks, onChange }: { blocks: Block[]; onChange: (b: Bloc
   );
 }
 
-/* ── Delete modal ────────────────────────────────────────────────────── */
+/* --- Delete modal --- */
 function DeleteModal({ item, onConfirm, onCancel, loading }: { item: NewsItem; onConfirm: () => void; onCancel: () => void; loading: boolean }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -374,7 +374,7 @@ function DeleteModal({ item, onConfirm, onCancel, loading }: { item: NewsItem; o
   );
 }
 
-/* ── Language tab bar ─────────────────────────────────────────────────── */
+/* --- Language tab bar --- */
 function LangTabs({ active, onChange, translations }: { active: LangCode; onChange: (l: LangCode) => void; translations: Record<string, LangContent> }) {
   return (
     <div className="flex items-center gap-1 rounded-xl border border-white/8 bg-white/[0.02] p-1">
@@ -392,7 +392,7 @@ function LangTabs({ active, onChange, translations }: { active: LangCode; onChan
   );
 }
 
-/* ── Editor ──────────────────────────────────────────────────────────── */
+/* --- Editor --- */
 function Editor({ initial, onSave, onCancel }: { initial: NewsItem | null; onSave: (data: Omit<NewsItem, "id">, id?: number) => Promise<void>; onCancel: () => void }) {
   const isNew = !initial?.id;
 
@@ -680,7 +680,7 @@ function Editor({ initial, onSave, onCancel }: { initial: NewsItem | null; onSav
   );
 }
 
-/* ── Table row ───────────────────────────────────────────────────────── */
+/* --- Table row --- */
 function NewsRow({ item, onEdit, onDelete }: { item: NewsItem; onEdit: (i: NewsItem) => void; onDelete: (i: NewsItem) => void }) {
   const langCount = Object.values(item.translations ?? {}).filter((t) => t.title || t.content).length;
   return (
@@ -741,7 +741,7 @@ function NewsRow({ item, onEdit, onDelete }: { item: NewsItem; onEdit: (i: NewsI
   );
 }
 
-/* ── Main ────────────────────────────────────────────────────────────── */
+/* --- Main --- */
 function NewsDashboardContent() {
   const [items, setItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
