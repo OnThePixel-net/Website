@@ -19,7 +19,7 @@ import {
   Link as LinkIcon,
   User,
   Languages,
-  Youtube,
+  CirclePlay,
   Type,
   Minus,
   Info,
@@ -115,7 +115,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 const BLOCK_TYPES: { type: Block["type"]; label: string; icon: React.ReactNode; description: string }[] = [
   { type: "paragraph", label: "Paragraph", icon: <Type size={14} />, description: "Fließtext mit Links" },
   { type: "heading", label: "Überschrift", icon: <span className="text-xs font-black">H</span>, description: "H2 oder H3 Überschrift" },
-  { type: "youtube", label: "YouTube", icon: <Youtube size={14} />, description: "YouTube-Video einbetten" },
+  { type: "youtube", label: "YouTube", icon: <CirclePlay size={14} />, description: "YouTube-Video einbetten" },
   { type: "image", label: "Bild", icon: <ImageIcon size={14} />, description: "Bild mit Bildunterschrift" },
   { type: "callout", label: "Kachel", icon: <Info size={14} />, description: "Info-, Tipp- oder Warnbox" },
   { type: "divider", label: "Trennlinie", icon: <Minus size={14} />, description: "Horizontale Trennlinie" },
@@ -227,7 +227,7 @@ function BlockEditor({ blocks, onChange }: { blocks: Block[]; onChange: (b: Bloc
           {block.type === "youtube" && (
             <div className="flex flex-col gap-3">
               <div className="flex items-center overflow-hidden rounded-lg border border-white/10 bg-white/5 focus-within:border-green-500/40 focus-within:ring-1 focus-within:ring-green-500/20 transition-all">
-                <Youtube size={14} className="ml-3 shrink-0 text-red-400" />
+                <CirclePlay size={14} className="ml-3 shrink-0 text-red-400" />
                 <input
                   type="url"
                   value={block.url}
