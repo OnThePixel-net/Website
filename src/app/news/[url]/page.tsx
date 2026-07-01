@@ -271,7 +271,7 @@ export default async function NewsPage({ params }: PageProps) {
               <div className="flex items-center gap-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={`https://api.mcskin.me/pfp/${encodeURIComponent(item.author)}?size=128`}
+                  src={`https://api.mcskin.me/head/${encodeURIComponent(item.author)}?size=128`}
                   alt={item.author}
                   width={28}
                   height={28}
