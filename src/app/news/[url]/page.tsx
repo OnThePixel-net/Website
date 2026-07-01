@@ -56,25 +56,151 @@ function estimateReadTime(text: string): number {
   return Math.max(1, Math.round(words / 200));
 }
 
-function parseMarkdownLinks(text: string) {
+/* ── Block types (mirrored from dashboard) ─────────────────────────── */
+type Block =
+  | { id: string; type: "paragraph"; content: string }
+  | { id: string; type: "heading"; level: 2 | 3; content: string }
+  | { id: string; type: "youtube"; url: string }
+  | { id: string; type: "image"; url: string; caption: string }
+  | { id: string; type: "callout"; variant: "info" | "warning" | "tip" | "success"; title: string; content: string }
+  | { id: string; type: "divider" };
+
+function parseContent(content: string): Block[] | null {
+  try {
+    const parsed = JSON.parse(content);
+    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]?.type) return parsed as Block[];
+  } catch { /* not JSON */ }
+  return null;
+}
+
+function extractYoutubeId(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+const CALLOUT_STYLES: Record<string, { border: string; bg: string; title: string; icon: string }> = {
+  info:    { border: "border-blue-500/30",    bg: "bg-blue-500/[0.06]",    title: "text-blue-400",    icon: "ℹ" },
+  tip:     { border: "border-green-500/30",   bg: "bg-green-500/[0.06]",   title: "text-green-400",   icon: "💡" },
+  warning: { border: "border-yellow-500/30",  bg: "bg-yellow-500/[0.06]",  title: "text-yellow-400",  icon: "⚠" },
+  success: { border: "border-emerald-500/30", bg: "bg-emerald-500/[0.06]", title: "text-emerald-400", icon: "✓" },
+};
+
+function InlineText({ text }: { text: string }) {
   const parts: Array<{ type: string; content?: string; text?: string; url?: string }> = [];
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   let lastIndex = 0;
   let match;
-
   while ((match = linkRegex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push({ type: "text", content: text.substring(lastIndex, match.index) });
-    }
+    if (match.index > lastIndex) parts.push({ type: "text", content: text.substring(lastIndex, match.index) });
     parts.push({ type: "link", text: match[1], url: match[2] });
     lastIndex = match.index + match[0].length;
   }
+  if (lastIndex < text.length) parts.push({ type: "text", content: text.substring(lastIndex) });
+  if (parts.length === 0) parts.push({ type: "text", content: text });
 
-  if (lastIndex < text.length) {
-    parts.push({ type: "text", content: text.substring(lastIndex) });
-  }
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.type === "link" && part.url && part.text ? (
+          <a key={i} href={part.url} target="_blank" rel="noopener noreferrer"
+            className="text-green-400 underline decoration-green-500/30 underline-offset-2 transition-colors hover:text-green-300 hover:decoration-green-400/60">
+            {part.text}
+          </a>
+        ) : (
+          <span key={i}>{part.content}</span>
+        )
+      )}
+    </>
+  );
+}
 
-  return parts.length > 0 ? parts : [{ type: "text", content: text }];
+function BlockRenderer({ blocks }: { blocks: Block[] }) {
+  return (
+    <div className="flex flex-col gap-4">
+      {blocks.map((block, i) => {
+        if (block.type === "paragraph") {
+          if (!block.content.trim()) return null;
+          return (
+            <p key={i} className="leading-relaxed text-white/65" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.9375rem" }}>
+              <InlineText text={block.content} />
+            </p>
+          );
+        }
+        if (block.type === "heading") {
+          const Tag = `h${block.level}` as "h2" | "h3";
+          return (
+            <Tag key={i} className={`font-bold text-white ${block.level === 2 ? "text-xl mt-4" : "text-base mt-2"}`} style={{ fontFamily: "'Syne', sans-serif" }}>
+              {block.content}
+            </Tag>
+          );
+        }
+        if (block.type === "youtube") {
+          const vid = extractYoutubeId(block.url);
+          if (!vid) return null;
+          return (
+            <div key={i} className="overflow-hidden rounded-xl border border-white/5">
+              <div className="relative aspect-video w-full bg-black">
+                <iframe
+                  src={`https://www.youtube.com/embed/${vid}`}
+                  className="absolute inset-0 h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="YouTube video"
+                />
+              </div>
+            </div>
+          );
+        }
+        if (block.type === "image") {
+          return (
+            <figure key={i} className="overflow-hidden rounded-xl border border-white/5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={block.url} alt={block.caption || ""} className="w-full object-cover" />
+              {block.caption && (
+                <figcaption className="px-4 py-2 text-center text-xs text-white/30" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                  {block.caption}
+                </figcaption>
+              )}
+            </figure>
+          );
+        }
+        if (block.type === "callout") {
+          const s = CALLOUT_STYLES[block.variant] ?? CALLOUT_STYLES.info;
+          return (
+            <div key={i} className={`rounded-xl border ${s.border} ${s.bg} px-5 py-4`}>
+              {block.title && (
+                <p className={`mb-1.5 flex items-center gap-1.5 text-sm font-semibold ${s.title}`} style={{ fontFamily: "'Syne', sans-serif" }}>
+                  <span>{s.icon}</span> {block.title}
+                </p>
+              )}
+              <p className="text-sm leading-relaxed text-white/60" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                {block.content}
+              </p>
+            </div>
+          );
+        }
+        if (block.type === "divider") {
+          return <hr key={i} className="border-white/8" />;
+        }
+        return null;
+      })}
+    </div>
+  );
+}
+
+function LegacyTextRenderer({ content }: { content: string }) {
+  const lines = content.split("\n");
+  return (
+    <div className="flex flex-col gap-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.9375rem" }}>
+      {lines.map((line, i) =>
+        line.trim() === "" ? <div key={i} className="h-3" /> : (
+          <p key={i} className="leading-relaxed text-white/65">
+            <InlineText text={line} />
+          </p>
+        )
+      )}
+    </div>
+  );
 }
 
 function toISODate(dateStr: string): string | undefined {
@@ -163,7 +289,7 @@ export default async function NewsPage({ params }: PageProps) {
   }
 
   const resolved = resolveContent(item, locale);
-  const textLines = resolved.content.split("\n");
+  const blocks = parseContent(resolved.content);
   const readTime = estimateReadTime(resolved.content);
 
   const canonicalUrl =
@@ -308,37 +434,7 @@ export default async function NewsPage({ params }: PageProps) {
 
           {/* Article body */}
           <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 md:p-8">
-            <div
-              className="leading-relaxed text-white/65"
-              style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.9375rem" }}
-            >
-              {textLines.map((line, lineIndex) => {
-                if (line.trim() === "") {
-                  return <div key={lineIndex} className="h-4" />;
-                }
-                const parts = parseMarkdownLinks(line);
-                return (
-                  <p key={lineIndex} className="mb-2">
-                    {parts.map((part, partIndex) => {
-                      if (part.type === "link" && part.url && part.text) {
-                        return (
-                          <a
-                            key={partIndex}
-                            href={part.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-green-400 underline decoration-green-500/30 underline-offset-2 transition-colors duration-200 hover:text-green-300 hover:decoration-green-400/60"
-                          >
-                            {part.text}
-                          </a>
-                        );
-                      }
-                      return <span key={partIndex}>{part.content}</span>;
-                    })}
-                  </p>
-                );
-              })}
-            </div>
+            {blocks ? <BlockRenderer blocks={blocks} /> : <LegacyTextRenderer content={resolved.content} />}
           </div>
 
           {/* Author card */}
