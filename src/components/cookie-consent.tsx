@@ -35,8 +35,9 @@ export default function CookieConsent() {
     localStorage.setItem("cookie-consent", "accepted");
     window.localStorage.setItem(
       "va-preferences",
-      JSON.stringify({ analytics: true }),
+      JSON.stringify({ analytics: true, youtube: true }),
     );
+    window.dispatchEvent(new Event("youtube-consent-changed"));
     dismissBanner();
   };
 
@@ -44,8 +45,9 @@ export default function CookieConsent() {
     localStorage.setItem("cookie-consent", "declined");
     window.localStorage.setItem(
       "va-preferences",
-      JSON.stringify({ analytics: false }),
+      JSON.stringify({ analytics: false, youtube: false }),
     );
+    window.dispatchEvent(new Event("youtube-consent-changed"));
     dismissBanner();
   };
 

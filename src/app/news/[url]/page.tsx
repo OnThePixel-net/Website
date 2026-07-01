@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import YoutubeEmbed from "@/components/youtube-embed";
 import TopPage from "@/components/page/top";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -137,19 +138,7 @@ function BlockRenderer({ blocks }: { blocks: Block[] }) {
         if (block.type === "youtube") {
           const vid = extractYoutubeId(block.url);
           if (!vid) return null;
-          return (
-            <div key={i} className="overflow-hidden rounded-xl border border-white/5">
-              <div className="relative aspect-video w-full bg-black">
-                <iframe
-                  src={`https://www.youtube.com/embed/${vid}`}
-                  className="absolute inset-0 h-full w-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  title="YouTube video"
-                />
-              </div>
-            </div>
-          );
+          return <YoutubeEmbed key={i} videoId={vid} />;
         }
         if (block.type === "image") {
           return (

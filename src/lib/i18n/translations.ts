@@ -372,6 +372,9 @@ export const translations = {
       analyticsLabel: "Analytics Cookies",
       analyticsDesc:
         "Help us understand how visitors interact with our website.",
+      youtubeLabel: "YouTube & Embedded Media",
+      youtubeDesc:
+        "Required to play embedded YouTube videos. Google/YouTube may set cookies and track your usage.",
       howWeUseTitle: "How we use cookies",
       howWeUseText:
         "OnThePixel.net uses cookies to enhance your experience, analyze site usage, and assist in our marketing efforts. We use Vercel Analytics to collect information about how visitors use our website. This data is anonymized and helps us improve our services.",
@@ -380,6 +383,13 @@ export const translations = {
       save: "Save Preferences",
       buttonLabel: "Cookie Settings",
       alwaysActive: "Always Active",
+    },
+    youtubeEmbed: {
+      title: "YouTube Video",
+      description:
+        "To play this video, YouTube cookies will be set. Google may track your usage across sites.",
+      accept: "Load video & accept cookies",
+      learnMore: "Learn more in our Privacy Policy",
     },
     playercount: {
       online: "Online players",
@@ -759,6 +769,9 @@ export const translations = {
       analyticsLabel: "Analyse-Cookies",
       analyticsDesc:
         "Helfen uns zu verstehen, wie Besucher mit unserer Website interagieren.",
+      youtubeLabel: "YouTube & Eingebettete Medien",
+      youtubeDesc:
+        "Erforderlich zum Abspielen eingebetteter YouTube-Videos. Google/YouTube kann dabei Cookies setzen und dein Nutzungsverhalten verfolgen.",
       howWeUseTitle: "Wie wir Cookies verwenden",
       howWeUseText:
         "OnThePixel.net verwendet Cookies, um dein Erlebnis zu verbessern, die Website-Nutzung zu analysieren und unsere Marketing-Aktivitäten zu unterstützen. Wir nutzen Vercel Analytics, um Informationen darüber zu erfassen, wie Besucher unsere Website nutzen. Diese Daten werden anonymisiert und helfen uns, unseren Service zu verbessern.",
@@ -767,6 +780,13 @@ export const translations = {
       save: "Einstellungen speichern",
       buttonLabel: "Cookie-Einstellungen",
       alwaysActive: "Immer aktiv",
+    },
+    youtubeEmbed: {
+      title: "YouTube-Video",
+      description:
+        "Zum Abspielen dieses Videos werden YouTube-Cookies gesetzt. Google kann dein Nutzungsverhalten seitenübergreifend verfolgen.",
+      accept: "Video laden & Cookies akzeptieren",
+      learnMore: "Mehr in unserer Datenschutzerklärung",
     },
     playercount: {
       online: "Spieler online",
