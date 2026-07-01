@@ -24,6 +24,17 @@ export async function ensureTable() {
     await db.execute(sql`
       ALTER TABLE news ADD COLUMN IF NOT EXISTS author TEXT NOT NULL DEFAULT ''
     `);
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS news_translations (
+        id SERIAL PRIMARY KEY,
+        news_id INTEGER NOT NULL REFERENCES news(id) ON DELETE CASCADE,
+        language TEXT NOT NULL,
+        title TEXT NOT NULL DEFAULT '',
+        short_description TEXT NOT NULL DEFAULT '',
+        content TEXT NOT NULL DEFAULT '',
+        UNIQUE(news_id, language)
+      )
+    `);
     initialized = true;
   } catch (e) {
     console.error("[db] ensureTable failed:", e);
