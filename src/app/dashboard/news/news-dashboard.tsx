@@ -207,7 +207,6 @@ function Editor({ initial, onSave, onCancel }: { initial: NewsItem | null; onSav
     const enContent = langContent["en"];
     if (!enContent.title.trim()) return setError("English title is required.");
     if (!meta.slug.trim()) return setError("Slug is required.");
-    if (!meta.published_at) return setError("Date is required.");
     setLoading(true);
 
     const translations: Record<string, LangContent> = {};
