@@ -44,14 +44,17 @@ export async function POST(req: NextRequest) {
   try {
     await ensureTable();
     const body = await req.json();
-    const { title, slug, short_description, content, image_url, published_at, author, translations } = body;
-    if (!title || !slug || !published_at) {
-      return NextResponse.json({ error: "title, slug and published_at are required" }, { status: 400 });
+    const { title, slug, short_description, content, image_url, translations } = body;
+    if (!title || !slug) {
+      return NextResponse.json({ error: "title and slug are required" }, { status: 400 });
     }
+    const session = await auth();
+    const author = session?.user?.name ?? "";
+    const published_at = new Date().toISOString().slice(0, 10);
     const db = getDb();
     const [item] = await db
       .insert(schema.news)
-      .values({ title, slug, short_description: short_description ?? "", content: content ?? "", image_url: image_url ?? null, published_at, author: author ?? "" })
+      .values({ title, slug, short_description: short_description ?? "", content: content ?? "", image_url: image_url ?? null, published_at, author })
       .returning();
 
     if (translations && typeof translations === "object") {

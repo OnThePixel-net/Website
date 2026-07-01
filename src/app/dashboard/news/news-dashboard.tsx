@@ -177,8 +177,6 @@ function Editor({ initial, onSave, onCancel }: { initial: NewsItem | null; onSav
   const [meta, setMeta] = useState({
     slug: initial?.slug ?? "",
     image_url: initial?.image_url ?? null,
-    published_at: initial?.published_at?.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
-    author: initial?.author ?? "",
   });
 
   const [langContent, setLangContent] = useState<Record<LangCode, LangContent>>({
@@ -229,8 +227,8 @@ function Editor({ initial, onSave, onCancel }: { initial: NewsItem | null; onSav
           short_description: enContent.short_description,
           content: enContent.content,
           image_url: meta.image_url,
-          published_at: meta.published_at,
-          author: meta.author,
+          published_at: initial?.published_at ?? new Date().toISOString().slice(0, 10),
+          author: initial?.author ?? "",
           translations,
         },
         initial?.id,
@@ -388,21 +386,6 @@ function Editor({ initial, onSave, onCancel }: { initial: NewsItem | null; onSav
               <p className="text-xs font-semibold uppercase tracking-wider text-white/25">Publish</p>
             </div>
             <div className="flex flex-col gap-4 p-5">
-              <Field label="Author">
-                <div className="flex items-center overflow-hidden rounded-lg border border-white/10 bg-white/5 focus-within:border-green-500/40 focus-within:ring-1 focus-within:ring-green-500/20 transition-all">
-                  <User size={13} className="ml-3 shrink-0 text-white/20" />
-                  <input
-                    type="text"
-                    value={meta.author}
-                    onChange={(e) => setMetaField("author", e.target.value)}
-                    placeholder="Name des Autors…"
-                    className="flex-1 bg-transparent py-2 px-3 text-sm text-white outline-none placeholder-white/20"
-                  />
-                </div>
-              </Field>
-              <Field label="Publish date *">
-                <Input type="date" value={meta.published_at} onChange={(e) => setMetaField("published_at", e.target.value)} />
-              </Field>
               <Field label="URL slug *">
                 <div className="flex items-center overflow-hidden rounded-lg border border-white/10 bg-white/5 focus-within:border-green-500/40 focus-within:ring-1 focus-within:ring-green-500/20 transition-all">
                   <span className="shrink-0 border-r border-white/10 bg-white/5 px-3 py-2 text-xs text-white/20">/news/</span>
