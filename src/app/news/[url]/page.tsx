@@ -328,9 +328,9 @@ export default async function NewsPage({ params }: PageProps) {
           </Link>
 
           {/* Hero image */}
-          <div className="relative mb-8 w-full overflow-hidden rounded-2xl">
-            {item.image_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
+          {item.image_url && (
+            <div className="relative mb-8 w-full overflow-hidden rounded-2xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={item.image_url}
                 alt={resolved.title}
@@ -341,32 +341,9 @@ export default async function NewsPage({ params }: PageProps) {
                 decoding="async"
                 className="h-56 w-full object-cover md:h-80"
               />
-            ) : (
-              <div
-                className="relative h-56 w-full overflow-hidden md:h-80"
-                style={{
-                  background: "linear-gradient(135deg, #0d2b1a 0%, #0a3d1f 50%, #052910 100%)",
-                }}
-              >
-                <div
-                  className="absolute inset-0 opacity-30"
-                  style={{
-                    backgroundImage: `radial-gradient(circle at 20% 50%, rgba(0,222,109,0.4) 0%, transparent 55%),
-                                      radial-gradient(circle at 80% 20%, rgba(0,222,109,0.15) 0%, transparent 40%)`,
-                  }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span
-                    className="select-none text-8xl font-black text-white/[0.04]"
-                    style={{ fontFamily: "'Syne', sans-serif" }}
-                  >
-                    OTP
-                  </span>
-                </div>
-              </div>
-            )}
-            <div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-gray-950 to-transparent" />
-          </div>
+              <div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-gray-950 to-transparent" />
+            </div>
+          )}
 
           {/* Title */}
           <h1
