@@ -39,24 +39,16 @@ function formatDate(dateStr: string, locale: Locale): string {
   }
 }
 
-const FALLBACK_GRADIENTS = [
-  "linear-gradient(135deg, #0d2b1a 0%, #0a3d1f 50%, #052910 100%)",
-  "linear-gradient(135deg, #0a1f2e 0%, #0d3347 50%, #041520 100%)",
-  "linear-gradient(135deg, #1a1a0d 0%, #2b2b0a 50%, #101005 100%)",
-];
 
 function NewsCard({
   item,
-  index,
   featured,
   locale,
 }: {
   item: NewsItem;
-  index: number;
   featured?: boolean;
   locale: Locale;
 }) {
-  const fallback = FALLBACK_GRADIENTS[index % FALLBACK_GRADIENTS.length];
   const tr = locale !== "en" ? item.translations?.[locale] : undefined;
   const title = tr?.title?.trim() ? tr.title : item.title;
   const description = tr?.short_description?.trim() ? tr.short_description : item.short_description;
@@ -68,9 +60,9 @@ function NewsCard({
         <div className="pointer-events-none absolute left-0 top-0 z-10 h-0.5 w-full origin-left scale-x-0 bg-gradient-to-r from-green-400 via-green-500 to-transparent transition-transform duration-300 group-hover:scale-x-100" />
 
         {/* Image area */}
-        <div className={`relative w-full shrink-0 overflow-hidden ${featured ? "h-52 md:h-64" : "h-40"}`}>
-          {item.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
+        {item.image_url && (
+          <div className={`relative w-full shrink-0 overflow-hidden ${featured ? "h-52 md:h-64" : "h-40"}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={item.image_url}
               alt={title}
@@ -81,43 +73,30 @@ function NewsCard({
               decoding="async"
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
-          ) : (
-            <div
-              className="h-full w-full transition-transform duration-500 group-hover:scale-105"
-              style={{ background: fallback }}
-            >
-              <div
-                className="absolute inset-0 opacity-20"
-                style={{
-                  backgroundImage: `radial-gradient(circle at 20% 50%, rgba(0,222,109,0.3) 0%, transparent 50%),
-                                    radial-gradient(circle at 80% 20%, rgba(0,222,109,0.15) 0%, transparent 40%)`,
-                }}
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span
-                  className="select-none text-5xl font-black text-white/5"
-                  style={{ fontFamily: "'Syne', sans-serif" }}
-                >
-                  OTP
-                </span>
-              </div>
+
+            <div className="absolute bottom-0 left-0 h-16 w-full bg-gradient-to-t from-gray-950/80 to-transparent" />
+
+            <div className="absolute bottom-3 left-4">
+              <span
+                className="rounded-md bg-black/50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-green-400 backdrop-blur-sm"
+                style={{ fontFamily: "'Syne', sans-serif" }}
+              >
+                {formatDate(item.published_at, locale)}
+              </span>
             </div>
-          )}
+          </div>
+        )}
 
-          <div className="absolute bottom-0 left-0 h-16 w-full bg-gradient-to-t from-gray-950/80 to-transparent" />
-
-          <div className="absolute bottom-3 left-4">
+        {/* Content */}
+        <div className="flex flex-1 flex-col gap-2 p-5">
+          {!item.image_url && (
             <span
-              className="rounded-md bg-black/50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-green-400 backdrop-blur-sm"
+              className="w-fit rounded-md bg-white/5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-green-400"
               style={{ fontFamily: "'Syne', sans-serif" }}
             >
               {formatDate(item.published_at, locale)}
             </span>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex flex-1 flex-col gap-2 p-5">
+          )}
           <div className="flex items-start justify-between gap-3">
             <h3
               className={`font-bold leading-snug text-white transition-colors duration-200 group-hover:text-green-400 group-hover:[text-shadow:0_0_20px_rgba(0,222,109,0.2)] ${
@@ -215,7 +194,7 @@ export default async function News() {
             <div className="flex flex-col gap-4">
               {featured && (
                 <Reveal direction="up" distance={50} duration={0.9}>
-                  <NewsCard item={featured} index={0} featured locale={locale} />
+                  <NewsCard item={featured} featured locale={locale} />
                 </Reveal>
               )}
               {rest.length > 0 && (
@@ -230,7 +209,6 @@ export default async function News() {
                     <NewsCard
                       key={item.id}
                       item={item}
-                      index={i + 1}
                       locale={locale}
                     />
                   ))}
