@@ -16,8 +16,9 @@ export async function PATCH(
   const { id } = await params;
   try {
     const body = await req.json();
-    const { title, slug, short_description, content, image_url, published_at, author } = body;
-    const [item] = await getDb()
+    const { title, slug, short_description, content, image_url, published_at, author, translations } = body;
+    const db = getDb();
+    const [item] = await db
       .update(schema.news)
       .set({
         ...(title !== undefined && { title }),
@@ -32,6 +33,27 @@ export async function PATCH(
       .where(eq(schema.news.id, Number(id)))
       .returning();
     if (!item) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    if (translations && typeof translations === "object") {
+      for (const [lang, tr] of Object.entries(translations as Record<string, { title?: string; short_description?: string; content?: string }>)) {
+        if (!lang || lang === "en") continue;
+        await db.insert(schema.newsTranslations).values({
+          news_id: Number(id),
+          language: lang,
+          title: (tr as { title?: string }).title ?? "",
+          short_description: (tr as { short_description?: string }).short_description ?? "",
+          content: (tr as { content?: string }).content ?? "",
+        }).onConflictDoUpdate({
+          target: [schema.newsTranslations.news_id, schema.newsTranslations.language],
+          set: {
+            title: (tr as { title?: string }).title ?? "",
+            short_description: (tr as { short_description?: string }).short_description ?? "",
+            content: (tr as { content?: string }).content ?? "",
+          },
+        });
+      }
+    }
+
     return NextResponse.json({ data: item });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 });

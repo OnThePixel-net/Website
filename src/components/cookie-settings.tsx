@@ -17,10 +17,16 @@ export default function CookieSettings({ isOpen, onClose }: CookieSettingsProps)
   const t = useTranslations();
   const { preferences, updatePreferences, resetPreferences } = useAnalytics();
   const [analyticsEnabled, setAnalyticsEnabled] = useState(preferences.analytics);
+  const [youtubeEnabled, setYoutubeEnabled] = useState(preferences.youtube);
+  const [twitchEnabled, setTwitchEnabled] = useState(preferences.twitch);
 
   useEffect(() => {
-    if (isOpen) setAnalyticsEnabled(preferences.analytics);
-  }, [isOpen, preferences.analytics]);
+    if (isOpen) {
+      setAnalyticsEnabled(preferences.analytics);
+      setYoutubeEnabled(preferences.youtube);
+      setTwitchEnabled(preferences.twitch);
+    }
+  }, [isOpen, preferences.analytics, preferences.youtube, preferences.twitch]);
 
   const handleClose = useCallback(() => {
     onClose();
@@ -43,14 +49,18 @@ export default function CookieSettings({ isOpen, onClose }: CookieSettingsProps)
   if (!isOpen) return null;
 
   const handleSave = () => {
-    updatePreferences({ analytics: analyticsEnabled });
-    localStorage.setItem("cookie-consent", analyticsEnabled ? "accepted" : "custom");
+    updatePreferences({ analytics: analyticsEnabled, youtube: youtubeEnabled, twitch: twitchEnabled });
+    localStorage.setItem("cookie-consent", (analyticsEnabled || youtubeEnabled || twitchEnabled) ? "custom" : "declined");
+    window.dispatchEvent(new Event("youtube-consent-changed"));
+    window.dispatchEvent(new Event("twitch-consent-changed"));
     onClose();
   };
 
   const handleReset = () => {
     resetPreferences();
     setAnalyticsEnabled(false);
+    setYoutubeEnabled(false);
+    setTwitchEnabled(false);
     onClose();
   };
 
@@ -129,6 +139,42 @@ export default function CookieSettings({ isOpen, onClose }: CookieSettingsProps)
                 id="analytics"
                 checked={analyticsEnabled}
                 onCheckedChange={setAnalyticsEnabled}
+              />
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-gray-800 bg-gray-800/40 p-4 transition-colors hover:border-gray-700">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <Label htmlFor="youtube" className="text-base font-medium text-white">
+                  {t.cookieSettings.youtubeLabel}
+                </Label>
+                <p className="mt-1 text-sm text-gray-400">
+                  {t.cookieSettings.youtubeDesc}
+                </p>
+              </div>
+              <Switch
+                id="youtube"
+                checked={youtubeEnabled}
+                onCheckedChange={setYoutubeEnabled}
+              />
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-gray-800 bg-gray-800/40 p-4 transition-colors hover:border-gray-700">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <Label htmlFor="twitch" className="text-base font-medium text-white">
+                  {t.cookieSettings.twitchLabel}
+                </Label>
+                <p className="mt-1 text-sm text-gray-400">
+                  {t.cookieSettings.twitchDesc}
+                </p>
+              </div>
+              <Switch
+                id="twitch"
+                checked={twitchEnabled}
+                onCheckedChange={setTwitchEnabled}
               />
             </div>
           </div>

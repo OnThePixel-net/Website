@@ -1,11 +1,8 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/i18n/seo";
 import { SUPPORTED_LOCALES } from "@/lib/i18n/translations";
-
-interface CmsNewsItem {
-  url: string;
-  date?: string;
-}
+import { getDb, schema } from "@/lib/db";
+import { ensureTable } from "@/lib/db/migrate";
 
 const STATIC_PATHS: { path: string; priority: number; changeFreq: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
   { path: "/", priority: 1.0, changeFreq: "weekly" },
@@ -32,14 +29,11 @@ const STATIC_PATHS: { path: string; priority: number; changeFreq: MetadataRoute.
   { path: "/privacy", priority: 0.3, changeFreq: "yearly" },
 ];
 
-async function getNewsUrls(): Promise<CmsNewsItem[]> {
+async function getNewsUrls(): Promise<{ slug: string; published_at: string }[]> {
   try {
-    const res = await fetch("https://cms.onthepixel.net/items/News", {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return (data.data || []) as CmsNewsItem[];
+    await ensureTable();
+    const db = getDb();
+    return await db.select({ slug: schema.news.slug, published_at: schema.news.published_at }).from(schema.news);
   } catch {
     return [];
   }
@@ -72,10 +66,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   const newsEntries: MetadataRoute.Sitemap = news.map((n) => {
-    const path = `/news/${n.url}`;
+    const path = `/news/${n.slug}`;
     return {
       url: `${SITE_URL}${path}`,
-      lastModified: n.date ? new Date(n.date) : new Date(),
+      lastModified: n.published_at ? new Date(n.published_at) : new Date(),
       changeFrequency: "monthly",
       priority: 0.6,
       alternates: { languages: buildLanguageAlternates(path) },
