@@ -26,7 +26,6 @@
         "./src/*"
       ]
     },
-    "baseUrl": "./",
     "target": "esnext"
   },
   "include": [
