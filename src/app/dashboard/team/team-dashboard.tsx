@@ -13,6 +13,7 @@ import {
   UserPlus,
   Shield,
   Save,
+  Pencil,
 } from "lucide-react";
 import { FaDiscord } from "react-icons/fa";
 import AuthGuard from "../auth-guard";
@@ -229,6 +230,205 @@ function CreateModal({
   );
 }
 
+/* --- Edit member modal --- */
+function EditModal({
+  member,
+  groups,
+  onClose,
+  onSaved,
+}: {
+  member: Member;
+  groups: Group[];
+  onClose: () => void;
+  onSaved: (msg: string) => void;
+}) {
+  const [displayName, setDisplayName] = useState(member.displayName);
+  const [email, setEmail] = useState(member.email);
+  const [minecraftUuid, setMinecraftUuid] = useState(member.minecraftUuid);
+  const [discordId, setDiscordId] = useState(member.discordId);
+  const [disabled, setDisabled] = useState(member.disabled);
+  const [groupIds, setGroupIds] = useState<string[]>(
+    member.groups.map((g) => g.id),
+  );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const toggleGroup = (id: string) =>
+    setGroupIds((prev) =>
+      prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id],
+    );
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (groupIds.length === 0)
+      return setError("Mindestens eine Gruppe muss ausgewählt werden.");
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/dashboard/team/${member.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          displayName: displayName.trim(),
+          email: email.trim(),
+          minecraftUuid: minecraftUuid.trim(),
+          discordId: discordId.trim(),
+          disabled,
+          groupIds,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok)
+        throw new Error(
+          data.detail || data.error || "Speichern fehlgeschlagen.",
+        );
+      onSaved(`${member.username} wurde aktualisiert.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative z-10 w-full max-w-lg rounded-2xl border border-white/10 bg-gray-900 p-6 shadow-2xl">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15">
+            <Pencil size={17} className="text-blue-400" />
+          </div>
+          <div>
+            <p className="font-semibold text-white">
+              {member.username} bearbeiten
+            </p>
+            <p className="text-xs text-white/40">
+              Ändert das Konto in PocketID.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="ml-auto rounded-md p-1 text-white/30 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={submit} className="flex flex-col gap-4">
+          <Field label="Anzeigename">
+            <input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder={member.username}
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/20 transition-all outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20"
+              autoFocus
+            />
+          </Field>
+
+          <Field label="E-Mail">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="username@onthepixel.net"
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/20 transition-all outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20"
+            />
+          </Field>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Minecraft-UUID">
+              <input
+                value={minecraftUuid}
+                onChange={(e) => setMinecraftUuid(e.target.value)}
+                placeholder="b35d0c41-37e8-…"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/20 transition-all outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20"
+              />
+            </Field>
+            <Field label="Discord-ID">
+              <input
+                value={discordId}
+                onChange={(e) => setDiscordId(e.target.value)}
+                placeholder="1279066016005099536"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/20 transition-all outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20"
+              />
+            </Field>
+          </div>
+
+          <Field label="Gruppen">
+            <div className="flex flex-wrap gap-2">
+              {groups.map((g) => {
+                const active = groupIds.includes(g.id);
+                return (
+                  <button
+                    key={g.id}
+                    type="button"
+                    onClick={() => toggleGroup(g.id)}
+                    className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      active
+                        ? "border-green-500/40 bg-green-500/15 text-green-300"
+                        : "border-white/10 bg-white/5 text-white/40 hover:bg-white/10"
+                    }`}
+                  >
+                    <Shield size={12} /> {g.friendlyName}
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+
+          <label className="flex cursor-pointer items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2.5">
+            <div>
+              <p className="text-sm font-medium text-white">
+                Konto deaktiviert
+              </p>
+              <p className="text-xs text-white/40">
+                Deaktivierte Konten können sich nicht anmelden.
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              checked={disabled}
+              onChange={(e) => setDisabled(e.target.checked)}
+              className="h-4 w-4 accent-red-500"
+            />
+          </label>
+
+          {error && (
+            <div className="flex items-start gap-2.5 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-300">
+              <AlertCircle size={15} className="mt-0.5 shrink-0" />
+              <span className="break-words">{error}</span>
+            </div>
+          )}
+
+          <div className="mt-1 flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 rounded-lg border border-white/10 py-2 text-sm text-white/60 transition-colors hover:bg-white/5"
+            >
+              Abbrechen
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-500 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-400 disabled:opacity-60"
+            >
+              {loading ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Save size={14} />
+              )}
+              Speichern
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 /* --- Delete modal --- */
 function DeleteModal({
   member,
@@ -290,9 +490,11 @@ function DeleteModal({
 /* --- Table row --- */
 function MemberRow({
   member,
+  onEdit,
   onDelete,
 }: {
   member: Member;
+  onEdit: (m: Member) => void;
   onDelete: (m: Member) => void;
 }) {
   return (
@@ -356,12 +558,20 @@ function MemberRow({
         )}
       </td>
       <td className="py-3 pr-4 pl-3">
-        <button
-          onClick={() => onDelete(member)}
-          className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-white/40 transition-colors hover:bg-red-500/10 hover:text-red-400"
-        >
-          <Trash2 size={12} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => onEdit(member)}
+            className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-white/40 transition-colors hover:bg-blue-500/10 hover:text-blue-400"
+          >
+            <Pencil size={12} />
+          </button>
+          <button
+            onClick={() => onDelete(member)}
+            className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-white/40 transition-colors hover:bg-red-500/10 hover:text-red-400"
+          >
+            <Trash2 size={12} />
+          </button>
+        </div>
       </td>
     </tr>
   );
@@ -375,6 +585,7 @@ function TeamDashboardContent() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [editTarget, setEditTarget] = useState<Member | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Member | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -451,6 +662,18 @@ function TeamDashboardContent() {
           onClose={() => setShowCreate(false)}
           onCreated={(msg) => {
             setShowCreate(false);
+            load();
+            showToast(msg);
+          }}
+        />
+      )}
+      {editTarget && (
+        <EditModal
+          member={editTarget}
+          groups={groups}
+          onClose={() => setEditTarget(null)}
+          onSaved={(msg) => {
+            setEditTarget(null);
             load();
             showToast(msg);
           }}
@@ -557,7 +780,12 @@ function TeamDashboardContent() {
               </thead>
               <tbody>
                 {filtered.map((m) => (
-                  <MemberRow key={m.id} member={m} onDelete={setDeleteTarget} />
+                  <MemberRow
+                    key={m.id}
+                    member={m}
+                    onEdit={setEditTarget}
+                    onDelete={setDeleteTarget}
+                  />
                 ))}
               </tbody>
             </table>
