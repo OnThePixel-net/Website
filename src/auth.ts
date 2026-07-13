@@ -24,6 +24,10 @@ if (
     issuer: process.env.OIDC_ISSUER,
     clientId: process.env.OIDC_CLIENT_ID,
     clientSecret: process.env.OIDC_CLIENT_SECRET,
+    // Explicitly send all three checks. Without this, the custom provider
+    // falls back to "pkce" only, so the authorize URL omits `state` and
+    // `nonce` and Pocket ID rejects the request with `invalid_state`.
+    checks: ["pkce", "state", "nonce"],
   });
 }
 
