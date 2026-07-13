@@ -112,7 +112,7 @@ export async function pocketIdFetch(
 export async function fetchAllPages<T>(path: string): Promise<T[]> {
   const items: T[] = [];
   let page = 1;
-  let totalPages = 1;
+  let totalPages: number;
   const sep = path.includes("?") ? "&" : "?";
 
   do {
