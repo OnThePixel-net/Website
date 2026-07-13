@@ -74,21 +74,19 @@ function OverviewContent() {
     async function load() {
       try {
         const [newsRes, creatorsRes, teamRes] = await Promise.all([
-          fetch(
-            "https://cms.onthepixel.net/items/News?limit=1&meta=total_count",
-          ),
+          fetch("/api/dashboard/news"),
           fetch(
             "https://cms.onthepixel.net/items/Creators?limit=1&meta=total_count",
           ),
           fetch("/api/dashboard/team"),
         ]);
         const [newsData, creatorsData, teamData] = await Promise.all([
-          newsRes.json(),
+          newsRes.ok ? newsRes.json() : Promise.resolve({ data: [] }),
           creatorsRes.json(),
           teamRes.ok ? teamRes.json() : Promise.resolve({ users: [] }),
         ]);
         setStats({
-          newsCount: newsData?.meta?.total_count ?? newsData?.data?.length ?? 0,
+          newsCount: newsData?.data?.length ?? 0,
           creatorsCount:
             creatorsData?.meta?.total_count ?? creatorsData?.data?.length ?? 0,
           teamCount: teamData?.users?.length ?? 0,
