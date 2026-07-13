@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Newspaper,
   Users,
+  UserCog,
   LogOut,
   Menu,
   X,
@@ -20,6 +21,7 @@ const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/news", label: "News", icon: Newspaper },
   { href: "/dashboard/creators", label: "Creators", icon: Users },
+  { href: "/dashboard/team", label: "Team", icon: UserCog },
 ];
 
 function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -37,7 +39,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-white/5 bg-gray-950 transition-transform duration-300 lg:translate-x-0",
-          open ? "translate-x-0" : "-translate-x-full"
+          open ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="flex h-16 items-center justify-between border-b border-white/5 px-5">
@@ -71,7 +73,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
                   active
                     ? "bg-green-500/10 text-green-400"
-                    : "text-white/50 hover:bg-white/5 hover:text-white"
+                    : "text-white/50 hover:bg-white/5 hover:text-white",
                 )}
               >
                 <item.icon size={18} />
@@ -145,7 +147,10 @@ export default function DashboardLayout({
             </button>
             <div className="flex items-center gap-2 text-white/20 lg:hidden">
               <Shield size={14} className="text-green-400/60" />
-              <span className="text-xs font-semibold" style={{ fontFamily: "'Syne', sans-serif" }}>
+              <span
+                className="text-xs font-semibold"
+                style={{ fontFamily: "'Syne', sans-serif" }}
+              >
                 OTP <span className="text-green-400">Admin</span>
               </span>
             </div>

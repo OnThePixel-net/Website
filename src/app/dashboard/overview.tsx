@@ -2,12 +2,19 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Newspaper, Users, ArrowRight, TrendingUp } from "lucide-react";
+import {
+  Newspaper,
+  Users,
+  UserCog,
+  ArrowRight,
+  TrendingUp,
+} from "lucide-react";
 import AuthGuard from "./auth-guard";
 
 interface StatsState {
   newsCount: number | null;
   creatorsCount: number | null;
+  teamCount: number | null;
   loading: boolean;
 }
 
@@ -45,7 +52,11 @@ function StatCard({
         </div>
       </div>
       <div className="mt-4 flex items-center gap-1 text-xs text-white/30 transition-colors group-hover:text-white/60">
-        Manage <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
+        Manage{" "}
+        <ArrowRight
+          size={12}
+          className="transition-transform group-hover:translate-x-0.5"
+        />
       </div>
     </Link>
   );
@@ -55,27 +66,42 @@ function OverviewContent() {
   const [stats, setStats] = useState<StatsState>({
     newsCount: null,
     creatorsCount: null,
+    teamCount: null,
     loading: true,
   });
 
   useEffect(() => {
     async function load() {
       try {
-        const [newsRes, creatorsRes] = await Promise.all([
-          fetch("https://cms.onthepixel.net/items/News?limit=1&meta=total_count"),
-          fetch("https://cms.onthepixel.net/items/Creators?limit=1&meta=total_count"),
+        const [newsRes, creatorsRes, teamRes] = await Promise.all([
+          fetch(
+            "https://cms.onthepixel.net/items/News?limit=1&meta=total_count",
+          ),
+          fetch(
+            "https://cms.onthepixel.net/items/Creators?limit=1&meta=total_count",
+          ),
+          fetch("/api/dashboard/team"),
         ]);
-        const [newsData, creatorsData] = await Promise.all([
+        const [newsData, creatorsData, teamData] = await Promise.all([
           newsRes.json(),
           creatorsRes.json(),
+          teamRes.ok ? teamRes.json() : Promise.resolve({ users: [] }),
         ]);
         setStats({
           newsCount: newsData?.meta?.total_count ?? newsData?.data?.length ?? 0,
-          creatorsCount: creatorsData?.meta?.total_count ?? creatorsData?.data?.length ?? 0,
+          creatorsCount:
+            creatorsData?.meta?.total_count ?? creatorsData?.data?.length ?? 0,
+          teamCount: teamData?.users?.length ?? 0,
           loading: false,
         });
       } catch {
-        setStats((s) => ({ ...s, loading: false, newsCount: 0, creatorsCount: 0 }));
+        setStats((s) => ({
+          ...s,
+          loading: false,
+          newsCount: 0,
+          creatorsCount: 0,
+          teamCount: 0,
+        }));
       }
     }
     load();
@@ -110,6 +136,13 @@ function OverviewContent() {
           href="/dashboard/creators"
           color="bg-blue-500/20"
         />
+        <StatCard
+          label="Team Members"
+          value={stats.teamCount}
+          icon={UserCog}
+          href="/dashboard/team"
+          color="bg-orange-500/20"
+        />
         <div className="rounded-xl border border-white/5 bg-white/[0.03] p-6">
           <div className="flex items-start justify-between">
             <div>
@@ -131,6 +164,12 @@ function OverviewContent() {
               className="flex items-center gap-2 rounded-lg bg-blue-500/10 px-3 py-2 text-sm font-medium text-blue-400 transition-colors hover:bg-blue-500/20"
             >
               <Users size={14} /> Manage Creators
+            </Link>
+            <Link
+              href="/dashboard/team"
+              className="flex items-center gap-2 rounded-lg bg-orange-500/10 px-3 py-2 text-sm font-medium text-orange-400 transition-colors hover:bg-orange-500/20"
+            >
+              <UserCog size={14} /> Manage Team
             </Link>
           </div>
         </div>
