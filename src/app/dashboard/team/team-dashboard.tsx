@@ -14,6 +14,8 @@ import {
   Shield,
   Save,
   Pencil,
+  Tag,
+  Weight,
 } from "lucide-react";
 import { FaDiscord } from "react-icons/fa";
 import AuthGuard from "../auth-guard";
@@ -22,6 +24,8 @@ interface Group {
   id: string;
   friendlyName: string;
   name?: string;
+  prefix?: string;
+  weight?: string;
 }
 
 interface Member {
@@ -487,6 +491,233 @@ function DeleteModal({
   );
 }
 
+/* --- Create / edit group modal --- */
+function GroupModal({
+  group,
+  onClose,
+  onSaved,
+}: {
+  group: Group | null;
+  onClose: () => void;
+  onSaved: (msg: string) => void;
+}) {
+  const editing = !!group;
+  const [name, setName] = useState(group?.friendlyName ?? "");
+  const [prefix, setPrefix] = useState(group?.prefix ?? "");
+  const [weight, setWeight] = useState(group?.weight ?? "");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!name.trim()) return setError("Name ist erforderlich.");
+    setLoading(true);
+    try {
+      const url = editing
+        ? `/api/dashboard/team/groups/${group!.id}`
+        : "/api/dashboard/team/groups";
+      const res = await fetch(url, {
+        method: editing ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          prefix: prefix.trim(),
+          weight: weight.trim(),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok)
+        throw new Error(
+          data.detail || data.error || "Speichern fehlgeschlagen.",
+        );
+      onSaved(
+        data.warning ??
+          (editing
+            ? `Gruppe "${name}" wurde aktualisiert.`
+            : `Gruppe "${name}" wurde angelegt.`),
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative z-10 w-full max-w-lg rounded-2xl border border-white/10 bg-gray-900 p-6 shadow-2xl">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/15">
+            <Shield size={18} className="text-purple-400" />
+          </div>
+          <div>
+            <p className="font-semibold text-white">
+              {editing ? `${group!.friendlyName} bearbeiten` : "Neue Gruppe"}
+            </p>
+            <p className="text-xs text-white/40">
+              OTP-Team-Gruppe in PocketID.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="ml-auto rounded-md p-1 text-white/30 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={submit} className="flex flex-col gap-4">
+          <Field label="Name *">
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="z. B. Moderator"
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/20 transition-all outline-none focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20"
+              autoFocus
+            />
+          </Field>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Prefix">
+              <input
+                value={prefix}
+                onChange={(e) => setPrefix(e.target.value)}
+                placeholder="z. B. &7[Mod]"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/20 transition-all outline-none focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20"
+              />
+            </Field>
+            <Field label="Weight">
+              <input
+                type="number"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                placeholder="z. B. 100"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/20 transition-all outline-none focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20"
+              />
+            </Field>
+          </div>
+
+          {error && (
+            <div className="flex items-start gap-2.5 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-300">
+              <AlertCircle size={15} className="mt-0.5 shrink-0" />
+              <span className="break-words">{error}</span>
+            </div>
+          )}
+
+          <div className="mt-1 flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 rounded-lg border border-white/10 py-2 text-sm text-white/60 transition-colors hover:bg-white/5"
+            >
+              Abbrechen
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-purple-500 py-2 text-sm font-semibold text-white transition-colors hover:bg-purple-400 disabled:opacity-60"
+            >
+              {loading ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Save size={14} />
+              )}
+              {editing ? "Speichern" : "Erstellen"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+/* --- Groups panel --- */
+function GroupsPanel({
+  groups,
+  onCreate,
+  onEdit,
+}: {
+  groups: Group[];
+  onCreate: () => void;
+  onEdit: (g: Group) => void;
+}) {
+  return (
+    <div className="mb-8">
+      <div className="mb-3 flex items-center justify-between">
+        <div>
+          <h2
+            className="text-lg font-bold text-white"
+            style={{ fontFamily: "'Syne', sans-serif" }}
+          >
+            Gruppen
+          </h2>
+          <p className="mt-0.5 text-sm text-white/40">
+            {groups.length} OTP-Gruppen
+          </p>
+        </div>
+        <button
+          onClick={onCreate}
+          className="flex h-9 items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-4 text-sm font-semibold text-purple-300 transition-colors hover:bg-purple-500/20"
+        >
+          <Plus size={15} /> Neue Gruppe
+        </button>
+      </div>
+
+      {groups.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] py-10">
+          <Shield size={28} className="text-white/10" />
+          <p className="text-sm text-white/30">Keine OTP-Gruppen.</p>
+        </div>
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {groups.map((g) => (
+            <div
+              key={g.id}
+              className="group flex items-start justify-between gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.04]"
+            >
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <Shield size={14} className="shrink-0 text-purple-400" />
+                  <p className="truncate text-sm font-medium text-white">
+                    {g.friendlyName}
+                  </p>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {g.prefix ? (
+                    <span className="inline-flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 font-mono text-xs text-white/60">
+                      <Tag size={11} /> {g.prefix}
+                    </span>
+                  ) : null}
+                  {g.weight ? (
+                    <span className="inline-flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 text-xs text-white/60">
+                      <Weight size={11} /> {g.weight}
+                    </span>
+                  ) : null}
+                  {!g.prefix && !g.weight && (
+                    <span className="text-xs text-white/20">
+                      kein Prefix / Weight
+                    </span>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => onEdit(g)}
+                className="shrink-0 rounded-md p-1.5 text-white/30 transition-colors hover:bg-purple-500/10 hover:text-purple-400"
+              >
+                <Pencil size={13} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* --- Table row --- */
 function MemberRow({
   member,
@@ -588,6 +819,9 @@ function TeamDashboardContent() {
   const [editTarget, setEditTarget] = useState<Member | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Member | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [groupModal, setGroupModal] = useState<{ group: Group | null } | null>(
+    null,
+  );
   const [toast, setToast] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -687,6 +921,17 @@ function TeamDashboardContent() {
           loading={deleteLoading}
         />
       )}
+      {groupModal && (
+        <GroupModal
+          group={groupModal.group}
+          onClose={() => setGroupModal(null)}
+          onSaved={(msg) => {
+            setGroupModal(null);
+            load();
+            showToast(msg);
+          }}
+        />
+      )}
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -736,6 +981,14 @@ function TeamDashboardContent() {
           <AlertCircle size={15} className="mt-0.5 shrink-0" />
           <span className="break-words">{loadError}</span>
         </div>
+      )}
+
+      {!loading && (
+        <GroupsPanel
+          groups={groups}
+          onCreate={() => setGroupModal({ group: null })}
+          onEdit={(g) => setGroupModal({ group: g })}
+        />
       )}
 
       <div className="overflow-hidden rounded-xl border border-white/5 bg-white/[0.02]">

@@ -128,6 +128,12 @@ export async function fetchAllPages<T>(path: string): Promise<T[]> {
   return items;
 }
 
+/** The custom claim that marks a group as belonging to the OTP team. */
+export const OTP_TEAM_CLAIM: CustomClaim = {
+  key: TEAM_CLAIM_KEY,
+  value: TEAM_CLAIM_VALUE,
+};
+
 /** True when a group carries the `Team=OTP` custom claim. */
 export function isOtpGroup(group: UserGroup): boolean {
   return (group.customClaims ?? []).some(
@@ -145,10 +151,31 @@ export function isOtpMember(user: PocketUser, otpIds: Set<string>): boolean {
   return (user.userGroups ?? []).some((g) => otpIds.has(g.id));
 }
 
-/** Read a custom-claim value off a user by key (case-insensitive). */
-export function getClaim(user: PocketUser, key: string): string {
-  const claim = (user.customClaims ?? []).find(
+/** Read a custom-claim value from any claim list by key (case-insensitive). */
+export function readClaim(
+  claims: CustomClaim[] | undefined,
+  key: string,
+): string {
+  const claim = (claims ?? []).find(
     (c) => c.key.toLowerCase() === key.toLowerCase(),
   );
   return claim?.value ?? "";
+}
+
+/** Read a custom-claim value off a user by key (case-insensitive). */
+export function getClaim(user: PocketUser, key: string): string {
+  return readClaim(user.customClaims, key);
+}
+
+/**
+ * Slugify a display name into a PocketID group `name` (lowercase, digits and
+ * single hyphens). Falls back to `group` when nothing usable remains.
+ */
+export function slugifyGroupName(input: string): string {
+  const slug = input
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || "group";
 }

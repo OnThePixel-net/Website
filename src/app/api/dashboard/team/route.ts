@@ -6,6 +6,7 @@ import {
   otpGroupIds,
   isOtpMember,
   getClaim,
+  readClaim,
   PocketIdError,
   type PocketUser,
   type UserGroup,
@@ -42,7 +43,13 @@ export async function GET() {
     const otpIds = otpGroupIds(groups);
     const otpGroups = groups
       .filter((g) => otpIds.has(g.id))
-      .map((g) => ({ id: g.id, name: g.name, friendlyName: g.friendlyName }));
+      .map((g) => ({
+        id: g.id,
+        name: g.name,
+        friendlyName: g.friendlyName,
+        prefix: readClaim(g.customClaims, "prefix"),
+        weight: readClaim(g.customClaims, "weight"),
+      }));
 
     const members = users
       .filter((u) => isOtpMember(u, otpIds))
