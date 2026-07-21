@@ -60,7 +60,7 @@
     "eslint-config-next": "^16.2.10",
     "eslint-plugin-drizzle": "^0.2.3",
     "postcss": "^8.5.20",
-    "prettier": "^3.9.5",
+    "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.1",
