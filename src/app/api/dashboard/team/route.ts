@@ -72,7 +72,7 @@ export async function GET() {
   }
 }
 
-/** POST — create a new team member via /api/signup, then set custom claims. */
+/** POST — create a new team member via the admin API, then set custom claims. */
 export async function POST(req: NextRequest) {
   if (!(await checkAuth()))
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -107,22 +107,34 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
 
-    // 1) Create the user account.
-    const signupRes = await pocketIdFetch("/api/signup", {
+    // 1) Create the user account via the admin endpoint. `/api/signup` is the
+    //    public self-registration route and is rejected with "Open user signup
+    //    is not enabled" when that toggle is off — admins create accounts
+    //    through `/api/users` (authenticated with the API key) instead. The
+    //    body mirrors the update route's shape; group membership is assigned
+    //    separately below.
+    const createRes = await pocketIdFetch("/api/users", {
       method: "POST",
       body: JSON.stringify({
         username,
         email,
         emailVerified: true,
         displayName: username,
-        userGroupIds: [groupId],
         disabled: false,
         isAdmin: false,
       }),
     });
-    const created = (await signupRes.json()) as PocketUser;
+    const created = (await createRes.json()) as PocketUser;
 
-    // 2) Set the Discord / Minecraft custom claims on the new user.
+    // 2) Assign the chosen OTP group (same endpoint the update route uses).
+    if (created?.id) {
+      await pocketIdFetch(`/api/users/${created.id}/user-groups`, {
+        method: "PUT",
+        body: JSON.stringify({ userGroupIds: [groupId] }),
+      });
+    }
+
+    // 3) Set the Discord / Minecraft custom claims on the new user.
     const claims = [
       { key: "Discord-id", value: discordId },
       { key: "Minecraft-uuid", value: minecraftUuid },
