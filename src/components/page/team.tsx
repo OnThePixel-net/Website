@@ -2,47 +2,26 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getServerTranslations } from "@/lib/i18n/server";
+import { getPublicTeamMembers, type PublicTeamMember } from "@/lib/pocketid";
 import Reveal from "@/components/gsap/Reveal";
 
-interface Rank {
-  uuid: string;
-  Name: string;
-  Color: string;
-  Discord_role_id: string;
-  Priority: number;
-}
-
-interface TeamMember {
-  minecraft_username: string;
-  Name: string;
-  Ranks?: Rank;
-}
-
-async function getTeamMembers(): Promise<TeamMember[]> {
+async function getTeamMembers(): Promise<PublicTeamMember[]> {
   try {
-    const response = await fetch(
-      "https://cms.onthepixel.net/items/Team?fields=*.*.*",
-      { next: { revalidate: 300 } }
-    );
-    if (!response.ok) return [];
-    const data = await response.json();
-    return data.data || [];
+    // Sourced from the PocketID team system (the dashboard), not the legacy
+    // Directus CMS. Degrades to an empty list if PocketID is unreachable.
+    return await getPublicTeamMembers();
   } catch {
     return [];
   }
 }
 
 export default async function Team() {
-  const [teamMembers, { t }] = await Promise.all([
+  // `getPublicTeamMembers` already orders members by group weight (highest
+  // first), so no further sorting is needed here.
+  const [sortedMembers, { t }] = await Promise.all([
     getTeamMembers(),
     getServerTranslations(),
   ]);
-
-  const sortedMembers = [...teamMembers].sort((a, b) => {
-    const priorityA = a.Ranks ? a.Ranks.Priority : 999;
-    const priorityB = b.Ranks ? b.Ranks.Priority : 999;
-    return priorityA - priorityB;
-  });
 
   return (
     <section className="py-10 px-4 bg-gray-950">
@@ -60,18 +39,18 @@ export default async function Team() {
             distance={30}
             className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"
           >
-            {sortedMembers.map((member, index) => {
-              const mainRank = member.Ranks;
+            {sortedMembers.map((member) => {
+              const avatarId = member.minecraftUuid || member.username;
 
               return (
                 <div
-                  key={index}
+                  key={member.id}
                   className="m-1 flex items-center rounded-md bg-white/10 p-4 transition-transform duration-300 hover:scale-105 hover:bg-white/15 gap-4"
                 >
                   <div className="relative shrink-0 rounded-lg overflow-hidden">
                     <Image
-                      alt={member.minecraft_username}
-                      src={`https://api.mcskin.me/pfp/${member.minecraft_username}`}
+                      alt={member.name}
+                      src={`https://api.mcskin.me/pfp/${avatarId}`}
                       width={64}
                       height={64}
                       className="rounded-lg object-cover"
@@ -79,13 +58,13 @@ export default async function Team() {
                   </div>
 
                   <div className="min-w-0">
-                    <p className="font-bold text-white truncate">{member.Name}</p>
-                    {mainRank ? (
+                    <p className="font-bold text-white truncate">{member.name}</p>
+                    {member.rankName ? (
                       <p
                         className="text-sm font-semibold tracking-wide truncate"
-                        style={{ color: mainRank.Color }}
+                        style={{ color: member.rankColor }}
                       >
-                        {mainRank.Name.toUpperCase()}
+                        {member.rankName.toUpperCase()}
                       </p>
                     ) : (
                       <p className="text-sm text-gray-400">{t.team.memberFallback}</p>

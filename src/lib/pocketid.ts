@@ -70,9 +70,20 @@ export class PocketIdError extends Error {
   }
 }
 
+/** Optional caching behaviour for a PocketID request. */
+export interface PocketIdFetchOpts {
+  /**
+   * When set, the request participates in Next.js data caching with this
+   * revalidation window (seconds) instead of the default `no-store`. Use for
+   * public, read-only calls that don't need per-request freshness.
+   */
+  revalidate?: number;
+}
+
 export async function pocketIdFetch(
   path: string,
   init: RequestInit = {},
+  opts: PocketIdFetchOpts = {},
 ): Promise<Response> {
   const apiKey = getApiKey();
   if (!apiKey) {
@@ -90,10 +101,15 @@ export async function pocketIdFetch(
     headers.set("Content-Type", "application/json");
   }
 
+  const cacheInit: RequestInit =
+    opts.revalidate != null
+      ? { next: { revalidate: opts.revalidate } }
+      : { cache: "no-store" };
+
   const res = await fetch(`${POCKETID_BASE}${path}`, {
     ...init,
+    ...cacheInit,
     headers,
-    cache: "no-store",
   });
 
   if (!res.ok) {
@@ -109,7 +125,10 @@ export async function pocketIdFetch(
 }
 
 /** Fetch every page of a paginated PocketID collection endpoint. */
-export async function fetchAllPages<T>(path: string): Promise<T[]> {
+export async function fetchAllPages<T>(
+  path: string,
+  opts: PocketIdFetchOpts = {},
+): Promise<T[]> {
   const items: T[] = [];
   let page = 1;
   let totalPages: number;
@@ -118,6 +137,8 @@ export async function fetchAllPages<T>(path: string): Promise<T[]> {
   do {
     const res = await pocketIdFetch(
       `${path}${sep}pagination[page]=${page}&pagination[limit]=100`,
+      {},
+      opts,
     );
     const json = (await res.json()) as Paginated<T>;
     items.push(...(json.data ?? []));
@@ -178,4 +199,113 @@ export function slugifyGroupName(input: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
   return slug || "group";
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Public team listing                                                       */
+/* -------------------------------------------------------------------------- */
+
+/** Numeric `weight` claim of a group (0 when unset/invalid). */
+export function groupWeight(group: UserGroup | undefined): number {
+  const raw = readClaim(group?.customClaims, "weight");
+  const n = Number.parseInt(raw, 10);
+  return Number.isFinite(n) ? n : 0;
+}
+
+/** Legacy Minecraft colour codes → hex. */
+const MC_COLORS: Record<string, string> = {
+  "0": "#000000",
+  "1": "#0000AA",
+  "2": "#00AA00",
+  "3": "#00AAAA",
+  "4": "#AA0000",
+  "5": "#AA00AA",
+  "6": "#FFAA00",
+  "7": "#AAAAAA",
+  "8": "#555555",
+  "9": "#5555FF",
+  a: "#55FF55",
+  b: "#55FFFF",
+  c: "#FF5555",
+  d: "#FF55FF",
+  e: "#FFFF55",
+  f: "#FFFFFF",
+};
+
+/** Fallback rank colour when a prefix carries no usable colour information. */
+const DEFAULT_RANK_COLOR = "#AAAAAA";
+
+/**
+ * Derive a display colour from a Minecraft-style group prefix. Supports hex
+ * codes (`&#RRGGBB`) and legacy colour codes (`&c`, `§a`, …); falls back to a
+ * neutral grey when no colour is present.
+ */
+export function prefixColor(prefix: string | undefined): string {
+  if (!prefix) return DEFAULT_RANK_COLOR;
+  const hex = prefix.match(/[&§]?#([0-9a-fA-F]{6})/);
+  if (hex) return `#${hex[1]}`;
+  const code = prefix.match(/[&§]([0-9a-fA-F])/);
+  if (code) return MC_COLORS[code[1].toLowerCase()] ?? DEFAULT_RANK_COLOR;
+  return DEFAULT_RANK_COLOR;
+}
+
+/** A team member shaped for the public `/team` page. Carries no email/PII. */
+export interface PublicTeamMember {
+  /** PocketID user id (stable React key). */
+  id: string;
+  /** Display name, falling back to the username. */
+  name: string;
+  /** Login name — used for the skin avatar when no Minecraft UUID is set. */
+  username: string;
+  /** Minecraft UUID custom claim (preferred avatar lookup). */
+  minecraftUuid: string;
+  /** Friendly name of the member's highest-weight OTP group. */
+  rankName: string;
+  /** Colour derived from that group's prefix. */
+  rankColor: string;
+  /** Weight of that group (used for ordering, highest first). */
+  weight: number;
+}
+
+/**
+ * Fetch the OTP team members for the public `/team` page from PocketID.
+ *
+ * Replaces the legacy Directus CMS `Team` collection. Only enabled accounts in
+ * an OTP-team group are returned, ranked by their group's weight (highest
+ * first), and no email/PII leaves the server. Results are cached for 5 minutes.
+ */
+export async function getPublicTeamMembers(): Promise<PublicTeamMember[]> {
+  const [groups, users] = await Promise.all([
+    fetchAllPages<UserGroup>("/api/user-groups", { revalidate: 300 }),
+    fetchAllPages<PocketUser>("/api/users", { revalidate: 300 }),
+  ]);
+
+  const otpIds = otpGroupIds(groups);
+  const groupById = new Map(groups.map((g) => [g.id, g]));
+
+  return users
+    .filter((u) => !u.disabled && isOtpMember(u, otpIds))
+    .map((u) => {
+      // Resolve the user's OTP groups to their full definitions (the group
+      // objects embedded on the user may omit custom claims / friendly names).
+      const memberGroups = (u.userGroups ?? [])
+        .filter((g) => otpIds.has(g.id))
+        .map((g) => groupById.get(g.id) ?? g);
+
+      // Highest weight wins as the member's primary rank.
+      const primary = memberGroups
+        .slice()
+        .sort((a, b) => groupWeight(b) - groupWeight(a))[0];
+
+      return {
+        id: u.id,
+        name: u.displayName ?? u.username,
+        username: u.username,
+        minecraftUuid: getClaim(u, "Minecraft-uuid"),
+        rankName: primary?.friendlyName ?? primary?.name ?? "",
+        rankColor: prefixColor(readClaim(primary?.customClaims, "prefix")),
+        weight: groupWeight(primary),
+      } satisfies PublicTeamMember;
+    })
+    .sort((a, b) => b.weight - a.weight);
 }
