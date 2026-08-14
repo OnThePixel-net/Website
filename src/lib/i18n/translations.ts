@@ -47,7 +47,11 @@ export const translations = {
       aboutUs: "About us",
       meetTheTeam: "Meet the Team",
       creators: "Creators",
+      sectionGames: "Games",
+      bedWars: "BedWars",
+      buildFFA: "BuildFFA",
       tntRun: "TNT Run",
+      sideQuests: "Sidequests",
       sectionResources: "Resources",
       leaderboard: "Leaderboard",
       statistics: "Statistics",
@@ -181,8 +185,7 @@ export const translations = {
         "Create stunning worlds and game maps for our Minecraft server.",
       supporterDesc:
         "Help players with questions, handle support tickets and keep the server friendly.",
-      developerDesc:
-        "Develop plugins and features for our Minecraft server.",
+      developerDesc: "Develop plugins and features for our Minecraft server.",
     },
     applyClosed: {
       backToPositions: "Back to Positions",
@@ -194,7 +197,8 @@ export const translations = {
     applicationForm: {
       backToPositions: "Back to Positions",
       titleSuffix: "Application",
-      intro: "Fill out the form below — we'll get back to you as soon as possible.",
+      intro:
+        "Fill out the form below — we'll get back to you as soon as possible.",
       discordVerified: "Discord verified",
       discordRequired: "Discord login required",
       login: "Login",
@@ -230,8 +234,7 @@ export const translations = {
       placeholderUsername: "Your current IGN",
       labelGithub: "GitHub / Portfolio",
       placeholderGithub: "https://github.com/yourname",
-      descriptionGithub:
-        "Link to your GitHub profile or any other portfolio",
+      descriptionGithub: "Link to your GitHub profile or any other portfolio",
       labelMotivation: "Why do you want to join?",
       placeholderMotivation:
         "Tell us about your Java/Spigot experience and what you'd like to contribute...",
@@ -240,8 +243,7 @@ export const translations = {
       labelUsername: "Minecraft Username",
       placeholderUsername: "Your current IGN",
       labelWhy: "Why do you want to be a Supporter?",
-      placeholderWhy:
-        "Tell us why you'd like to join the support team...",
+      placeholderWhy: "Tell us why you'd like to join the support team...",
       labelExperience: "Previous Experience",
       placeholderExperience:
         "Have you been a moderator or supporter before? Describe your experience...",
@@ -250,8 +252,7 @@ export const translations = {
       backToPositions: "Back to Positions",
       title: "Discord Login Required",
       messageBefore: "To apply as ",
-      messageAfter:
-        ", you first need to sign in with your Discord account.",
+      messageAfter: ", you first need to sign in with your Discord account.",
       signIn: "Sign in with Discord",
     },
     headerAuth: {
@@ -443,7 +444,11 @@ export const translations = {
       aboutUs: "Über uns",
       meetTheTeam: "Lerne das Team kennen",
       creators: "Creators",
+      sectionGames: "Spielmodi",
+      bedWars: "BedWars",
+      buildFFA: "BuildFFA",
       tntRun: "TNT Run",
+      sideQuests: "Sidequests",
       sectionResources: "Ressourcen",
       leaderboard: "Bestenliste",
       statistics: "Statistiken",
@@ -613,8 +618,7 @@ export const translations = {
         fillField: "Bitte fülle das Feld aus: {label}",
         captchaRequired: "Bitte schließe die Captcha-Überprüfung ab.",
         captchaError: "Captcha-Fehler. Bitte versuche es erneut.",
-        submitFailed:
-          "Senden fehlgeschlagen. Bitte versuche es erneut.",
+        submitFailed: "Senden fehlgeschlagen. Bitte versuche es erneut.",
       },
     },
     builderForm: {
@@ -623,7 +627,8 @@ export const translations = {
       labelPortfolio: "Portfolio-Links",
       placeholderPortfolio:
         "Links zu deinen Bauten (PMC, Imgur, Planet Minecraft...)",
-      descriptionPortfolio: "Teile Links, unter denen wir deine Arbeit ansehen können",
+      descriptionPortfolio:
+        "Teile Links, unter denen wir deine Arbeit ansehen können",
       labelMotivation: "Warum möchtest du beitreten?",
       placeholderMotivation:
         "Erzähle uns etwas über dich und warum du Teil des Teams werden möchtest...",
@@ -685,8 +690,7 @@ export const translations = {
         usernameRequired: "Bitte gib deinen Minecraft-Benutzernamen ein.",
         captchaRequired: "Bitte schließe die Captcha-Überprüfung ab.",
         captchaError: "Captcha-Fehler. Bitte versuche es erneut.",
-        submitFailed:
-          "Einlösen fehlgeschlagen. Bitte versuche es erneut.",
+        submitFailed: "Einlösen fehlgeschlagen. Bitte versuche es erneut.",
       },
     },
     sidequests: {
@@ -730,8 +734,7 @@ export const translations = {
       intro: "Suche nach einem beliebigen Spieler auf OnThePixel.net",
       placeholder: "Minecraft-Benutzername...",
       search: "Suchen",
-      genericError:
-        "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      genericError: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
       notFoundTitle: "Spieler nicht gefunden",
       notFoundText:
         "{name} hat noch nie auf OnThePixel.net gespielt oder der Benutzername ist falsch.",

@@ -32,7 +32,7 @@ export default function Home() {
       <Header />
       <Trailer />
       <News />
-      <Team />
+      <Team as="h2" />
     </>
   );
 }

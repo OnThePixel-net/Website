@@ -17,7 +17,7 @@ export default function Footer() {
   return (
     <footer className="px-4 py-12 md:px-6">
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-5">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-6">
           <div className="hidden md:col-span-2 md:block">
             <div className="mb-4 flex items-center">
               <Link href={"/"}>
@@ -98,12 +98,41 @@ export default function Footer() {
                   {t.footer.creators}
                 </Link>
               </li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="mb-2 font-semibold">{t.footer.sectionGames}</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/bedwars"
+                  className="text-gray-400 hover:text-green-500"
+                >
+                  {t.footer.bedWars}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/buildffa"
+                  className="text-gray-400 hover:text-green-500"
+                >
+                  {t.footer.buildFFA}
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/tntrun"
                   className="text-gray-400 hover:text-green-500"
                 >
                   {t.footer.tntRun}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/sidequests"
+                  className="text-gray-400 hover:text-green-500"
+                >
+                  {t.footer.sideQuests}
                 </Link>
               </li>
             </ul>
@@ -121,7 +150,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/statistics"
+                  href="/stats"
                   className="text-gray-400 hover:text-green-500"
                 >
                   {t.footer.statistics}
@@ -226,7 +255,9 @@ export default function Footer() {
             <Link href={"/"}>
               <Image
                 className="mr-2 text-3xl font-bold"
-                src={"https://cdn.onthepixel.net/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"}
+                src={
+                  "https://cdn.onthepixel.net/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"
+                }
                 alt="OnThePixel.net"
                 width={40}
                 height={40}
