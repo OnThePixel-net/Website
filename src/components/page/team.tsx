@@ -15,7 +15,14 @@ async function getTeamMembers(): Promise<PublicTeamMember[]> {
   }
 }
 
-export default async function Team() {
+export default async function Team({
+  as: Heading = "h1",
+}: {
+  // Heading level for the section title. Defaults to h1 (standalone /team
+  // page); the homepage renders Team as one section among several and passes
+  // "h2" so the page keeps a single h1 (the hero).
+  as?: "h1" | "h2";
+} = {}) {
   // `getPublicTeamMembers` already orders members by group weight (highest
   // first), so no further sorting is needed here.
   const [sortedMembers, { t }] = await Promise.all([
@@ -24,12 +31,12 @@ export default async function Team() {
   ]);
 
   return (
-    <section className="py-10 px-4 bg-gray-950">
+    <section className="bg-gray-950 px-4 py-10">
       <div className="container mx-auto px-4 py-10">
         <Reveal direction="up">
-          <h1 id="team" className="text-3xl font-bold mb-4 text-white">
+          <Heading id="team" className="mb-4 text-3xl font-bold text-white">
             {t.team.heading}
-          </h1>
+          </Heading>
         </Reveal>
         {sortedMembers.length > 0 ? (
           <Reveal
@@ -45,9 +52,9 @@ export default async function Team() {
               return (
                 <div
                   key={member.id}
-                  className="m-1 flex items-center rounded-md bg-white/10 p-4 transition-transform duration-300 hover:scale-105 hover:bg-white/15 gap-4"
+                  className="m-1 flex items-center gap-4 rounded-md bg-white/10 p-4 transition-transform duration-300 hover:scale-105 hover:bg-white/15"
                 >
-                  <div className="relative shrink-0 rounded-lg overflow-hidden">
+                  <div className="relative shrink-0 overflow-hidden rounded-lg">
                     <Image
                       alt={member.name}
                       src={`https://api.mcskin.me/pfp/${avatarId}`}
@@ -58,16 +65,20 @@ export default async function Team() {
                   </div>
 
                   <div className="min-w-0">
-                    <p className="font-bold text-white truncate">{member.name}</p>
+                    <p className="truncate font-bold text-white">
+                      {member.name}
+                    </p>
                     {member.rankName ? (
                       <p
-                        className="text-sm font-semibold tracking-wide truncate"
+                        className="truncate text-sm font-semibold tracking-wide"
                         style={{ color: member.rankColor }}
                       >
                         {member.rankName.toUpperCase()}
                       </p>
                     ) : (
-                      <p className="text-sm text-gray-400">{t.team.memberFallback}</p>
+                      <p className="text-sm text-gray-400">
+                        {t.team.memberFallback}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -78,7 +89,11 @@ export default async function Team() {
           <div className="text-gray-400">{t.team.empty}</div>
         )}
 
-        <Reveal direction="up" delay={0.05} className="mt-12 p-6 bg-white/10 rounded-lg border-l-4 border-green-500">
+        <Reveal
+          direction="up"
+          delay={0.05}
+          className="mt-12 rounded-lg border-l-4 border-green-500 bg-white/10 p-6"
+        >
           <h2
             className="text-lg font-bold"
             style={{ color: "#00de6d", textShadow: "0 0 10px #00de6d" }}
@@ -88,7 +103,7 @@ export default async function Team() {
           <p className="mt-2 text-gray-300">{t.team.joinText}</p>
           <Link
             href="/apply"
-            className="inline-block mt-4 px-5 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg transition-colors font-medium"
+            className="mt-4 inline-block rounded-lg bg-green-700 px-5 py-2 font-medium text-white transition-colors hover:bg-green-600"
           >
             {t.team.applyNow} →
           </Link>

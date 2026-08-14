@@ -4,7 +4,11 @@ import { SUPPORTED_LOCALES } from "@/lib/i18n/translations";
 import { getDb, schema } from "@/lib/db";
 import { ensureTable } from "@/lib/db/migrate";
 
-const STATIC_PATHS: { path: string; priority: number; changeFreq: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
+const STATIC_PATHS: {
+  path: string;
+  priority: number;
+  changeFreq: MetadataRoute.Sitemap[number]["changeFrequency"];
+}[] = [
   { path: "/", priority: 1.0, changeFreq: "weekly" },
   { path: "/about", priority: 0.7, changeFreq: "monthly" },
   { path: "/team", priority: 0.6, changeFreq: "monthly" },
@@ -24,16 +28,22 @@ const STATIC_PATHS: { path: string; priority: number; changeFreq: MetadataRoute.
   { path: "/buildffa", priority: 0.6, changeFreq: "monthly" },
   { path: "/tntrun", priority: 0.6, changeFreq: "monthly" },
   { path: "/sidequests", priority: 0.5, changeFreq: "monthly" },
-  { path: "/redeem", priority: 0.4, changeFreq: "monthly" },
   { path: "/imprint", priority: 0.3, changeFreq: "yearly" },
   { path: "/privacy", priority: 0.3, changeFreq: "yearly" },
 ];
 
-async function getNewsUrls(): Promise<{ slug: string; published_at: string }[]> {
+async function getNewsUrls(): Promise<
+  { slug: string; published_at: string }[]
+> {
   try {
     await ensureTable();
     const db = getDb();
-    return await db.select({ slug: schema.news.slug, published_at: schema.news.published_at }).from(schema.news);
+    return await db
+      .select({
+        slug: schema.news.slug,
+        published_at: schema.news.published_at,
+      })
+      .from(schema.news);
   } catch {
     return [];
   }
