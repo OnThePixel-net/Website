@@ -7,7 +7,13 @@ import { AnalyticsProvider } from "@/components/analytics-provider";
 import SessionProvider from "@/components/SessionProvider";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { getServerLocale } from "@/lib/i18n/server";
-import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/i18n/seo";
+import {
+  DEFAULT_OG_IMAGE,
+  DEFAULT_TWITTER_IMAGE,
+  LOGO_IMAGE,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/i18n/seo";
 
 const inter = Inter({ subsets: ["latin"] });
 const syne = Syne({
@@ -64,7 +70,7 @@ export const metadata: Metadata = {
     title: "OnThePixel.net — Minecraft Minigame Server",
     description:
       "Fast-paced Minecraft minigames. Duels, BuildFFA, TNT Run and more.",
-    images: [DEFAULT_OG_IMAGE],
+    images: [DEFAULT_TWITTER_IMAGE],
   },
   robots: {
     index: true,
@@ -100,7 +106,7 @@ export default async function RootLayout({
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: DEFAULT_OG_IMAGE,
+    logo: LOGO_IMAGE,
     sameAs: [
       "https://www.youtube.com/@thebestminecraftserver",
       "https://twitch.tv/onthepixel",
@@ -122,7 +128,11 @@ export default async function RootLayout({
   return (
     <html lang={initialLocale}>
       <head>
-        <script async src="https://analytics.intern.onthepixel.net/script.js" data-website-id="2362b4d0-3dea-4b1e-b3f8-86b0af3e4bd1"></script>
+        <script
+          async
+          src="https://analytics.intern.onthepixel.net/script.js"
+          data-website-id="2362b4d0-3dea-4b1e-b3f8-86b0af3e4bd1"
+        ></script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
@@ -132,7 +142,9 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
       </head>
-      <body className={`${inter.className} ${syne.variable} ${dmSans.variable} scroll-smooth bg-gray-950`}>
+      <body
+        className={`${inter.className} ${syne.variable} ${dmSans.variable} scroll-smooth bg-gray-950`}
+      >
         <SessionProvider>
           <LanguageProvider initialLocale={initialLocale}>
             <AnalyticsProvider>

@@ -3,7 +3,17 @@ import { Locale, SUPPORTED_LOCALES } from "./translations";
 
 export const SITE_URL = "https://onthepixel.net";
 export const SITE_NAME = "OnThePixel.net";
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e`;
+
+// 1200×630 social-share banners served as static files from /public. These
+// are the images crawlers and social platforms fetch directly (not through
+// the imgix loader), so they must be plain, resolvable URLs.
+export const DEFAULT_OG_IMAGE = `${SITE_URL}/opengraph-image.png`;
+export const DEFAULT_TWITTER_IMAGE = `${SITE_URL}/twitter-image.png`;
+
+// Square brand logo (served via CDN) for schema.org Organization markup —
+// this must stay the logo, not the wide social banner.
+export const LOGO_IMAGE =
+  "https://cdn.onthepixel.net/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e";
 
 const HREFLANG_BY_LOCALE: Record<Locale, string> = {
   en: "en",
@@ -36,12 +46,18 @@ export function buildLocalizedMetadata(opts: {
   const cleanPath = path === "/" ? "" : path.replace(/\/$/, "");
 
   const canonical =
-    locale === "en" ? `${SITE_URL}${cleanPath || "/"}` : `${SITE_URL}/${locale}${cleanPath}`;
+    locale === "en"
+      ? `${SITE_URL}${cleanPath || "/"}`
+      : `${SITE_URL}/${locale}${cleanPath}`;
 
-  const languages: Record<string, string> = { "x-default": `${SITE_URL}${cleanPath || "/"}` };
+  const languages: Record<string, string> = {
+    "x-default": `${SITE_URL}${cleanPath || "/"}`,
+  };
   for (const loc of SUPPORTED_LOCALES) {
     languages[HREFLANG_BY_LOCALE[loc]] =
-      loc === "en" ? `${SITE_URL}${cleanPath || "/"}` : `${SITE_URL}/${loc}${cleanPath}`;
+      loc === "en"
+        ? `${SITE_URL}${cleanPath || "/"}`
+        : `${SITE_URL}/${loc}${cleanPath}`;
   }
 
   // Explicit dimensions help crawlers and social platforms render the
