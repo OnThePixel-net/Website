@@ -46,9 +46,9 @@ export default function LeaderboardComponent({
       // In production API call
       const response = await fetch(`https://api.onthepixel.net/${endpoint}`);
       const data = await response.json();
-      
+
       let playersData = [];
-      
+
       // Handle different API response structures
       if (Array.isArray(data)) {
         // Direct array (like pixels API)
@@ -57,18 +57,25 @@ export default function LeaderboardComponent({
         // Object with data property (like duels API)
         playersData = data.data;
       }
-      
+
       // Transform data to LeaderboardItem format
       const transformedData = playersData.map((item: any, index: number) => ({
-        position: item.rank || (index + 1),
-        username: item.name || item.player_name || item.username || `Player${index + 1}`,
+        position: item.rank || index + 1,
+        username:
+          item.name ||
+          item.player_name ||
+          item.username ||
+          `Player${index + 1}`,
         score: 0, // Remove automatic score handling
-        stats: statColumns.reduce((acc, column) => {
-          acc[column.key] = item[column.key] || 0;
-          return acc;
-        }, {} as { [key: string]: number | string }),
+        stats: statColumns.reduce(
+          (acc, column) => {
+            acc[column.key] = item[column.key] || 0;
+            return acc;
+          },
+          {} as { [key: string]: number | string },
+        ),
       }));
-      
+
       setLeaderboard(transformedData);
       setError(null);
     } catch (err) {
@@ -80,25 +87,31 @@ export default function LeaderboardComponent({
   };
 
   return (
-    <Card className="w-full bg-gray-900/50 border-gray-800">
+    <Card className="w-full border-gray-800 bg-gray-900/50">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">{title}</CardTitle>
+        <CardTitle as="h2" className="text-2xl font-bold">
+          {title}
+        </CardTitle>
         <p className="text-gray-400">{description}</p>
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+          <div className="flex h-64 items-center justify-center">
+            <div className="h-12 w-12 animate-spin rounded-full border-t-2 border-b-2 border-green-500"></div>
           </div>
         ) : error ? (
-          <div className="text-center text-red-500 p-4">{error}</div>
+          <div className="p-4 text-center text-red-500">{error}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-800">
-                  <th className="px-4 py-2 text-left">{t.leaderboardTable.colHash}</th>
-                  <th className="px-4 py-2 text-left">{t.leaderboardTable.colPlayer}</th>
+                  <th className="px-4 py-2 text-left">
+                    {t.leaderboardTable.colHash}
+                  </th>
+                  <th className="px-4 py-2 text-left">
+                    {t.leaderboardTable.colPlayer}
+                  </th>
                   {statColumns.map((column) => (
                     <th key={column.key} className="px-4 py-2 text-right">
                       {column.label}
@@ -111,7 +124,7 @@ export default function LeaderboardComponent({
                   leaderboard.map((item) => (
                     <tr
                       key={item.position}
-                      className="border-b border-gray-800 hover:bg-white/5 transition-colors"
+                      className="border-b border-gray-800 transition-colors hover:bg-white/5"
                     >
                       <td className="px-4 py-3">
                         {item.position <= 3 ? (
@@ -120,15 +133,15 @@ export default function LeaderboardComponent({
                               item.position === 1
                                 ? "default"
                                 : item.position === 2
-                                ? "secondary"
-                                : "outline"
+                                  ? "secondary"
+                                  : "outline"
                             }
                             className={
                               item.position === 1
                                 ? "bg-yellow-500 text-black"
                                 : item.position === 2
-                                ? "bg-gray-300 text-black"
-                                : "bg-amber-700 text-white"
+                                  ? "bg-gray-300 text-black"
+                                  : "bg-amber-700 text-white"
                             }
                           >
                             {item.position}
@@ -148,19 +161,16 @@ export default function LeaderboardComponent({
                               {item.username.slice(0, 2)}
                             </AvatarFallback>
                           </Avatar>
-                          <a 
+                          <a
                             href={`https://onthepixel.net/stats/${item.username}`}
-                            className="font-medium text-white hover:text-green-400 transition-colors underline decoration-transparent hover:decoration-current"
+                            className="font-medium text-white underline decoration-transparent transition-colors hover:text-green-400 hover:decoration-current"
                           >
                             {item.username}
                           </a>
                         </div>
                       </td>
                       {statColumns.map((column) => (
-                        <td
-                          key={column.key}
-                          className="px-4 py-3 text-right"
-                        >
+                        <td key={column.key} className="px-4 py-3 text-right">
                           {item.stats[column.key]}
                         </td>
                       ))}
