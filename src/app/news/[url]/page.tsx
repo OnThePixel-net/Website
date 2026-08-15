@@ -249,6 +249,8 @@ function BlockRenderer({ blocks }: { blocks: Block[] }) {
               <img
                 src={block.url}
                 alt={block.caption || ""}
+                loading="lazy"
+                decoding="async"
                 className="w-full object-cover"
               />
               {block.caption && (
@@ -526,6 +528,8 @@ export default async function NewsPage({ params }: PageProps) {
                   alt={item.author}
                   width={28}
                   height={28}
+                  loading="lazy"
+                  decoding="async"
                   className="h-7 w-7 rounded-full object-cover"
                 />
                 <span
@@ -573,6 +577,8 @@ export default async function NewsPage({ params }: PageProps) {
                 alt={item.author}
                 width={48}
                 height={48}
+                loading="lazy"
+                decoding="async"
                 className="h-12 w-12 shrink-0 rounded-full object-cover"
               />
               <div>
