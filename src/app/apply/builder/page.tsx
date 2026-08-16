@@ -7,6 +7,7 @@ import ApplicationForm, {
 } from "@/components/page/ApplicationForm";
 import { getServerLocale, getServerTranslations } from "@/lib/i18n/server";
 import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+import { isPositionOpen } from "@/lib/apply";
 
 const META_COPY = {
   en: {
@@ -32,20 +33,6 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-async function isPositionOpen(name: string): Promise<boolean> {
-  try {
-    const res = await fetch("https://cms.onthepixel.net/items/Apply", {
-      next: { revalidate: 60 },
-    });
-    const data = await res.json();
-    const position = (data.data ?? []).find(
-      (p: { name: string; status: string }) => p.name === name,
-    );
-    return position?.status === "open";
-  } catch {
-    return false;
-  }
-}
 
 export default async function BuilderApplicationPage() {
   const [open, { t }] = await Promise.all([

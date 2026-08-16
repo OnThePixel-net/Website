@@ -10,6 +10,7 @@ import {
   Newspaper,
   Users,
   UserCog,
+  ClipboardList,
   LogOut,
   Menu,
   X,
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/news", label: "News", icon: Newspaper },
   { href: "/dashboard/creators", label: "Creators", icon: Users },
+  { href: "/dashboard/apply", label: "Bewerbungen", icon: ClipboardList },
   { href: "/dashboard/team", label: "Team", icon: UserCog },
 ];
 

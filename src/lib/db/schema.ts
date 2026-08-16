@@ -39,9 +39,19 @@ export const creatorChannels = pgTable("creator_channels", {
   sort_order: integer("sort_order").notNull().default(0),
 });
 
+export const applyPositions = pgTable("apply_positions", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  slug: text("slug").notNull().unique(),
+  status: text("status").notNull().default("closed"),
+  sort_order: integer("sort_order").notNull().default(0),
+  updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 export type NewsItem = typeof news.$inferSelect;
 export type NewNewsItem = typeof news.$inferInsert;
 export type NewsTranslationItem = typeof newsTranslations.$inferSelect;
 export type CreatorRecord = typeof creators.$inferSelect;
 export type NewCreatorRecord = typeof creators.$inferInsert;
 export type CreatorChannelRecord = typeof creatorChannels.$inferSelect;
+export type ApplyPositionRecord = typeof applyPositions.$inferSelect;
