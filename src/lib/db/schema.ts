@@ -22,6 +22,36 @@ export const newsTranslations = pgTable("news_translations", {
   content: text("content").notNull().default(""),
 });
 
+export const creators = pgTable("creators", {
+  id: serial("id").primaryKey(),
+  minecraft_uuid: text("minecraft_uuid").notNull().unique(),
+  name: text("name").notNull(),
+  sort_order: integer("sort_order").notNull().default(0),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const creatorChannels = pgTable("creator_channels", {
+  id: serial("id").primaryKey(),
+  creator_id: integer("creator_id").notNull().references(() => creators.id, { onDelete: "cascade" }),
+  platform: text("platform").notNull(),
+  url: text("url").notNull(),
+  sort_order: integer("sort_order").notNull().default(0),
+});
+
+export const applyPositions = pgTable("apply_positions", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  slug: text("slug").notNull().unique(),
+  status: text("status").notNull().default("closed"),
+  sort_order: integer("sort_order").notNull().default(0),
+  updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 export type NewsItem = typeof news.$inferSelect;
 export type NewNewsItem = typeof news.$inferInsert;
 export type NewsTranslationItem = typeof newsTranslations.$inferSelect;
+export type CreatorRecord = typeof creators.$inferSelect;
+export type NewCreatorRecord = typeof creators.$inferInsert;
+export type CreatorChannelRecord = typeof creatorChannels.$inferSelect;
+export type ApplyPositionRecord = typeof applyPositions.$inferSelect;

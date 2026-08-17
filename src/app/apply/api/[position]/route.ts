@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { isPositionOpen } from "@/lib/apply";
 
 const POSITION_NAMES: Record<string, string> = {
   developer: "Java Developer",
@@ -22,6 +23,15 @@ export async function POST(
 
   if (!positionName) {
     return NextResponse.json({ message: "Invalid position" }, { status: 400 });
+  }
+
+  // A position closed in the dashboard must also be closed server-side —
+  // otherwise the form could still be submitted directly.
+  if (!(await isPositionOpen(positionName))) {
+    return NextResponse.json(
+      { message: "Applications for this position are currently closed" },
+      { status: 403 },
+    );
   }
 
   const body = await req.json();

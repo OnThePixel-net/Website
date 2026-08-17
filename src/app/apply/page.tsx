@@ -4,6 +4,7 @@ import TopPage from "@/components/page/top";
 import type { Metadata } from "next";
 import { getServerLocale, getServerTranslations } from "@/lib/i18n/server";
 import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+import { listApplyPositions, POSITION_ROUTES } from "@/lib/apply";
 
 const META_COPY = {
   en: {
@@ -30,22 +31,9 @@ interface Position {
   name: string;
 }
 
-const POSITION_ROUTES: Record<string, string> = {
-  "Builder": "/apply/builder",
-  "Supporter": "/apply/supporter",
-  "Java Developer": "/apply/developer",
-};
-
 async function getPositions(): Promise<Position[]> {
-  try {
-    const res = await fetch("https://cms.onthepixel.net/items/Apply", {
-      next: { revalidate: 60 },
-    });
-    const data = await res.json();
-    return data.data || [];
-  } catch {
-    return [];
-  }
+  const positions = await listApplyPositions();
+  return positions.map((p) => ({ id: p.id, name: p.name, status: p.status }));
 }
 
 export default async function ApplyPage() {

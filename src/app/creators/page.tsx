@@ -4,6 +4,7 @@ import Creators, { Creator, LiveStatus } from "@/components/page/creators";
 import TopPage from "@/components/page/top";
 import { getServerLocale } from "@/lib/i18n/server";
 import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+import { getPublicCreators } from "@/lib/creators";
 
 const META_COPY = {
   en: {
@@ -26,13 +27,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function getCreatorsData() {
   try {
-    const creatorsRes = await fetch(
-      "https://cms.onthepixel.net/items/Creators?fields=*.*.*",
-      { next: { revalidate: 300 } }
-    );
-    if (!creatorsRes.ok) return { creators: [], followersMap: {}, liveMap: {} };
-    const creatorsData = await creatorsRes.json();
-    const creators: Creator[] = creatorsData.data || [];
+    // Creators are managed in the admin dashboard and stored in Postgres.
+    const creators: Creator[] = await getPublicCreators();
+    if (creators.length === 0) {
+      return { creators: [], followersMap: {}, liveMap: {} };
+    }
 
     const [followersResults, liveResults] = await Promise.all([
       Promise.all(
