@@ -109,14 +109,8 @@ function SocialLinks() {
         "*.onthepixel.net",
         "*.onthepixel.dev",
         "*.bedwars.net",
-        "*.tntrun.de",
         "*.buildffa.net",
-        "*.mcwith.me",
-        "*.norizz.de",
-        "*.thejocraft.monster",
-        "*.deinmutter.de",
-        "*.gerhart.studio",
-        "*.gerhart.dev",
+        "*.mcserver.cheap",
       ].map((d) => (
         <p className="mt-2" key={d}>
           <span className="text-green-400">{d}</span>
