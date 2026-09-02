@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Syne, DM_Sans } from "next/font/google";
 import "../globals.css";
-import Footer from "@/components/page/footer";
-import { SiteHeader } from "@/components/page/site-header";
 import { AnalyticsProvider } from "@/components/analytics-provider";
 import SessionProvider from "@/components/SessionProvider";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
@@ -99,6 +97,17 @@ export const metadata: Metadata = {
  *
  * Route handlers need no layout, so `app/api`, `app/sitemap.ts`,
  * `app/robots.ts` and `app/llms.txt` keep working next to this subtree.
+ *
+ * It deliberately holds no site chrome. The header and the footer belong to
+ * the public site only, and the admin dashboard has a sidebar of its own, so
+ * they live in `(site)/layout.tsx` — a route group, which shapes the layout
+ * tree without appearing in any URL. Selecting the chrome by pathname instead
+ * would mean reading `headers()` here and would drag the whole site back into
+ * dynamic rendering.
+ *
+ * What stays here is what both groups need: the document itself, the fonts,
+ * the site-wide JSON-LD, and the three providers — the dashboard needs the
+ * session, and the cookie banner belongs on every page.
  */
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((locale) => ({ locale }));
@@ -166,11 +175,7 @@ export default async function RootLayout({
       >
         <SessionProvider>
           <LanguageProvider locale={locale} dictionary={dictionary}>
-            <AnalyticsProvider>
-              <SiteHeader />
-              <main>{children}</main>
-              <Footer locale={locale} />
-            </AnalyticsProvider>
+            <AnalyticsProvider>{children}</AnalyticsProvider>
           </LanguageProvider>
         </SessionProvider>
       </body>

@@ -13,8 +13,8 @@ import { DEFAULT_LOCALE } from "@/lib/i18n/translations";
  * therefore pulls in the stylesheet itself and answers in the default locale,
  * which is the only sensible choice for a URL that carried no language.
  *
- * The locale-aware counterpart is app/[locale]/not-found.tsx, which handles
- * pages that matched a locale and then called `notFound()`.
+ * The locale-aware counterpart is app/[locale]/(site)/not-found.tsx, which
+ * handles pages that matched a locale and then called `notFound()`.
  */
 export default function RootNotFound() {
   const t = getDictionary(DEFAULT_LOCALE);
