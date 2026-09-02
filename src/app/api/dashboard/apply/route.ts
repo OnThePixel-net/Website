@@ -1,19 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requirePermission } from "@/lib/authz";
+import { LEVEL_READ, LEVEL_WRITE } from "@/lib/permissions";
 import { getDb, schema } from "@/lib/db";
 import { ensureApplyTables } from "@/lib/db/migrate";
 import { listApplyPositions } from "@/lib/apply";
 import { eq } from "drizzle-orm";
 
-async function checkAuth() {
-  const session = await auth();
-  return !!session;
-}
-
 /** GET — list the apply positions with their open/closed status. */
 export async function GET() {
-  if (!(await checkAuth()))
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const gate = await requirePermission("apply", LEVEL_READ);
+  if (!gate.ok) return gate.response;
   try {
     await ensureApplyTables();
     return NextResponse.json({ data: await listApplyPositions() });
@@ -25,8 +21,8 @@ export async function GET() {
 
 /** PATCH — open or close a position, addressed by id or slug. */
 export async function PATCH(req: NextRequest) {
-  if (!(await checkAuth()))
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const gate = await requirePermission("apply", LEVEL_WRITE);
+  if (!gate.ok) return gate.response;
 
   try {
     await ensureApplyTables();

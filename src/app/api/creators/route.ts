@@ -1,7 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listCreators, toPublicCreator, normalizeMinecraftUuid } from "@/lib/creators";
 
+// These endpoints serve only content that is already public on the site and
+// read no cookies or auth headers, so a wildcard origin exposes nothing that a
+// plain fetch of the page would not. Credentialed requests stay impossible:
+// `Access-Control-Allow-Credentials` is deliberately absent, and browsers
+// reject `*` together with credentials.
 const CORS = { "Access-Control-Allow-Origin": "*" };
+
+// Same policy for the list and for a single creator — both are public rows.
+const CACHE = "public, s-maxage=60, stale-while-revalidate=300";
+// Cache misses too, so an unknown uuid/name cannot be used to hammer the
+// database. Short and without stale-while-revalidate so a newly added creator
+// does not stay hidden behind a cached 404.
+const NOT_FOUND_CACHE = "public, s-maxage=30";
+// Errors are never cached — a cached 500 would outlive the outage that caused it.
+const ERROR_CACHE = "no-store";
 
 /**
  * Public read-only REST API for creators.
@@ -34,16 +48,11 @@ export async function GET(req: NextRequest) {
       if (!entry)
         return NextResponse.json(
           { error: "Not found" },
-          { status: 404, headers: CORS },
+          { status: 404, headers: { ...CORS, "Cache-Control": NOT_FOUND_CACHE } },
         );
       return NextResponse.json(
         { data: raw ? entry : toPublicCreator(entry) },
-        {
-          headers: {
-            ...CORS,
-            "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
-          },
-        },
+        { headers: { ...CORS, "Cache-Control": CACHE } },
       );
     }
 
@@ -56,16 +65,14 @@ export async function GET(req: NextRequest) {
         data: raw ? page : page.map(toPublicCreator),
         meta: { total: all.length, limit, offset },
       },
-      {
-        headers: {
-          ...CORS,
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
-        },
-      },
+      { headers: { ...CORS, "Cache-Control": CACHE } },
     );
   } catch (e) {
     console.error("[creators public GET]", e);
-    return NextResponse.json({ error: String(e) }, { status: 500, headers: CORS });
+    return NextResponse.json(
+      { error: String(e) },
+      { status: 500, headers: { ...CORS, "Cache-Control": ERROR_CACHE } },
+    );
   }
 }
 

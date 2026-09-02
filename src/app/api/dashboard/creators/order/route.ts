@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requirePermission } from "@/lib/authz";
+import { LEVEL_WRITE } from "@/lib/permissions";
 import { getDb, schema } from "@/lib/db";
 import { ensureCreatorTables } from "@/lib/db/migrate";
 import { eq } from "drizzle-orm";
-
-async function checkAuth() {
-  const session = await auth();
-  return !!session;
-}
 
 /**
  * PUT — persist the creator display order. The body carries the full list of
@@ -15,8 +11,11 @@ async function checkAuth() {
  * `sort_order`, which is what the public listing sorts by.
  */
 export async function PUT(req: NextRequest) {
-  if (!(await checkAuth()))
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Reordering changes rows, it does not remove any — so this is LEVEL_WRITE, not
+  // LEVEL_DELETE, despite the method being PUT on a list. Levels are assigned per
+  // handler by what it actually does, never by its HTTP verb alone.
+  const gate = await requirePermission("creators", LEVEL_WRITE);
+  if (!gate.ok) return gate.response;
 
   try {
     await ensureCreatorTables();

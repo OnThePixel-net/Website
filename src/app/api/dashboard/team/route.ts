@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requirePermission } from "@/lib/authz";
+import {
+  LEVEL_READ,
+  LEVEL_WRITE,
+  permissionsFromClaims,
+} from "@/lib/permissions";
 import {
   pocketIdFetch,
   fetchAllPages,
@@ -11,11 +16,16 @@ import {
   type PocketUser,
   type UserGroup,
 } from "@/lib/pocketid";
-
-async function checkAuth() {
-  const session = await auth();
-  return !!session;
-}
+import { isDiscordConfigured } from "@/lib/discord";
+import {
+  checkGuildMembership,
+  groupRoleId,
+  isCreatorGroup,
+  joinWarnings,
+  managedRoleIdFor,
+  normalizeSnowflake,
+  syncManagedRole,
+} from "@/lib/discord-sync";
 
 function handleError(e: unknown) {
   if (e instanceof PocketIdError) {
@@ -31,8 +41,8 @@ function handleError(e: unknown) {
 
 /** GET — list OTP team members and the available OTP groups. */
 export async function GET() {
-  if (!(await checkAuth()))
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const gate = await requirePermission("team", LEVEL_READ);
+  if (!gate.ok) return gate.response;
 
   try {
     const [groups, users] = await Promise.all([
@@ -49,6 +59,12 @@ export async function GET() {
         friendlyName: g.friendlyName,
         prefix: readClaim(g.customClaims, "prefix"),
         weight: readClaim(g.customClaims, "weight"),
+        discordRoleId: groupRoleId(g),
+        isCreatorRank: isCreatorGroup(g),
+        // What members of this rank may do in the dashboard, per area. Sent
+        // even when every level is 0 so the rank editor always has a complete
+        // set to render its four selects from.
+        permissions: permissionsFromClaims(g.customClaims),
       }));
 
     const members = users
@@ -66,7 +82,15 @@ export async function GET() {
           .map((g) => ({ id: g.id, friendlyName: g.friendlyName ?? g.name })),
       }));
 
-    return NextResponse.json({ users: members, groups: otpGroups });
+    // Whether the Discord bot is set up at all. Read from the environment, so
+    // it costs no upstream request — the dashboard uses it to say plainly that
+    // the role sync is inactive instead of leaving the operator to guess why
+    // nothing happens on Discord.
+    return NextResponse.json({
+      users: members,
+      groups: otpGroups,
+      discord: { configured: isDiscordConfigured() },
+    });
   } catch (e) {
     return handleError(e);
   }
@@ -74,14 +98,14 @@ export async function GET() {
 
 /** POST — create a new team member via the admin API, then set custom claims. */
 export async function POST(req: NextRequest) {
-  if (!(await checkAuth()))
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const gate = await requirePermission("team", LEVEL_WRITE);
+  if (!gate.ok) return gate.response;
 
   try {
     const body = await req.json();
     const username = String(body.username ?? "").trim();
     const groupId = String(body.groupId ?? "").trim();
-    const discordId = String(body.discordId ?? "").trim();
+    const rawDiscordId = String(body.discordId ?? "").trim();
     const minecraftUuid = String(body.minecraftUuid ?? "").trim();
     const email =
       String(body.email ?? "").trim() ||
@@ -98,6 +122,16 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
 
+    const discordId = rawDiscordId ? normalizeSnowflake(rawDiscordId) : "";
+    if (discordId === null)
+      return NextResponse.json(
+        {
+          error:
+            "Ungültige Discord-ID. Erwartet werden 17–20 Ziffern (Developer Mode in Discord aktivieren, dann Rechtsklick auf den Account → „ID kopieren“).",
+        },
+        { status: 400 },
+      );
+
     // Ensure the chosen group is actually an OTP-team group.
     const groups = await fetchAllPages<UserGroup>("/api/user-groups");
     const otpIds = otpGroupIds(groups);
@@ -106,6 +140,23 @@ export async function POST(req: NextRequest) {
         { error: "Ungültige Gruppe (keine OTP-Gruppe)." },
         { status: 400 },
       );
+
+    // 0) Ask Discord BEFORE anything is written. A user id that is not on the
+    //    server can never receive a role, and a half-created member whose role
+    //    silently never arrives is exactly the situation this check exists to
+    //    prevent — so this refuses and creates nothing. Only a definitive "not
+    //    a member" refuses; an unreachable Discord returns a warning instead
+    //    and lets the account be created (see `checkGuildMembership`).
+    let membershipWarning: string | undefined;
+    if (discordId) {
+      const membership = await checkGuildMembership(discordId, username);
+      if (!membership.ok)
+        return NextResponse.json(
+          { error: membership.message },
+          { status: 400 },
+        );
+      membershipWarning = membership.warning;
+    }
 
     // 1) Create the user account via the admin endpoint. `/api/signup` is the
     //    public self-registration route and is rejected with "Open user signup
@@ -155,8 +206,24 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // 4) Hand out the rank's Discord role. The account exists in PocketID by
+    //    now, so a failure here is reported, not rolled back: deleting a fresh
+    //    Pocket ID account to undo a role that Discord refused would trade a
+    //    missing role for a destroyed identity, and the two most likely causes
+    //    (role hierarchy, missing permission) are fixed on the Discord side and
+    //    then applied by simply saving the member again.
+    const chosenGroup = groups.find((g) => g.id === groupId);
+    const roleWarning = await syncManagedRole(
+      { discordId: null, roleId: null },
+      { discordId, roleId: managedRoleIdFor(chosenGroup ? [chosenGroup] : []) },
+      `Team member ${username} created via the OTP dashboard`,
+    );
+
     return NextResponse.json(
-      { data: created, warning: claimsWarning },
+      {
+        data: created,
+        warning: joinWarnings(membershipWarning, claimsWarning, roleWarning),
+      },
       { status: 201 },
     );
   } catch (e) {
