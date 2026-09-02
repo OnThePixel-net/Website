@@ -31,6 +31,12 @@ export interface CreatorEntry {
   id: number;
   name: string;
   minecraftUuid: string;
+  /**
+   * Discord user id (snowflake) used for the Discord role sync, or `null` for
+   * creators that were added before the sync existed. Internal — see
+   * `toPublicCreator`.
+   */
+  discordId: string | null;
   sortOrder: number;
   channels: CreatorChannel[];
 }
@@ -61,6 +67,21 @@ export function normalizeMinecraftUuid(input: unknown): string | null {
     raw.slice(16, 20),
     raw.slice(20),
   ].join("-");
+}
+
+/**
+ * Accept a Discord user id (a snowflake) and return it unchanged, or `null`
+ * when it is not one. Snowflakes are 17–20 digit decimal numbers; they are kept
+ * as strings because their 64-bit value does not survive a JavaScript number.
+ *
+ * An empty input maps to `null` as well — "no Discord account linked" is a
+ * valid state for a creator, so the dashboard can pass a cleared field
+ * straight through.
+ */
+export function normalizeDiscordId(input: unknown): string | null {
+  const raw = String(input ?? "").trim();
+  if (!/^\d{17,20}$/.test(raw)) return null;
+  return raw;
 }
 
 /**
@@ -97,17 +118,36 @@ export async function listCreators(): Promise<CreatorEntry[]> {
       .orderBy(asc(schema.creatorChannels.sort_order), asc(schema.creatorChannels.id)),
   ]);
 
+  // Bucket the channels by creator once instead of re-scanning the full list
+  // per creator. The insertion order of each bucket is the query's sort order,
+  // so the channels stay in the order the dashboard persisted them.
+  const byCreatorId = new Map<number, CreatorChannel[]>();
+  for (const c of channels) {
+    const bucket = byCreatorId.get(c.creator_id);
+    const channel = { id: c.id, platform: c.platform, url: c.url };
+    if (bucket) bucket.push(channel);
+    else byCreatorId.set(c.creator_id, [channel]);
+  }
+
   return rows.map((row) => ({
     id: row.id,
     name: row.name,
     minecraftUuid: row.minecraft_uuid,
+    discordId: row.discord_id,
     sortOrder: row.sort_order,
-    channels: channels
-      .filter((c) => c.creator_id === row.id)
-      .map((c) => ({ id: c.id, platform: c.platform, url: c.url })),
+    channels: byCreatorId.get(row.id) ?? [],
   }));
 }
 
+/**
+ * Reduce a creator to the public payload.
+ *
+ * `discordId` is deliberately dropped: `/api/creators` is a public, documented
+ * endpoint (see `/api-docs`) and the Discord user id is internal bookkeeping
+ * for the role sync, not something the site needs to render. Publishing it
+ * would hand every visitor a directory of the creators' Discord accounts and
+ * silently extend the documented response shape.
+ */
 export function toPublicCreator(entry: CreatorEntry): PublicCreator {
   return {
     Minecraft_username: entry.minecraftUuid,

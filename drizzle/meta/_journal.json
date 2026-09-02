@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788339477070,
+      "tag": "0000_baseline_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788347805460,
+      "tag": "0001_creators_discord_id",
+      "breakpoints": true
+    }
+  ]
+}
