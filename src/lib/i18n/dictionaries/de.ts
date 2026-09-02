@@ -162,12 +162,14 @@ export const de = {
     open: "OFFEN",
     closed: "GESCHLOSSEN",
     applyNow: "Jetzt bewerben",
-    builderDesc:
-      "Erschaffe beeindruckende Welten und Spielkarten für unseren Minecraft-Server.",
-    supporterDesc:
-      "Hilf Spielern bei Fragen, bearbeite Support-Tickets und sorge für eine freundliche Atmosphäre auf dem Server.",
-    developerDesc:
-      "Entwickle Plugins und Funktionen für unseren Minecraft-Server.",
+  },
+  // Copy of one position's page. The position's own name fills {position};
+  // its description comes from the database and only falls back to
+  // metaDescription when it is empty.
+  applyPosition: {
+    metaTitle: "Als {position} bewerben",
+    metaDescription:
+      "Bewirb dich als {position} im OnThePixel.net-Team — sieh dir die Aufgaben an und sende deine Bewerbung direkt online.",
   },
   applyClosed: {
     backToPositions: "Zurück zu den Positionen",
@@ -198,40 +200,30 @@ export const de = {
       captchaRequired: "Bitte schließe die Captcha-Überprüfung ab.",
       captchaError: "Captcha-Fehler. Bitte versuche es erneut.",
       submitFailed: "Senden fehlgeschlagen. Bitte versuche es erneut.",
+      // Keyed by the `code` a rejected submission answers with. A code that is
+      // not listed here falls back to submitFailed.
+      codes: {
+        login_required: "Bitte melde dich zuerst mit Discord an.",
+        discord_required: "Bitte melde dich zuerst mit Discord an.",
+        captcha_required: "Bitte schließe die Captcha-Überprüfung ab.",
+        captcha_invalid:
+          "Die Captcha-Überprüfung ist fehlgeschlagen. Bitte löse das Captcha erneut.",
+        captcha_unavailable:
+          "Das Captcha kann gerade nicht geprüft werden, deshalb sind Bewerbungen vorübergehend pausiert. Bitte versuche es später erneut.",
+        position_closed:
+          "Für diese Position werden aktuell keine Bewerbungen angenommen.",
+        answers_invalid:
+          "Deine Bewerbung konnte nicht gelesen werden. Bitte versuche es erneut.",
+        unknown_field:
+          "Dieses Formular ist nicht mehr aktuell. Bitte lade die Seite neu und versuche es erneut.",
+        answer_required: "Bitte fülle alle Pflichtfelder aus.",
+        answer_too_long:
+          "Eine deiner Antworten ist zu lang. Bitte kürze sie.",
+        answers_too_long:
+          "Deine Bewerbung ist insgesamt zu lang. Bitte kürze deine Antworten.",
+        server_error: "Senden fehlgeschlagen. Bitte versuche es erneut.",
+      },
     },
-  },
-  builderForm: {
-    labelUsername: "Minecraft-Benutzername",
-    placeholderUsername: "Dein aktueller Benutzername",
-    labelPortfolio: "Portfolio-Links",
-    placeholderPortfolio:
-      "Links zu deinen Bauten (PMC, Imgur, Planet Minecraft...)",
-    descriptionPortfolio:
-      "Teile Links, unter denen wir deine Arbeit ansehen können",
-    labelMotivation: "Warum möchtest du beitreten?",
-    placeholderMotivation:
-      "Erzähle uns etwas über dich und warum du Teil des Teams werden möchtest...",
-  },
-  developerForm: {
-    labelUsername: "Minecraft-Benutzername",
-    placeholderUsername: "Dein aktueller Benutzername",
-    labelGithub: "GitHub / Portfolio",
-    placeholderGithub: "https://github.com/deinname",
-    descriptionGithub:
-      "Link zu deinem GitHub-Profil oder einem anderen Portfolio",
-    labelMotivation: "Warum möchtest du beitreten?",
-    placeholderMotivation:
-      "Erzähle uns von deiner Erfahrung mit Java/Spigot und was du beitragen möchtest...",
-  },
-  supporterForm: {
-    labelUsername: "Minecraft-Benutzername",
-    placeholderUsername: "Dein aktueller Benutzername",
-    labelWhy: "Warum möchtest du Supporter werden?",
-    placeholderWhy:
-      "Erzähle uns, warum du dem Support-Team beitreten möchtest...",
-    labelExperience: "Bisherige Erfahrung",
-    placeholderExperience:
-      "Warst du bereits Moderator oder Supporter? Beschreibe deine Erfahrung...",
   },
   discordLogin: {
     backToPositions: "Zurück zu den Positionen",
@@ -498,6 +490,8 @@ export const de = {
         "Liefert die Positionen, auf die man sich bewerben kann, in der Reihenfolge der Bewerbungsseite und mit ihrem aktuellen Status. status ist entweder open oder closed.",
       paramSlug:
         "Gibt eine einzelne Position anhand ihres Slugs zurück, Groß- und Kleinschreibung wird ignoriert.",
+      fieldsText:
+        "slug ist die Adresse der Position auf dieser Website: /apply/<slug>/. descriptionEn und descriptionDe enthalten den kurzen Text, den die Bewerbungsseite auf der Karte der Position zeigt, auf Englisch und auf Deutsch; beide können ein leerer String sein, solange sie nicht gepflegt wurden.",
       singleText:
         "Mit slug enthält die Antwort ein einzelnes Objekt statt eines Arrays.",
       status200: "Erfolg.",

@@ -159,11 +159,14 @@ export const en = {
     open: "OPEN",
     closed: "CLOSED",
     applyNow: "Apply now",
-    builderDesc:
-      "Create stunning worlds and game maps for our Minecraft server.",
-    supporterDesc:
-      "Help players with questions, handle support tickets and keep the server friendly.",
-    developerDesc: "Develop plugins and features for our Minecraft server.",
+  },
+  // Copy of one position's page. The position's own name fills {position};
+  // its description comes from the database and only falls back to
+  // metaDescription when it is empty.
+  applyPosition: {
+    metaTitle: "Apply as {position}",
+    metaDescription:
+      "Apply to join the OnThePixel.net team as {position} — see what the role involves and send your application online.",
   },
   applyClosed: {
     backToPositions: "Back to Positions",
@@ -194,37 +197,29 @@ export const en = {
       captchaRequired: "Please complete the captcha verification.",
       captchaError: "Captcha error. Please try again.",
       submitFailed: "Failed to submit. Please try again.",
+      // Keyed by the `code` a rejected submission answers with. A code that is
+      // not listed here falls back to submitFailed, so the server's own
+      // (German) wording never reaches an English reader.
+      codes: {
+        login_required: "Please login with Discord first.",
+        discord_required: "Please login with Discord first.",
+        captcha_required: "Please complete the captcha verification.",
+        captcha_invalid:
+          "Captcha verification failed. Please try the captcha again.",
+        captcha_unavailable:
+          "We cannot verify the captcha right now, so applications are paused. Please try again later.",
+        position_closed:
+          "Applications for this position are currently closed.",
+        answers_invalid: "Your application could not be read. Please try again.",
+        unknown_field:
+          "This form is out of date. Please reload the page and try again.",
+        answer_required: "Please fill out all required fields.",
+        answer_too_long: "One of your answers is too long. Please shorten it.",
+        answers_too_long:
+          "Your application is too long overall. Please shorten your answers.",
+        server_error: "Failed to submit. Please try again.",
+      },
     },
-  },
-  builderForm: {
-    labelUsername: "Minecraft Username",
-    placeholderUsername: "Your current IGN",
-    labelPortfolio: "Portfolio Links",
-    placeholderPortfolio:
-      "Links to your builds (PMC, Imgur, Planet Minecraft...)",
-    descriptionPortfolio: "Share links where we can see your work",
-    labelMotivation: "Why do you want to join?",
-    placeholderMotivation:
-      "Tell us about yourself and why you want to be part of the team...",
-  },
-  developerForm: {
-    labelUsername: "Minecraft Username",
-    placeholderUsername: "Your current IGN",
-    labelGithub: "GitHub / Portfolio",
-    placeholderGithub: "https://github.com/yourname",
-    descriptionGithub: "Link to your GitHub profile or any other portfolio",
-    labelMotivation: "Why do you want to join?",
-    placeholderMotivation:
-      "Tell us about your Java/Spigot experience and what you'd like to contribute...",
-  },
-  supporterForm: {
-    labelUsername: "Minecraft Username",
-    placeholderUsername: "Your current IGN",
-    labelWhy: "Why do you want to be a Supporter?",
-    placeholderWhy: "Tell us why you'd like to join the support team...",
-    labelExperience: "Previous Experience",
-    placeholderExperience:
-      "Have you been a moderator or supporter before? Describe your experience...",
   },
   discordLogin: {
     backToPositions: "Back to Positions",
@@ -488,6 +483,8 @@ export const en = {
         "Returns the positions you can apply for, in the order the apply page shows them, together with their current status. status is either open or closed.",
       paramSlug:
         "Return a single position by its slug, matched case-insensitively.",
+      fieldsText:
+        "slug is the position's address on this site: /apply/<slug>/. descriptionEn and descriptionDe hold the short text the apply page shows on the position's card, in English and German; either one may be an empty string when it has not been written yet.",
       singleText:
         "With slug the response holds a single object instead of an array.",
       status200: "Success.",

@@ -5,6 +5,7 @@ import { LocaleLink } from "@/components/LocaleLink";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useSession, signIn } from "next-auth/react";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
+import type { Translations } from "@/lib/i18n/translations";
 
 export interface ApplicationField {
   id: string;
@@ -12,12 +13,33 @@ export interface ApplicationField {
   type: "text" | "textarea";
   placeholder?: string;
   description?: string;
+  /**
+   * Whether an answer is expected. Defaults to `true`, which is what every
+   * question was before the form became data-driven; only an explicit `false`
+   * drops the asterisk and the check below.
+   */
+  required?: boolean;
 }
 
 interface ApplicationFormProps {
   position: string;
   fields: ApplicationField[];
   apiEndpoint: string;
+}
+
+/**
+ * Turn a rejected submission into a message in the reader's language.
+ *
+ * The server answers with a stable `code` next to its own German `message`.
+ * Only the code is translated here — falling back to the server's text would
+ * show German to an English reader, so an unmapped code becomes the generic
+ * failure message instead.
+ */
+function submitErrorMessage(payload: unknown, t: Translations): string {
+  const body = (payload ?? {}) as { code?: unknown };
+  const codes: Record<string, string> = t.applicationForm.errors.codes;
+  const code = typeof body.code === "string" ? body.code : "";
+  return codes[code] ?? t.applicationForm.errors.submitFailed;
 }
 
 const DiscordIcon = () => (
@@ -54,6 +76,7 @@ export default function ApplicationForm({
     }
 
     for (const field of fields) {
+      if (field.required === false) continue;
       if (!formData[field.id]?.trim()) {
         setError(
           t.applicationForm.errors.fillField.replace("{label}", field.label),
@@ -81,8 +104,8 @@ export default function ApplicationForm({
       });
 
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.message || `Error ${response.status}`);
+        const err = await response.json().catch(() => null);
+        throw new Error(submitErrorMessage(err, t));
       }
 
       setIsSubmitted(true);
@@ -178,8 +201,13 @@ export default function ApplicationForm({
             {fields.map((field) => (
               <div key={field.id}>
                 <label className="block text-sm font-medium text-white mb-1.5">
-                  {field.label}{" "}
-                  <span className="text-red-400" title={t.applicationForm.required}>*</span>
+                  {field.label}
+                  {field.required !== false && (
+                    <>
+                      {" "}
+                      <span className="text-red-400" title={t.applicationForm.required}>*</span>
+                    </>
+                  )}
                 </label>
                 {field.description && (
                   <p className="text-xs text-gray-500 mb-1.5">{field.description}</p>

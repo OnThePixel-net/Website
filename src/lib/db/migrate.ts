@@ -140,6 +140,67 @@ export const ensureApplyTables = once("ensureApplyTables", async () => {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
+  // The bilingual card copy was added after the table already existed, so a
+  // throwaway database created by an older build still needs the columns.
+  // NOT NULL with a default keeps the rows that are already there valid. See
+  // `drizzle/0002_apply_questions_submissions.sql` for the real migration.
+  await db.execute(sql`
+    ALTER TABLE apply_positions ADD COLUMN IF NOT EXISTS description_en TEXT NOT NULL DEFAULT ''
+  `);
+  await db.execute(sql`
+    ALTER TABLE apply_positions ADD COLUMN IF NOT EXISTS description_de TEXT NOT NULL DEFAULT ''
+  `);
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS apply_questions (
+      id SERIAL PRIMARY KEY,
+      position_id INTEGER NOT NULL REFERENCES apply_positions(id) ON DELETE CASCADE,
+      field_key TEXT NOT NULL,
+      type TEXT NOT NULL DEFAULT 'text',
+      required BOOLEAN NOT NULL DEFAULT TRUE,
+      label_en TEXT NOT NULL DEFAULT '',
+      label_de TEXT NOT NULL DEFAULT '',
+      placeholder_en TEXT NOT NULL DEFAULT '',
+      placeholder_de TEXT NOT NULL DEFAULT '',
+      description_en TEXT NOT NULL DEFAULT '',
+      description_de TEXT NOT NULL DEFAULT '',
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT apply_questions_position_id_field_key_key UNIQUE (position_id, field_key)
+    )
+  `);
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS apply_questions_position_id_idx
+      ON apply_questions (position_id, sort_order)
+  `);
+  // `position_id` is nullable and ON DELETE SET NULL on purpose: deleting a
+  // position must not delete the applications that were sent for it, and the
+  // snapshot columns keep such a row readable. See `lib/db/schema.ts`.
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS apply_submissions (
+      id SERIAL PRIMARY KEY,
+      position_id INTEGER REFERENCES apply_positions(id) ON DELETE SET NULL,
+      position_name TEXT NOT NULL,
+      position_slug TEXT NOT NULL,
+      discord_id TEXT NOT NULL,
+      discord_username TEXT NOT NULL,
+      discord_avatar_url TEXT,
+      answers JSONB NOT NULL DEFAULT '[]'::jsonb,
+      status TEXT NOT NULL DEFAULT 'new',
+      internal_note TEXT NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      reviewed_at TIMESTAMPTZ
+    )
+  `);
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS apply_submissions_position_id_created_at_idx
+      ON apply_submissions (position_id, created_at DESC)
+  `);
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS apply_submissions_created_at_idx
+      ON apply_submissions (created_at DESC)
+  `);
   for (let i = 0; i < APPLY_POSITION_SEED.length; i++) {
     const { name, slug } = APPLY_POSITION_SEED[i];
     await db.execute(sql`

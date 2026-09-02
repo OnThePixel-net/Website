@@ -15,6 +15,13 @@
       "when": 1788347805460,
       "tag": "0001_creators_discord_id",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788365652956,
+      "tag": "0002_apply_questions_submissions",
+      "breakpoints": true
     }
   ]
 }
