@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { FaCopy } from "react-icons/fa6";
@@ -31,20 +31,22 @@ export default function Header() {
       const bg = root.querySelector("[data-anim='bg']");
 
       if (prefersReduced) {
-        gsap.set([logo, title, tagline, buttons, bg], { autoAlpha: 1 });
+        // The hidden start state is a `motion-safe:` class, so it is already
+        // inactive here; this only clears anything a previous run left behind.
+        gsap.set([logo, title, tagline, buttons], { autoAlpha: 1 });
         return;
       }
-
-      gsap.set([logo, title, tagline, buttons], { autoAlpha: 0 });
 
       const tl = gsap.timeline({
         defaults: { ease: "power3.out", duration: 0.9 },
       });
 
+      // The background is the LCP element, so it must never be faded in: it
+      // paints with the document and only gets a transform-only settle here.
       tl.fromTo(
         bg,
-        { scale: 1.15, autoAlpha: 0.6 },
-        { scale: 1, autoAlpha: 1, duration: 1.4, ease: "power2.out" },
+        { scale: 1.15 },
+        { scale: 1, duration: 1.4, ease: "power2.out" },
       )
         .fromTo(
           logo,
@@ -97,9 +99,15 @@ export default function Header() {
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div data-anim="bg" className="absolute inset-0">
           <Image
-            alt="Background Image"
+            // Decorative: it sits at -z-10 behind the hero text, dimmed and
+            // covered by a gradient, and carries no information the headline
+            // does not already state. An empty alt keeps it out of the
+            // accessibility tree; /not-found treats the same image the same way.
+            alt=""
             className="h-full w-full object-cover brightness-75 filter"
             height="1080"
+            priority
+            sizes="100vw"
             src="/bc993216-3548-4e87-bb85-bfb349c3d3b3"
             width="1920"
           />
@@ -108,10 +116,15 @@ export default function Header() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-950" />
       </div>
       <main className="flex flex-col items-center">
-        <div data-anim="logo" className="relative mb-4">
+        <div
+          data-anim="logo"
+          className="relative mb-4 motion-safe:invisible motion-safe:opacity-0"
+        >
           <Image
-            alt="Logo"
+            alt="OnThePixel.net"
             height="100"
+            priority
+            sizes="250px"
             src="/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"
             style={{
               aspectRatio: "100/100",
@@ -122,7 +135,7 @@ export default function Header() {
         </div>
         <h1
           data-anim="title"
-          className="mb-4 text-4xl font-bold sm:text-5xl md:text-6xl"
+          className="mb-4 text-4xl font-bold motion-safe:invisible motion-safe:opacity-0 sm:text-5xl md:text-6xl"
           style={{
             color: "#fff",
             textShadow: "0 0 15px #fff",
@@ -130,28 +143,39 @@ export default function Header() {
         >
           OnThePixel.net
         </h1>
-        <p data-anim="tagline" className="mb-8 text-center">
+        <p
+          data-anim="tagline"
+          className="mb-8 text-center motion-safe:invisible motion-safe:opacity-0"
+        >
           {t.hero.tagline}
         </p>
         <div className="flex space-x-4">
-          <Link href="/leaderboard" data-anim="btn">
+          <LocaleLink
+            href="/leaderboard"
+            data-anim="btn"
+            className="motion-safe:invisible motion-safe:opacity-0"
+          >
             <Button className="flex h-12 w-36 items-center bg-green-700 px-4 py-2 text-lg text-white transition-transform duration-500 hover:scale-105 sm:w-40 sm:px-6 sm:text-xl md:w-48 md:text-2xl">
               {t.hero.leaderboard}
             </Button>
-          </Link>
+          </LocaleLink>
           <Button
             data-anim="btn"
-            className="flex size-12 items-center rounded bg-green-700 px-4 py-2"
+            className="flex size-12 items-center rounded bg-green-700 px-4 py-2 motion-safe:invisible motion-safe:opacity-0"
             onClick={() => copyToClipboard("OnThePixel.net")}
             aria-label={t.hero.copyAddress}
           >
             <FaCopy className="size-20 text-white" aria-hidden="true" />
           </Button>
-          <Link href="https://discord.onthepixel.net" data-anim="btn">
+          <LocaleLink
+            href="https://discord.onthepixel.net"
+            data-anim="btn"
+            className="motion-safe:invisible motion-safe:opacity-0"
+          >
             <Button className="flex h-12 w-36 items-center bg-green-700 px-4 py-2 text-lg text-white transition-transform duration-500 hover:scale-105 sm:w-40 sm:px-6 sm:text-xl md:w-48 md:text-2xl">
               {t.hero.discord}
             </Button>
-          </Link>
+          </LocaleLink>
         </div>
       </main>
     </div>

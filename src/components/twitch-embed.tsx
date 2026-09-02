@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { FaTwitch } from "react-icons/fa";
+import { LocaleLink } from "@/components/LocaleLink";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 function getTwitchConsent(): boolean {
@@ -75,13 +76,13 @@ export default function TwitchEmbed({ channel }: { channel: string }) {
           >
             {t.twitchEmbed.accept}
           </button>
-          <a
+          <LocaleLink
             href="/privacy#twitch"
             className="text-[11px] text-white/20 hover:text-white/50 transition-colors underline underline-offset-2"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
             {t.twitchEmbed.learnMore}
-          </a>
+          </LocaleLink>
         </div>
       </div>
     );

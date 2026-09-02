@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useSession, signIn } from "next-auth/react";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
@@ -118,12 +118,12 @@ export default function ApplicationForm({
           </div>
           <h1 className="text-2xl font-bold mb-4">{t.applicationForm.submittedTitle}</h1>
           <p className="text-gray-400 mb-8">{t.applicationForm.submittedMessage}</p>
-          <Link
+          <LocaleLink
             href="/"
             className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
             {t.applicationForm.backToHome}
-          </Link>
+          </LocaleLink>
         </div>
       </section>
     );
@@ -133,12 +133,12 @@ export default function ApplicationForm({
     <section className="bg-gray-950 min-h-screen">
       <div className="container mx-auto px-4 py-10">
         <div className="max-w-xl mx-auto">
-          <Link
+          <LocaleLink
             href="/apply"
             className="inline-block mb-6 text-sm text-gray-400 hover:text-green-400 transition-colors duration-200"
           >
             ← {t.applicationForm.backToPositions}
-          </Link>
+          </LocaleLink>
 
           <h1 className="text-2xl font-bold mb-2">
             {position} {t.applicationForm.titleSuffix}

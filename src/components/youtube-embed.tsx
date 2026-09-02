@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { CirclePlay } from "lucide-react";
+import { LocaleLink } from "@/components/LocaleLink";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 function getYoutubeConsent(): boolean {
@@ -77,13 +78,13 @@ export default function YoutubeEmbed({ videoId }: { videoId: string }) {
             >
               {t.youtubeEmbed.accept}
             </button>
-            <a
+            <LocaleLink
               href="/privacy#youtube"
               className="text-[11px] text-white/20 hover:text-white/50 transition-colors underline underline-offset-2"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               {t.youtubeEmbed.learnMore}
-            </a>
+            </LocaleLink>
           </div>
         </div>
       </div>

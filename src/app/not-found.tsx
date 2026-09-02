@@ -1,64 +1,31 @@
-"use client";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { useTranslations } from "@/lib/i18n/LanguageProvider";
+import "./globals.css";
+import NotFoundScreen from "@/components/page/NotFoundScreen";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { localizePath } from "@/lib/i18n/paths";
+import { DEFAULT_LOCALE } from "@/lib/i18n/translations";
 
-export default function NotFound() {
-  const t = useTranslations();
+/**
+ * The 404 for URLs that matched no route at all.
+ *
+ * Next uses the *root* not-found for those, and the root of this app is the
+ * `[locale]` segment — so this file sits outside it and gets a minimal layout
+ * of Next's own making: no locale, and none of the layout's chrome. It
+ * therefore pulls in the stylesheet itself and answers in the default locale,
+ * which is the only sensible choice for a URL that carried no language.
+ *
+ * The locale-aware counterpart is app/[locale]/not-found.tsx, which handles
+ * pages that matched a locale and then called `notFound()`.
+ */
+export default function RootNotFound() {
+  const t = getDictionary(DEFAULT_LOCALE);
+
   return (
-    <div
-      key="1"
-      className="relative min-h-screen flex flex-col items-center justify-center text-white"
-    >
-      <div className="absolute inset-0 -z-10">
-        <Image
-          alt="Background Image"
-          className="object-cover w-full h-full filter brightness-75"
-          height="1080"
-          src="/bc993216-3548-4e87-bb85-bfb349c3d3b3"
-          style={{
-            aspectRatio: "1920/1080",
-            objectFit: "cover",
-          }}
-          width="1920"
-        />
-        <div className="absolute inset-0" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-950" />
-      </div>
-      <main className="flex flex-col items-center">
-        <div className="relative mb-4">
-          <Image
-            alt="Logo"
-            height="100"
-            src="/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"
-            style={{
-              aspectRatio: "100/100",
-              objectFit: "cover",
-            }}
-            width="250"
-          />
-        </div>
-        <h1
-          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4"
-          style={{
-            color: "#fff",
-            textShadow: "0 0 15px #fff",
-          }}
-        >
-          404
-        </h1>
-        <p className="mb-8 text-center">
-          {t.notFound.tagline}
-        </p>
-        <div className="flex space-x-4">
-          <Link href="/">
-            <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
-              {t.notFound.home}
-            </Button>
-          </Link>
-        </div>
-      </main>
+    <div className="bg-gray-950">
+      <NotFoundScreen
+        tagline={t.notFound.tagline}
+        homeLabel={t.notFound.home}
+        homeHref={localizePath(DEFAULT_LOCALE, "/")}
+      />
     </div>
   );
 }

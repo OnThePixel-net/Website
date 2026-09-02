@@ -1,6 +1,7 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getServerTranslations } from "@/lib/i18n/server";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/translations";
 
 export interface StatColumn {
   key: string;
@@ -8,6 +9,9 @@ export interface StatColumn {
 }
 
 interface LeaderboardTableProps {
+  // Handed down from the page rather than resolved here: the locale is a
+  // route segment, and only pages and layouts see the route params.
+  locale: Locale;
   title: string;
   description: string;
   endpoint: string;
@@ -71,12 +75,13 @@ function rankBadgeClasses(position: number): string {
 }
 
 export default async function LeaderboardTable({
+  locale,
   title,
   description,
   endpoint,
   statColumns,
 }: LeaderboardTableProps) {
-  const { t } = await getServerTranslations();
+  const t = getDictionary(locale);
   const { rows, failed } = await fetchLeaderboard(endpoint, statColumns);
 
   return (
@@ -142,12 +147,12 @@ export default async function LeaderboardTable({
                             decoding="async"
                             className="h-8 w-8 rounded"
                           />
-                          <Link
+                          <LocaleLink
                             href={`/stats/${item.username}`}
                             className="font-medium text-white underline decoration-transparent transition-colors hover:text-green-400 hover:decoration-current"
                           >
                             {item.username}
-                          </Link>
+                          </LocaleLink>
                         </div>
                       </td>
                       {statColumns.map((column) => (
