@@ -1,7 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import { DEV_LOGIN_ENABLED, DEV_ROLES } from "@/lib/dev-auth";
-import { prefixColor } from "@/lib/pocketid";
+import { compareRanked, prefixColor } from "@/lib/pocketid";
 import LoginClient, { type DevRoleOption } from "./login-client";
 
 export const metadata: Metadata = {
@@ -22,8 +22,14 @@ function devRoleOptions(): DevRoleOption[] {
 
   return (
     DEV_ROLES.slice()
-      // Highest weight first — same ordering the team views use for real groups.
-      .sort((a, b) => b.weight - a.weight)
+      // Same ordering the team views use for real groups: highest weight
+      // first, ties A→Z by the label the picker renders, then by id.
+      .sort((a, b) =>
+        compareRanked(
+          { weight: a.weight, name: a.friendlyName, id: a.id },
+          { weight: b.weight, name: b.friendlyName, id: b.id },
+        ),
+      )
       .map((role) => ({
         id: role.id,
         label: role.friendlyName,

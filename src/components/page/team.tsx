@@ -32,8 +32,9 @@ export default async function Team({
   // always one level under whatever `as` renders.
   const SubHeading = Heading === "h1" ? "h2" : "h3";
 
-  // `getPublicTeamMembers` already orders members by group weight (highest
-  // first), so no further sorting is needed here.
+  // `getPublicTeamMembers` already orders members the way every list in the
+  // app does — heaviest rank first, ties A→Z by the rendered name — so no
+  // further sorting is needed here.
   const t = getDictionary(locale);
   const sortedMembers = await getTeamMembers();
 

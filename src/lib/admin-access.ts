@@ -57,10 +57,12 @@
 import {
   fetchAllPages,
   getClaim,
+  groupLabel,
   groupWeight,
   isOtpGroup,
   otpGroupIds,
   prefixColor,
+  primaryGroup,
   readClaim,
   type PocketUser,
   type UserGroup,
@@ -309,9 +311,10 @@ function matchPocketUserByDiscordId(
  * The account's primary role: its highest-weight OTP group.
  *
  * Same rule as `getPublicTeamMembers()` in `src/lib/pocketid.ts` and the team
- * dashboard, including the reason for the group lookup — the group objects
- * embedded on a user may omit `customClaims` / `friendlyName`, so each one is
- * resolved back to its full definition before the weights are compared.
+ * dashboard — they share `primaryGroup()`, including the reason for the group
+ * lookup: the group objects embedded on a user may omit `customClaims` /
+ * `friendlyName`, so each one is resolved back to its full definition before
+ * the weights are compared.
  */
 function primaryRole(
   user: PocketUser,
@@ -324,15 +327,13 @@ function primaryRole(
     .filter((g) => otpIds.has(g.id))
     .map((g) => groupById.get(g.id) ?? g);
 
-  const primary = memberGroups
-    .slice()
-    .sort((a, b) => groupWeight(b) - groupWeight(a))[0];
+  const primary = primaryGroup(memberGroups);
 
   if (!primary) return undefined;
 
   return {
     id: primary.id,
-    friendlyName: primary.friendlyName ?? primary.name,
+    friendlyName: groupLabel(primary),
     weight: groupWeight(primary),
     color: prefixColor(readClaim(primary.customClaims, "prefix")),
     teamMember: isOtpGroup(primary),

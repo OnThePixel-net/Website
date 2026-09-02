@@ -12,6 +12,10 @@ import {
   isOtpMember,
   getClaim,
   readClaim,
+  compareRanked,
+  groupLabel,
+  groupWeight,
+  sortGroups,
   PocketIdError,
   type PocketUser,
   type UserGroup,
@@ -51,8 +55,12 @@ export async function GET() {
     ]);
 
     const otpIds = otpGroupIds(groups);
-    const otpGroups = groups
-      .filter((g) => otpIds.has(g.id))
+    const groupById = new Map(groups.map((g) => [g.id, g]));
+
+    // Ranks go out heaviest first, ties A→Z by friendly name — the order the
+    // rank list, the create dialog's picker and the edit dialog's toggles all
+    // render in, since they read this one response.
+    const otpGroups = sortGroups(groups.filter((g) => otpIds.has(g.id)))
       .map((g) => ({
         id: g.id,
         name: g.name,
@@ -69,18 +77,58 @@ export async function GET() {
 
     const members = users
       .filter((u) => isOtpMember(u, otpIds))
-      .map((u) => ({
-        id: u.id,
-        username: u.username,
-        displayName: u.displayName ?? u.username,
-        email: u.email ?? "",
-        disabled: !!u.disabled,
-        discordId: getClaim(u, "Discord-id"),
-        minecraftUuid: getClaim(u, "Minecraft-uuid"),
-        groups: (u.userGroups ?? [])
-          .filter((g) => otpIds.has(g.id))
-          .map((g) => ({ id: g.id, friendlyName: g.friendlyName ?? g.name })),
-      }));
+      .map((u) => {
+        // The group objects embedded on a user may omit custom claims and
+        // friendly names, so resolve each one back to its full definition
+        // before weights or labels are read off it.
+        const memberGroups = sortGroups(
+          (u.userGroups ?? [])
+            .filter((g) => otpIds.has(g.id))
+            .map((g) => groupById.get(g.id) ?? g),
+        );
+
+        return {
+          // The weight of the member's primary (heaviest) rank. Kept beside
+          // the payload rather than in it: it is only a sort key, so the
+          // response shape stays exactly as it was.
+          weight: groupWeight(memberGroups[0]),
+          member: {
+            id: u.id,
+            username: u.username,
+            displayName: u.displayName ?? u.username,
+            email: u.email ?? "",
+            disabled: !!u.disabled,
+            discordId: getClaim(u, "Discord-id"),
+            minecraftUuid: getClaim(u, "Minecraft-uuid"),
+            // Heaviest rank first here too, so a member's badges read in the
+            // same order as the rank list itself.
+            groups: memberGroups.map((g) => ({
+              id: g.id,
+              friendlyName: groupLabel(g),
+            })),
+          },
+        };
+      })
+      // Enabled accounts first (a disabled one is a leftover the roster still
+      // has to show, not a current member), then heaviest rank, then A→Z by
+      // `username` — the name this roster renders — and finally by id.
+      .sort((a, b) =>
+        compareRanked(
+          {
+            weight: a.weight,
+            name: a.member.username,
+            id: a.member.id,
+            disabled: a.member.disabled,
+          },
+          {
+            weight: b.weight,
+            name: b.member.username,
+            id: b.member.id,
+            disabled: b.member.disabled,
+          },
+        ),
+      )
+      .map((entry) => entry.member);
 
     // Whether the Discord bot is set up at all. Read from the environment, so
     // it costs no upstream request — the dashboard uses it to say plainly that
