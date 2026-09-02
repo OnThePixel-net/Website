@@ -212,6 +212,123 @@ export function groupWeight(group: UserGroup | undefined): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Ordering                                                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The collator every list in the app sorts names with.
+ *
+ * A plain string comparison (`a < b`, or `localeCompare()` without options)
+ * would order by code point: every lowercase name lands behind every uppercase
+ * one ("Zeta" before "alpha") and umlauts end up behind "z". So the options are
+ * picked deliberately:
+ *
+ * - locale `de`: the dashboard is German and the public site is German/English.
+ *   German dictionary collation files an umlaut under its base letter, which is
+ *   where a reader scanning the list looks for it ("Ämil" sits at A).
+ * - `sensitivity: "accent"`: case is ignored, so "alpha" sorts next to "Alpha"
+ *   and both come before "Zeta". Accents still count, so two names differing
+ *   only in an umlaut keep a defined order instead of falling through to the
+ *   id tie-break.
+ * - `numeric: true`: rank and account names carry numbers often enough that
+ *   "Team 2" belongs before "Team 10", not after it.
+ */
+const NAME_COLLATOR = new Intl.Collator("de", {
+  sensitivity: "accent",
+  numeric: true,
+});
+
+/** Compare two display names A→Z. Missing names are treated as empty. */
+export function compareNames(
+  a: string | null | undefined,
+  b: string | null | undefined,
+): number {
+  return NAME_COLLATOR.compare(a ?? "", b ?? "");
+}
+
+/** Anything the app orders by rank: a rank itself, or a person holding one. */
+export interface RankOrdered {
+  /**
+   * Rank weight, highest first. Accepts the raw claim string as well as a
+   * parsed number; anything missing or unparsable counts as 0, so a member
+   * without a weighted rank orders like weight 0 instead of breaking the sort.
+   */
+  weight?: number | string | null;
+  /**
+   * The name the UI actually shows, so the visible order matches the sort key.
+   * For a rank that is `friendlyName` (falling back to `name`), for a person
+   * whichever of `displayName` / `username` that view renders.
+   */
+  name?: string | null;
+  /** Stable id — the final tie-break that keeps repeated calls identical. */
+  id?: string | null;
+  /**
+   * Disabled accounts sort behind every enabled one. Ranks and lists that show
+   * only enabled accounts leave this unset.
+   */
+  disabled?: boolean;
+}
+
+/** Normalise a weight from a number or a claim string; 0 when unusable. */
+function toWeight(value: number | string | null | undefined): number {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  const n = Number.parseInt((value ?? "").trim(), 10);
+  return Number.isFinite(n) ? n : 0;
+}
+
+/**
+ * The single ordering used everywhere ranks or people are listed: enabled
+ * before disabled, then the heaviest rank first, then A→Z by the displayed
+ * name, then by id.
+ *
+ * The id tie-break is what makes the result deterministic — without it two
+ * equally weighted, equally named entries would come out in whatever order
+ * PocketID happened to return them in, which can differ between two calls.
+ */
+export function compareRanked(a: RankOrdered, b: RankOrdered): number {
+  const aDisabled = a.disabled === true;
+  const bDisabled = b.disabled === true;
+  if (aDisabled !== bDisabled) return aDisabled ? 1 : -1;
+
+  const byWeight = toWeight(b.weight) - toWeight(a.weight);
+  if (byWeight !== 0) return byWeight;
+
+  const byName = compareNames(a.name, b.name);
+  if (byName !== 0) return byName;
+
+  return (a.id ?? "").localeCompare(b.id ?? "");
+}
+
+/** A group's display label: its friendly name, falling back to the slug. */
+export function groupLabel(group: UserGroup | undefined): string {
+  return group?.friendlyName?.trim() || group?.name || "";
+}
+
+/** {@link compareRanked} for full group objects. */
+export function compareGroups(a: UserGroup, b: UserGroup): number {
+  return compareRanked(
+    { weight: groupWeight(a), name: groupLabel(a), id: a.id },
+    { weight: groupWeight(b), name: groupLabel(b), id: b.id },
+  );
+}
+
+/** The given groups in rank order, as a new array. */
+export function sortGroups(groups: UserGroup[]): UserGroup[] {
+  return groups.slice().sort(compareGroups);
+}
+
+/**
+ * A member's primary rank: the heaviest of the groups they are in.
+ *
+ * A member can hold several ranks; the heaviest one is the one the site shows
+ * them with. Ties resolve through {@link compareRanked}, so the pick is stable
+ * rather than dependent on the order PocketID returned the groups in.
+ */
+export function primaryGroup(groups: UserGroup[]): UserGroup | undefined {
+  return sortGroups(groups)[0];
+}
+
 /** Legacy Minecraft colour codes → hex. */
 const MC_COLORS: Record<string, string> = {
   "0": "#000000",
@@ -271,8 +388,9 @@ export interface PublicTeamMember {
  * Fetch the OTP team members for the public `/team` page from PocketID.
  *
  * Replaces the legacy Directus CMS `Team` collection. Only enabled accounts in
- * an OTP-team group are returned, ranked by their group's weight (highest
- * first), and no email/PII leaves the server. Results are cached for 5 minutes.
+ * an OTP-team group are returned, ordered by {@link compareRanked} (heaviest
+ * rank first, then A→Z by the displayed name), and no email/PII leaves the
+ * server. Results are cached for 5 minutes.
  */
 export async function getPublicTeamMembers(): Promise<PublicTeamMember[]> {
   const [groups, users] = await Promise.all([
@@ -293,19 +411,19 @@ export async function getPublicTeamMembers(): Promise<PublicTeamMember[]> {
         .map((g) => groupById.get(g.id) ?? g);
 
       // Highest weight wins as the member's primary rank.
-      const primary = memberGroups
-        .slice()
-        .sort((a, b) => groupWeight(b) - groupWeight(a))[0];
+      const primary = primaryGroup(memberGroups);
 
       return {
         id: u.id,
         name: u.displayName ?? u.username,
         username: u.username,
         minecraftUuid: getClaim(u, "Minecraft-uuid"),
-        rankName: primary?.friendlyName ?? primary?.name ?? "",
+        rankName: groupLabel(primary),
         rankColor: prefixColor(readClaim(primary?.customClaims, "prefix")),
         weight: groupWeight(primary),
       } satisfies PublicTeamMember;
     })
-    .sort((a, b) => b.weight - a.weight);
+    // Heaviest rank first, then A→Z by the rendered name (`name`, i.e.
+    // displayName with the username as fallback), then by id.
+    .sort(compareRanked);
 }

@@ -45,8 +45,8 @@ import {
   fetchAllPages,
   isOtpGroup,
   pocketIdFetch,
+  primaryGroup,
   readClaim,
-  groupWeight,
   type CustomClaim,
   type UserGroup,
 } from "@/lib/pocketid";
@@ -115,20 +115,6 @@ export function isCreatorGroup(group: UserGroup | undefined): boolean {
 }
 
 /**
- * Rank order: heavier `weight` first, ties broken by group id.
- *
- * The weight part matches how the public team page and `getPublicTeamMembers()`
- * pick a member's primary rank, so the Discord role a member gets is the rank
- * the website shows them with. The id tie-break exists purely so the result is
- * deterministic — without it, two equally weighted ranks would resolve
- * differently depending on the order PocketID happened to return them in.
- */
-function byRank(a: UserGroup, b: UserGroup): number {
-  const delta = groupWeight(b) - groupWeight(a);
-  return delta !== 0 ? delta : a.id.localeCompare(b.id);
-}
-
-/**
  * The single Discord role a team member should hold, derived from every OTP
  * group they belong to.
  *
@@ -149,7 +135,10 @@ function byRank(a: UserGroup, b: UserGroup): number {
 export function managedRoleIdFor(memberGroups: UserGroup[]): string {
   const mapped = memberGroups.filter((g) => groupRoleId(g));
   if (mapped.length === 0) return "";
-  return groupRoleId(mapped.slice().sort(byRank)[0]);
+  // `primaryGroup()` is the ordering the whole site ranks with (heaviest
+  // weight, then friendly name, then id), so the role a member gets is the
+  // rank the website shows them with — and the same one on every run.
+  return groupRoleId(primaryGroup(mapped));
 }
 
 /**
@@ -159,12 +148,12 @@ export function managedRoleIdFor(memberGroups: UserGroup[]): string {
  * clears it everywhere else), but nothing stops a second one from being set
  * directly in PocketID. Rather than failing on that, this resolves it the same
  * way {@link managedRoleIdFor} resolves a member's rank — highest weight wins,
- * ties broken by group id — so the outcome is at least deterministic and
- * matches what the group panel highlights.
+ * ties broken by friendly name and then group id — so the outcome is at least
+ * deterministic and matches what the group panel highlights.
  */
 export function resolveCreatorGroup(groups: UserGroup[]): UserGroup | null {
   const marked = groups.filter((g) => isOtpGroup(g) && isCreatorGroup(g));
-  return marked.length > 0 ? marked.slice().sort(byRank)[0] : null;
+  return primaryGroup(marked) ?? null;
 }
 
 /** What {@link resolveCreatorRole} found, plus why it found nothing. */
