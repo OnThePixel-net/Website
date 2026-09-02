@@ -34,6 +34,19 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Everything needed to run `node scripts/migrate.mjs` inside this image.
+#
+# Next bundles drizzle-orm and postgres into the server chunks rather than
+# leaving them in .next/standalone/node_modules, so the migration script — a
+# plain module Next never traced — cannot import them. Both packages are
+# dependency-free, so copying the two directories is enough and pulls in no
+# tree of its own. drizzle-kit is deliberately NOT here: it is a build tool,
+# and the migrator inside drizzle-orm does the same job at runtime.
+COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/migrate.mjs ./scripts/migrate.mjs
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/drizzle-orm ./node_modules/drizzle-orm
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/postgres ./node_modules/postgres
+
 USER nextjs
 EXPOSE 3000
 
