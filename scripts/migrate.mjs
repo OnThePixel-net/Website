@@ -46,7 +46,21 @@ if (!url) {
 // keep the process alive after the work is done.
 const client = postgres(url, { max: 1 });
 
+/**
+ * Arbitrary but fixed key for the advisory lock below. Any constant works as
+ * long as nothing else in this database picks the same one.
+ */
+const LOCK_KEY = 8_073_120_240_902n;
+
 try {
+  // Serialise concurrent runs. The container migrates on start, so a deploy
+  // that brings up several replicas at once would otherwise have them race:
+  // each reads the list of applied migrations before any of them writes, and
+  // both then apply the same file. A session-level advisory lock makes the
+  // losers wait and find the work already done. The lock is released with the
+  // connection, so a crashed process cannot leave it held.
+  await client`SELECT pg_advisory_lock(${LOCK_KEY})`;
+
   console.log(`[migrate] applying migrations from ${MIGRATIONS_FOLDER}`);
   await migrate(drizzle(client), { migrationsFolder: MIGRATIONS_FOLDER });
   console.log("[migrate] database is up to date");
