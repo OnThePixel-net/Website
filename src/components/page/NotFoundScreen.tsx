@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
  * The branded 404 screen, as markup only.
  *
  * There are two 404 entry points and they cannot share a component instance:
- * `app/[locale]/not-found.tsx` runs inside the layout and knows the locale,
- * while `app/not-found.tsx` answers URLs that never matched a locale segment
- * at all and therefore has no layout around it. Keeping the markup here means
- * the two stay identical instead of drifting apart.
+ * `app/[locale]/(site)/not-found.tsx` runs inside the site layout and knows
+ * the locale, while `app/not-found.tsx` answers URLs that never matched a
+ * locale segment at all and therefore has no layout around it. Keeping the
+ * markup here means the two stay identical instead of drifting apart.
  */
 export default function NotFoundScreen({
   tagline,
@@ -24,12 +24,12 @@ export default function NotFoundScreen({
   return (
     <div
       key="1"
-      className="relative min-h-screen flex flex-col items-center justify-center text-white"
+      className="relative flex min-h-screen flex-col items-center justify-center text-white"
     >
       <div className="absolute inset-0 -z-10">
         <Image
           alt=""
-          className="object-cover w-full h-full filter brightness-75"
+          className="h-full w-full object-cover brightness-75 filter"
           height="1080"
           sizes="100vw"
           src="/bc993216-3548-4e87-bb85-bfb349c3d3b3"
@@ -57,7 +57,7 @@ export default function NotFoundScreen({
           />
         </div>
         <h1
-          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4"
+          className="mb-4 text-4xl font-bold sm:text-5xl md:text-6xl"
           style={{
             color: "#fff",
             textShadow: "0 0 15px #fff",
@@ -65,12 +65,10 @@ export default function NotFoundScreen({
         >
           404
         </h1>
-        <p className="mb-8 text-center">
-          {tagline}
-        </p>
+        <p className="mb-8 text-center">{tagline}</p>
         <div className="flex space-x-4">
           <Link href={homeHref}>
-            <Button className="bg-green-700 text-white text-lg sm:text-xl md:text-2xl px-4 sm:px-6 py-2 flex items-center w-36 sm:w-40 md:w-48 h-12 hover:scale-105 transition-transform duration-500">
+            <Button className="flex h-12 w-36 items-center bg-green-700 px-4 py-2 text-lg text-white transition-transform duration-500 hover:scale-105 sm:w-40 sm:px-6 sm:text-xl md:w-48 md:text-2xl">
               {homeLabel}
             </Button>
           </Link>

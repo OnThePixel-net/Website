@@ -4,7 +4,16 @@ import { LocaleLink } from "@/components/LocaleLink";
 import { useEffect } from "react";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
-export default function Error({
+/**
+ * The branded 500 screen, together with the logging and the retry button an
+ * error boundary needs.
+ *
+ * There are two boundaries and they cannot be one file: the public site and
+ * the dashboard sit in sibling route groups, so an `error.tsx` in either one
+ * covers only that group. Both re-export this component, which keeps a failure
+ * in an admin page looking exactly like a failure anywhere else on the site.
+ */
+export default function ErrorScreen({
   error,
   reset,
 }: {
@@ -27,7 +36,11 @@ export default function Error({
 
       <h1
         className="mb-3 text-2xl font-bold text-white md:text-3xl"
-        style={{ fontFamily: "'Syne', sans-serif", color: "#00de6d", textShadow: "0 0 30px rgba(0,222,109,0.3)" }}
+        style={{
+          fontFamily: "'Syne', sans-serif",
+          color: "#00de6d",
+          textShadow: "0 0 30px rgba(0,222,109,0.3)",
+        }}
       >
         {t.error.heading}
       </h1>
