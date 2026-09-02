@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 # A newer push to the same branch makes the running job pointless.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
