@@ -123,9 +123,33 @@ const CREATORS_SINGLE_RESPONSE = `{
 
 const APPLY_LIST_RESPONSE = `{
   "data": [
-    { "id": 1, "name": "Builder", "slug": "builder", "status": "open", "sortOrder": 0 },
-    { "id": 2, "name": "Supporter", "slug": "supporter", "status": "closed", "sortOrder": 1 },
-    { "id": 3, "name": "Java Developer", "slug": "developer", "status": "closed", "sortOrder": 2 }
+    {
+      "id": 1,
+      "name": "Builder",
+      "slug": "builder",
+      "status": "open",
+      "sortOrder": 0,
+      "descriptionEn": "Create stunning worlds and game maps for our Minecraft server.",
+      "descriptionDe": "Erschaffe beeindruckende Welten und Spielkarten für unseren Minecraft-Server."
+    },
+    {
+      "id": 2,
+      "name": "Supporter",
+      "slug": "supporter",
+      "status": "closed",
+      "sortOrder": 1,
+      "descriptionEn": "Help players with questions and handle support tickets.",
+      "descriptionDe": "Hilf Spielern bei Fragen und bearbeite Support-Tickets."
+    },
+    {
+      "id": 3,
+      "name": "Java Developer",
+      "slug": "developer",
+      "status": "closed",
+      "sortOrder": 2,
+      "descriptionEn": "Develop plugins and features for our Minecraft server.",
+      "descriptionDe": "Entwickle Plugins und Funktionen für unseren Minecraft-Server."
+    }
   ]
 }`;
 
@@ -135,7 +159,9 @@ const APPLY_SINGLE_RESPONSE = `{
     "name": "Builder",
     "slug": "builder",
     "status": "open",
-    "sortOrder": 0
+    "sortOrder": 0,
+    "descriptionEn": "Create stunning worlds and game maps for our Minecraft server.",
+    "descriptionDe": "Erschaffe beeindruckende Welten und Spielkarten für unseren Minecraft-Server."
   }
 }`;
 
@@ -364,6 +390,7 @@ export default async function ApiDocsPage({ params }: LocalePageProps) {
             {l.exampleResponse}
           </h3>
           <CodeBlock>{APPLY_LIST_RESPONSE}</CodeBlock>
+          <p>{c.apply.fieldsText}</p>
 
           <h3 className="text-lg font-semibold mt-4 mb-2">{l.single}</h3>
           <p>{c.apply.singleText}</p>

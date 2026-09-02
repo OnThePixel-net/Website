@@ -9,7 +9,7 @@ import {
 } from "@/lib/i18n/server";
 import { buildLocalizedMetadata } from "@/lib/i18n/seo";
 import { buildBreadcrumbList, jsonLdScriptProps } from "@/lib/jsonld";
-import { listApplyPositions, POSITION_ROUTES } from "@/lib/apply";
+import { listApplyPositions, pickApplyText } from "@/lib/apply";
 
 const META_COPY = {
   en: {
@@ -37,29 +37,12 @@ export async function generateMetadata({
   return buildLocalizedMetadata({ locale, path: "/apply", title, description });
 }
 
-interface Position {
-  id: number;
-  status: string;
-  name: string;
-}
-
-async function getPositions(): Promise<Position[]> {
-  const positions = await listApplyPositions();
-  return positions.map((p) => ({ id: p.id, name: p.name, status: p.status }));
-}
-
 export default async function ApplyPage({ params }: LocalePageProps) {
   const [positions, { locale, t }] = await Promise.all([
-    getPositions(),
+    listApplyPositions(),
     getRouteTranslations(params),
   ]);
   const { title } = META_COPY[locale];
-
-  const descriptions: Record<string, string> = {
-    "Builder": t.apply.builderDesc,
-    "Supporter": t.apply.supporterDesc,
-    "Java Developer": t.apply.developerDesc,
-  };
 
   return (
     <>
@@ -80,13 +63,19 @@ export default async function ApplyPage({ params }: LocalePageProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {positions.map((position) => {
                 const isOpen = position.status === "open";
-                const route = POSITION_ROUTES[position.name];
-                const description = descriptions[position.name] ?? "";
+                // Every position has a page of its own, addressed by its slug —
+                // the route no longer has to be looked up in a table keyed by
+                // the position's name.
+                const route = `/apply/${position.slug}`;
+                const description = pickApplyText(
+                  { en: position.descriptionEn, de: position.descriptionDe },
+                  locale,
+                );
 
                 const card = (
                   <div
                     className={`h-full flex flex-col bg-white/5 rounded-lg overflow-hidden transition-all duration-300 ${
-                      isOpen && route
+                      isOpen
                         ? "hover:scale-105 hover:bg-white/10 border border-transparent hover:border-green-500/50 group"
                         : "opacity-50"
                     }`}
@@ -107,7 +96,7 @@ export default async function ApplyPage({ params }: LocalePageProps) {
                       <p className="text-sm text-gray-300 flex-1">{description}</p>
                       <span
                         className={`text-sm mt-4 ${
-                          isOpen && route
+                          isOpen
                             ? "text-green-400 group-hover:text-green-300 transition-colors"
                             : "invisible"
                         }`}
@@ -118,7 +107,7 @@ export default async function ApplyPage({ params }: LocalePageProps) {
                   </div>
                 );
 
-                if (isOpen && route) {
+                if (isOpen) {
                   return (
                     <LocaleLink key={position.id} href={route} className="block h-full">
                       {card}

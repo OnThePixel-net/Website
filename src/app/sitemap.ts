@@ -2,7 +2,8 @@ import type { MetadataRoute } from "next";
 import { localizedUrl } from "@/lib/i18n/seo";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/lib/i18n/translations";
 import { getDb, schema } from "@/lib/db";
-import { ensureTable } from "@/lib/db/migrate";
+import { APPLY_POSITION_SEED, ensureTable } from "@/lib/db/migrate";
+import { listApplyPositions } from "@/lib/apply";
 
 // Static pages have no content source we could derive a modification date
 // from, so their `lastModified` is maintained by hand. Emitting `new Date()`
@@ -45,24 +46,6 @@ const STATIC_PATHS: {
     path: "/apply",
     priority: 0.7,
     changeFreq: "weekly",
-    lastModified: DEFAULT_LAST_MODIFIED,
-  },
-  {
-    path: "/apply/builder",
-    priority: 0.5,
-    changeFreq: "monthly",
-    lastModified: DEFAULT_LAST_MODIFIED,
-  },
-  {
-    path: "/apply/developer",
-    priority: 0.5,
-    changeFreq: "monthly",
-    lastModified: DEFAULT_LAST_MODIFIED,
-  },
-  {
-    path: "/apply/supporter",
-    priority: 0.5,
-    changeFreq: "monthly",
     lastModified: DEFAULT_LAST_MODIFIED,
   },
   {
@@ -168,6 +151,26 @@ async function getNewsUrls(): Promise<
   }
 }
 
+/**
+ * The slugs of the application pages, which are the slugs of the positions.
+ * They used to be three fixed entries in STATIC_PATHS; a position added in the
+ * dashboard now shows up here on its own.
+ *
+ * Closed positions are listed as well — their pages answer 200 with the closed
+ * notice, and dropping a URL from the sitemap because applications are paused
+ * for a month would throw away its indexing. `listApplyPositions` swallows a
+ * database fault and answers with an empty list, in which case the slugs the
+ * schema ships with keep the indexed URLs in the sitemap.
+ */
+async function getApplyPaths(): Promise<string[]> {
+  const positions = await listApplyPositions();
+  const slugs =
+    positions.length > 0
+      ? positions.map((p) => p.slug)
+      : APPLY_POSITION_SEED.map((p) => p.slug);
+  return slugs.map((slug) => `/apply/${slug}`);
+}
+
 // URLs come from localizedUrl() so the sitemap, the canonical tags and the
 // hreflang alternates all spell a page the same way (trailing slash included).
 function buildLanguageAlternates(path: string): Record<string, string> {
@@ -180,7 +183,10 @@ function buildLanguageAlternates(path: string): Record<string, string> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const news = await getNewsUrls();
+  const [news, applyPaths] = await Promise.all([
+    getNewsUrls(),
+    getApplyPaths(),
+  ]);
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map(
     ({ path, priority, changeFreq, lastModified }) => ({
@@ -191,6 +197,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: { languages: buildLanguageAlternates(path) },
     }),
   );
+
+  // Same priority and change frequency the three fixed entries carried, and
+  // the same hand-maintained date: a position row does expose an updated_at,
+  // but it changes when the dashboard toggles a status, not when the page's
+  // content does.
+  const applyEntries: MetadataRoute.Sitemap = applyPaths.map((path) => ({
+    url: localizedUrl(DEFAULT_LOCALE, path),
+    lastModified: new Date(DEFAULT_LAST_MODIFIED),
+    changeFrequency: "monthly",
+    priority: 0.5,
+    alternates: { languages: buildLanguageAlternates(path) },
+  }));
 
   // News articles do have a real modification date, so they keep it.
   const newsEntries: MetadataRoute.Sitemap = news.map((n) => {
@@ -204,5 +222,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
-  return [...staticEntries, ...newsEntries];
+  return [...staticEntries, ...applyEntries, ...newsEntries];
 }

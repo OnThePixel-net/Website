@@ -29,6 +29,12 @@ function listLength(data: unknown, key: string): number {
   return Array.isArray(list) ? list.length : 0;
 }
 
+/** A named number on a JSON response, 0 when it is missing or not one. */
+function numberField(data: unknown, key: string): number {
+  const value = (data as Record<string, unknown> | null)?.[key];
+  return typeof value === "number" ? value : 0;
+}
+
 function StatCard({
   label,
   value,
@@ -119,7 +125,16 @@ function OverviewContent() {
             listLength(d, "data"),
           ),
           count(canTeam, "/api/dashboard/team", (d) => listLength(d, "users")),
-          count(canApply, "/api/dashboard/apply", (d) => listLength(d, "data")),
+          // The apply tile counts UNREAD applications, not positions: the
+          // number of positions barely moves and tells nobody to open the
+          // dashboard, while "3 neue Bewerbungen" is exactly what does. Asked
+          // with `limit=1` so only the `total` of the filter travels, not the
+          // applications themselves.
+          count(
+            canApply,
+            "/api/dashboard/apply/submissions?status=new&limit=1",
+            (d) => numberField(d, "total"),
+          ),
         ]);
 
       setStats({
@@ -177,7 +192,7 @@ function OverviewContent() {
         )}
         {canApply && (
           <StatCard
-            label="Bewerbungen"
+            label="Neue Bewerbungen"
             value={stats.applyCount}
             icon={ClipboardList}
             href="/dashboard/apply"

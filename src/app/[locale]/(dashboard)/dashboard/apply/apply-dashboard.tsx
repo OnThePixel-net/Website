@@ -1,95 +1,59 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
-import {
-  ClipboardList,
-  RefreshCw,
-  AlertCircle,
-  Loader2,
-  ExternalLink,
-} from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import { LEVEL_WRITE } from "@/lib/permissions";
+import { ClipboardList, HelpCircle, Inbox } from "lucide-react";
+import { LEVEL_DELETE, LEVEL_WRITE } from "@/lib/permissions";
 import { usePermissionLevel } from "@/lib/use-permission";
 import AuthGuard from "../auth-guard";
+import { ErrorNote, apiJson, type Position } from "./apply-shared";
+import SubmissionsPanel from "./submissions-panel";
+import QuestionsPanel from "./questions-panel";
+import PositionsPanel from "./positions-panel";
 
-interface Position {
-  id: number;
-  name: string;
-  slug: string;
-  status: "open" | "closed";
-  sortOrder: number;
-}
+/**
+ * The apply area of the dashboard.
+ *
+ * Three views on the same data, in the order they are worked in: the
+ * applications that came in, the questions their forms ask, and the positions
+ * those forms belong to. They are tabs rather than three sidebar entries
+ * because they are one area with one permission level — the sidebar lists one
+ * link per area, and adding two more would suggest three separate rights.
+ *
+ * The position list is loaded here, once, because all three need it: the
+ * submissions filter, the question editor's position picker and the position
+ * list itself. The submissions themselves are paged and filtered, so they are
+ * fetched by their own panel.
+ */
 
-function PositionCard({
-  position,
-  busy,
-  canWrite,
-  onToggle,
-}: {
-  position: Position;
-  busy: boolean;
-  /** Level 2+. Without it the card is read-only: the switch is not rendered. */
-  canWrite: boolean;
-  onToggle: (next: "open" | "closed") => void;
-}) {
-  const open = position.status === "open";
+type TabId = "submissions" | "questions" | "positions";
 
-  return (
-    <div className="flex items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.02] p-5">
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <h2 className="truncate text-base font-semibold text-white">{position.name}</h2>
-          <span
-            className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
-              open
-                ? "bg-green-500/15 text-green-400"
-                : "bg-white/5 text-white/40"
-            }`}
-          >
-            {open ? "Offen" : "Geschlossen"}
-          </span>
-        </div>
-        <Link
-          href={`/apply/${position.slug}`}
-          target="_blank"
-          className="mt-1 inline-flex items-center gap-1 text-xs text-white/30 transition-colors hover:text-white/60"
-        >
-          /apply/{position.slug} <ExternalLink size={11} />
-        </Link>
-      </div>
-
-      {!canWrite ? null : busy ? (
-        <Loader2 size={18} className="animate-spin text-white/30" />
-      ) : (
-        <Switch
-          checked={open}
-          onCheckedChange={(checked) => onToggle(checked ? "open" : "closed")}
-          aria-label={`Bewerbungen für ${position.name} ${open ? "schließen" : "öffnen"}`}
-        />
-      )}
-    </div>
-  );
-}
+const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
+  { id: "submissions", label: "Bewerbungen", icon: Inbox },
+  { id: "questions", label: "Fragen", icon: HelpCircle },
+  { id: "positions", label: "Positionen", icon: ClipboardList },
+];
 
 function ApplyDashboardContent() {
-  // Level 1 may look at the positions but not flip them, so the switch is not
-  // rendered at all. The 403 from the PATCH route is the actual boundary — this
-  // only keeps the operator from reaching for a control that would refuse.
-  const canWrite = usePermissionLevel("apply") >= LEVEL_WRITE;
+  // Level 1 may look at everything in this area but change nothing; level 2
+  // adds creating and editing, level 3 deleting. The routes enforce the same —
+  // hiding the controls only keeps the operator from reaching for one that
+  // would answer 403.
+  const level = usePermissionLevel("apply");
+  const canWrite = level >= LEVEL_WRITE;
+  const canDelete = level >= LEVEL_DELETE;
+
+  const [tab, setTab] = useState<TabId>("submissions");
   const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [busyId, setBusyId] = useState<number | null>(null);
 
-  const load = useCallback(async () => {
+  const loadPositions = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/dashboard/apply");
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body.error ?? `Fehler ${res.status}`);
+      const body = await apiJson<{ data: Position[] }>(
+        "/api/dashboard/apply/positions",
+      );
       setPositions(body.data ?? []);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -100,33 +64,8 @@ function ApplyDashboardContent() {
   }, []);
 
   useEffect(() => {
-    load();
-  }, [load]);
-
-  const toggle = async (position: Position, next: "open" | "closed") => {
-    setBusyId(position.id);
-    setError(null);
-    // Optimistic: the switch flips straight away and is rolled back on failure.
-    setPositions((prev) =>
-      prev.map((p) => (p.id === position.id ? { ...p, status: next } : p)),
-    );
-    try {
-      const res = await fetch("/api/dashboard/apply", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: position.id, status: next }),
-      });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body.error ?? `Fehler ${res.status}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-      setPositions((prev) =>
-        prev.map((p) => (p.id === position.id ? { ...p, status: position.status } : p)),
-      );
-    } finally {
-      setBusyId(null);
-    }
-  };
+    loadPositions();
+  }, [loadPositions]);
 
   const openCount = positions.filter((p) => p.status === "open").length;
 
@@ -145,51 +84,52 @@ function ApplyDashboardContent() {
           </p>
         </div>
 
-        <button
-          onClick={load}
-          disabled={loading}
-          className="flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
-        >
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-          Neu laden
-        </button>
-      </div>
-
-      {error && (
-        <div className="mb-4 flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-          <AlertCircle size={15} className="mt-0.5 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-green-400 border-t-transparent" />
-        </div>
-      ) : positions.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/5 bg-white/[0.02] py-16">
-          <ClipboardList size={32} className="text-white/10" />
-          <p className="text-sm text-white/30">Keine Positionen gefunden.</p>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {positions.map((position) => (
-            <PositionCard
-              key={position.id}
-              position={position}
-              busy={busyId === position.id}
-              canWrite={canWrite}
-              onToggle={(next) => toggle(position, next)}
-            />
+        <div className="flex items-center gap-1 rounded-xl border border-white/8 bg-white/[0.02] p-1">
+          {TABS.map((entry) => (
+            <button
+              key={entry.id}
+              type="button"
+              onClick={() => setTab(entry.id)}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+                tab === entry.id
+                  ? "bg-green-500 text-black shadow"
+                  : "text-white/40 hover:text-white/70"
+              }`}
+            >
+              <entry.icon size={13} />
+              {entry.label}
+            </button>
           ))}
         </div>
-      )}
+      </div>
 
-      <p className="mt-6 text-xs text-white/25">
-        Geschlossene Positionen erscheinen auf <code className="text-white/40">/apply</code>{" "}
-        weiterhin, sind aber ausgegraut und nicht verlinkt; das Bewerbungsformular nimmt
-        dann keine Einsendungen mehr an.
-      </p>
+      {error && <ErrorNote message={error} />}
+
+      {tab === "submissions" && (
+        <SubmissionsPanel
+          positions={positions}
+          canWrite={canWrite}
+          canDelete={canDelete}
+        />
+      )}
+      {tab === "questions" && (
+        <QuestionsPanel
+          positions={positions}
+          loading={loading}
+          canWrite={canWrite}
+          canDelete={canDelete}
+          reload={loadPositions}
+        />
+      )}
+      {tab === "positions" && (
+        <PositionsPanel
+          positions={positions}
+          loading={loading}
+          canWrite={canWrite}
+          canDelete={canDelete}
+          reload={loadPositions}
+        />
+      )}
     </div>
   );
 }
