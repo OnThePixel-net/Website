@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { Button } from "@/components/ui/button";
 import { FaCookieBite } from "react-icons/fa";
 import { X } from "lucide-react";
@@ -42,7 +42,7 @@ export default function CookieConsent() {
     dismissBanner();
   };
 
-  const handleDecline = () => {
+  const handleDecline = useCallback(() => {
     localStorage.setItem("cookie-consent", "declined");
     window.localStorage.setItem(
       "va-preferences",
@@ -51,7 +51,7 @@ export default function CookieConsent() {
     window.dispatchEvent(new Event("youtube-consent-changed"));
     window.dispatchEvent(new Event("twitch-consent-changed"));
     dismissBanner();
-  };
+  }, [dismissBanner]);
 
   const handleCustomize = () => {
     setShowSettings(true);
@@ -71,7 +71,7 @@ export default function CookieConsent() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isVisible, showSettings]);
+  }, [isVisible, showSettings, handleDecline]);
 
   if (!isVisible && !showSettings) return null;
 
@@ -119,12 +119,12 @@ export default function CookieConsent() {
                   <p>{t.cookieConsent.paragraph1}</p>
                   <p>
                     {t.cookieConsent.paragraph2}{" "}
-                    <Link
+                    <LocaleLink
                       href="/privacy"
                       className="font-medium text-green-400 underline-offset-2 hover:underline"
                     >
                       {t.footer.privacy}
-                    </Link>
+                    </LocaleLink>
                     .
                   </p>
                 </div>

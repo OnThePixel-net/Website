@@ -1,7 +1,8 @@
 import React from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { getServerTranslations } from "@/lib/i18n/server";
+import { LocaleLink } from "@/components/LocaleLink";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/translations";
 import { getPublicTeamMembers, type PublicTeamMember } from "@/lib/pocketid";
 import Reveal from "@/components/gsap/Reveal";
 
@@ -17,18 +18,24 @@ async function getTeamMembers(): Promise<PublicTeamMember[]> {
 
 export default async function Team({
   as: Heading = "h1",
+  locale,
 }: {
   // Heading level for the section title. Defaults to h1 (standalone /team
   // page); the homepage renders Team as one section among several and passes
   // "h2" so the page keeps a single h1 (the hero).
   as?: "h1" | "h2";
-} = {}) {
+  // Handed down from the page: only pages and layouts see the route params
+  // the locale comes from.
+  locale: Locale;
+}) {
+  // The "join the team" box sits below the section title, so its heading is
+  // always one level under whatever `as` renders.
+  const SubHeading = Heading === "h1" ? "h2" : "h3";
+
   // `getPublicTeamMembers` already orders members by group weight (highest
   // first), so no further sorting is needed here.
-  const [sortedMembers, { t }] = await Promise.all([
-    getTeamMembers(),
-    getServerTranslations(),
-  ]);
+  const t = getDictionary(locale);
+  const sortedMembers = await getTeamMembers();
 
   return (
     <section className="bg-gray-950 px-4 py-10">
@@ -60,6 +67,7 @@ export default async function Team({
                       src={`https://api.mcskin.me/pfp/${avatarId}`}
                       width={64}
                       height={64}
+                      sizes="64px"
                       className="rounded-lg object-cover"
                     />
                   </div>
@@ -94,19 +102,19 @@ export default async function Team({
           delay={0.05}
           className="mt-12 rounded-lg border-l-4 border-green-500 bg-white/10 p-6"
         >
-          <h2
+          <SubHeading
             className="text-lg font-bold"
             style={{ color: "#00de6d", textShadow: "0 0 10px #00de6d" }}
           >
             {t.team.joinTitle}
-          </h2>
+          </SubHeading>
           <p className="mt-2 text-gray-300">{t.team.joinText}</p>
-          <Link
+          <LocaleLink
             href="/apply"
             className="mt-4 inline-block rounded-lg bg-green-700 px-5 py-2 font-medium text-white transition-colors hover:bg-green-600"
           >
             {t.team.applyNow} →
-          </Link>
+          </LocaleLink>
         </Reveal>
       </div>
     </section>

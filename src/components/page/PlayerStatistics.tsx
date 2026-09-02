@@ -3,8 +3,9 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Search, Sword, Trophy, Target, Zap, Clock, TrendingUp, Award } from "lucide-react";
-import Link from "next/link";
+import { LocaleLink, useLocale } from "@/components/LocaleLink";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { localizePath } from "@/lib/i18n/paths";
 import { DATE_LOCALES } from "@/lib/i18n/translations";
 
 interface DuelMode {
@@ -200,7 +201,7 @@ function DuelsCard({ duels, username }: { duels: PlayerStats["stats"]["duels"]; 
         <StatBox label={t.playerStatistics.winStreak} value={duels.winStreak} />
       </div>
       {kitsPlayed > 0 && (
-        <Link
+        <LocaleLink
           href={`/stats/${username}/duels`}
           className="flex items-center justify-between border-t border-white/5 px-5 py-3 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-green-400 group"
         >
@@ -208,7 +209,7 @@ function DuelsCard({ duels, username }: { duels: PlayerStats["stats"]["duels"]; 
             {t.playerStatistics.viewAllKits.replace("{count}", String(kitsPlayed))}
           </span>
           <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-        </Link>
+        </LocaleLink>
       )}
     </div>
   );
@@ -216,7 +217,8 @@ function DuelsCard({ duels, username }: { duels: PlayerStats["stats"]["duels"]; 
 
 export default function PlayerStatistics({ initialUsername }: PlayerStatisticsProps) {
   const router = useRouter();
-  const { locale, t } = useLanguage();
+  const locale = useLocale();
+  const { t } = useLanguage();
   const dateLocale = DATE_LOCALES[locale];
   const [username, setUsername] = useState(initialUsername || "");
   const [stats, setStats] = useState<PlayerStats | null>(null);
@@ -337,14 +339,18 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
 
       setStats(playerData);
       if (name !== initialUsername) {
-        router.push(`/stats/${name}`, { scroll: false });
+        // Built here rather than with a hook: the target is only known
+        // inside this callback. Same helper the links use.
+        router.push(localizePath(locale, `/stats/${name}`), {
+          scroll: false,
+        });
       }
     } catch {
       setError(t.playerStatistics.genericError);
     } finally {
       setLoading(false);
     }
-  }, [router, initialUsername, t]);
+  }, [router, locale, initialUsername, t]);
 
   useEffect(() => {
     if (initialUsername) fetchPlayerStats(initialUsername);
@@ -428,6 +434,7 @@ export default function PlayerStatistics({ initialUsername }: PlayerStatisticsPr
                     alt={stats.playerinfo.username}
                     width={80}
                     height={80}
+                    sizes="80px"
                     className="rounded-lg"
                   />
                 </div>

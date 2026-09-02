@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Locale, SUPPORTED_LOCALES } from "./translations";
+import { localizePath } from "./paths";
+import { DEFAULT_LOCALE, Locale, SUPPORTED_LOCALES } from "./translations";
 
 export const SITE_URL = "https://onthepixel.net";
 export const SITE_NAME = "OnThePixel.net";
@@ -19,6 +20,24 @@ const HREFLANG_BY_LOCALE: Record<Locale, string> = {
   en: "en",
   de: "de",
 };
+
+/**
+ * Build the absolute URL a page is actually served at.
+ *
+ * The app runs with `trailingSlash: true`, so the URL the server answers with
+ * 200 always ends in a slash ("/about/", not "/about"). Canonical tags,
+ * hreflang alternates, OpenGraph URLs and sitemap entries must use exactly
+ * that form — anything else points crawlers at a URL variant that only
+ * redirects, which splits signals between the two spellings.
+ *
+ * The path itself comes from `localizePath`, the same helper the internal
+ * links use, so an <a href> and the canonical tag of the page behind it can
+ * never spell that page differently. `path` is locale-free and may be passed
+ * with or without a leading or trailing slash.
+ */
+export function localizedUrl(locale: Locale, path: string): string {
+  return `${SITE_URL}${localizePath(locale, path)}`;
+}
 
 /**
  * Build a Metadata object with localized title/description, hreflang
@@ -43,21 +62,14 @@ export function buildLocalizedMetadata(opts: {
   const { locale, path, title, description, type = "website" } = opts;
   const image = opts.image ?? DEFAULT_OG_IMAGE;
   const imageAlt = opts.imageAlt ?? title;
-  const cleanPath = path === "/" ? "" : path.replace(/\/$/, "");
 
-  const canonical =
-    locale === "en"
-      ? `${SITE_URL}${cleanPath || "/"}`
-      : `${SITE_URL}/${locale}${cleanPath}`;
+  const canonical = localizedUrl(locale, path);
 
   const languages: Record<string, string> = {
-    "x-default": `${SITE_URL}${cleanPath || "/"}`,
+    "x-default": localizedUrl(DEFAULT_LOCALE, path),
   };
   for (const loc of SUPPORTED_LOCALES) {
-    languages[HREFLANG_BY_LOCALE[loc]] =
-      loc === "en"
-        ? `${SITE_URL}${cleanPath || "/"}`
-        : `${SITE_URL}/${loc}${cleanPath}`;
+    languages[HREFLANG_BY_LOCALE[loc]] = localizedUrl(loc, path);
   }
 
   // Explicit dimensions help crawlers and social platforms render the

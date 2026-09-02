@@ -28,6 +28,7 @@ export default function HeaderAuthButton({ user }: HeaderAuthButtonProps) {
             alt={user.name ?? ""}
             width={28}
             height={28}
+            sizes="28px"
             className="rounded-full"
           />
         )}

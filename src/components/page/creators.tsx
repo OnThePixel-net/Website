@@ -196,6 +196,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                           src={`https://api.mcskin.me/pfp/${creator.Minecraft_username}`}
                           width={40}
                           height={40}
+                          sizes="40px"
                           className="rounded"
                         />
                         <div className="flex-1 min-w-0">
@@ -254,6 +255,7 @@ export default function Creators({ initialCreators, initialFollowers, initialLiv
                         src={`https://api.mcskin.me/pfp/${creator.Minecraft_username}`}
                         width={64}
                         height={64}
+                        sizes="64px"
                         className="rounded-lg object-cover"
                       />
                     </div>

@@ -1,18 +1,21 @@
 "use client";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
+import { stripLocalePrefix } from "@/lib/i18n/paths";
 
 export function MainNav() {
-  const pathname = usePathname();
+  // Compared against locale-free hrefs, so the locale prefix has to go:
+  // "/de/team/" and "/team/" are the same entry and must highlight alike.
+  const pathname = stripLocalePrefix(usePathname());
   const t = useTranslations();
   return (
     <nav className="flex items-center space-x-4 lg:space-x-6">
-      <Link href="/" className="mr-6 flex items-center space-x-2">
+      <LocaleLink href="/" className="mr-6 flex items-center space-x-2">
         <span className="font-bold">OnThePixel.net</span>
-      </Link>
-      <Link
+      </LocaleLink>
+      <LocaleLink
         href="/leaderboard"
         className={cn(
           "hidden text-sm font-medium transition-colors hover:text-primary sm:inline-block",
@@ -22,8 +25,8 @@ export function MainNav() {
         )}
       >
         {t.nav.leaderboard}
-      </Link>
-      <Link
+      </LocaleLink>
+      <LocaleLink
         href="/stats"
         className={cn(
           "hidden text-sm font-medium transition-colors hover:text-primary sm:inline-block",
@@ -33,26 +36,26 @@ export function MainNav() {
         )}
       >
         {t.nav.statistics}
-      </Link>
-      <Link
+      </LocaleLink>
+      <LocaleLink
         href="/team"
         className={cn(
           "hidden text-sm font-medium transition-colors hover:text-primary sm:inline-block",
-          pathname === "/team" ? "text-foreground" : "text-foreground/60",
+          pathname === "/team/" ? "text-foreground" : "text-foreground/60",
         )}
       >
         {t.nav.team}
-      </Link>
-      <Link
+      </LocaleLink>
+      <LocaleLink
         href="/creators"
         className={cn(
           "hidden text-sm font-medium transition-colors hover:text-primary sm:inline-block",
-          pathname === "/creators" ? "text-foreground" : "text-foreground/60",
+          pathname === "/creators/" ? "text-foreground" : "text-foreground/60",
         )}
       >
         {t.nav.creators}
-      </Link>
-      <Link
+      </LocaleLink>
+      <LocaleLink
         href="/apply"
         className={cn(
           "hidden text-sm font-medium transition-colors hover:text-primary sm:inline-block",
@@ -60,7 +63,7 @@ export function MainNav() {
         )}
       >
         {t.nav.apply}
-      </Link>
+      </LocaleLink>
     </nav>
   );
 }

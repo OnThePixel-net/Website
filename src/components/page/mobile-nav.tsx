@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import Link, { LinkProps } from "next/link";
-import { useRouter } from "next/navigation";
+import type { LinkProps } from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 export function MobileNav() {
@@ -43,15 +43,21 @@ export function MobileNav() {
           <MobileLink onOpenChange={setOpen} href="/apply">
             {t.nav.apply}
           </MobileLink>
-          <Link href="https://discord.onthepixel.net">{t.nav.discord}</Link>
-          <Link href="https://x.com/onthepixelnet">{t.nav.twitter}</Link>
+          <LocaleLink href="https://discord.onthepixel.net">
+            {t.nav.discord}
+          </LocaleLink>
+          <LocaleLink href="https://x.com/onthepixelnet">
+            {t.nav.twitter}
+          </LocaleLink>
         </div>
       </SheetContent>
     </Sheet>
   );
 }
 
-interface MobileLinkProps extends LinkProps {
+interface MobileLinkProps extends Omit<LinkProps, "href"> {
+  /** Locale-free, root-relative path — LocaleLink adds the prefix. */
+  href: string;
   children: React.ReactNode;
   onOpenChange?: (open: boolean) => void;
   className?: string;
@@ -64,18 +70,16 @@ function MobileLink({
   className,
   ...props
 }: MobileLinkProps) {
-  const router = useRouter();
   return (
-    <Link
+    <LocaleLink
       href={href}
-      onClick={() => {
-        router.push(href.toString());
-        onOpenChange?.(false);
-      }}
+      // The sheet has to close on navigation; the link itself does the
+      // navigating, so this only flips the panel shut.
+      onClick={() => onOpenChange?.(false)}
       className={className}
       {...props}
     >
       {children}
-    </Link>
+    </LocaleLink>
   );
 }

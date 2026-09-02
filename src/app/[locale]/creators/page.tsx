@@ -1,0 +1,124 @@
+import React from "react";
+import type { Metadata } from "next";
+import Creators, { Creator, LiveStatus } from "@/components/page/creators";
+import TopPage from "@/components/page/top";
+import { getRouteLocale, type LocalePageProps } from "@/lib/i18n/server";
+import { buildLocalizedMetadata } from "@/lib/i18n/seo";
+import { buildBreadcrumbList, jsonLdScriptProps } from "@/lib/jsonld";
+import { getPublicCreators } from "@/lib/creators";
+
+const META_COPY = {
+  en: {
+    title: "Creators",
+    description:
+      "Our content creators — streamers and YouTubers playing on OnThePixel.net. Watch them live or catch their latest videos.",
+  },
+  de: {
+    title: "Creators",
+    description:
+      "Unsere Content-Creators — Streamer und YouTuber, die auf OnThePixel.net spielen. Schau ihnen live zu oder entdecke ihre neuesten Videos.",
+  },
+} as const;
+
+export async function generateMetadata({
+  params,
+}: LocalePageProps): Promise<Metadata> {
+  const locale = await getRouteLocale(params);
+  const { title, description } = META_COPY[locale];
+  return buildLocalizedMetadata({ locale, path: "/creators", title, description });
+}
+
+async function getCreatorsData() {
+  try {
+    // Creators are managed in the admin dashboard and stored in Postgres.
+    const creators: Creator[] = await getPublicCreators();
+    if (creators.length === 0) {
+      return { creators: [], followersMap: {}, liveMap: {} };
+    }
+
+    const [followersResults, liveResults] = await Promise.all([
+      Promise.all(
+        creators.map(async (creator) => {
+          try {
+            const res = await fetch(
+              `https://api.onthepixel.net/creators/followers/${creator.Name}`,
+              { next: { revalidate: 3600 } }
+            );
+            if (res.ok) {
+              const data = await res.json();
+              if (data.success && data.data?.social) {
+                const count =
+                  data.data.social.followers || data.data.social.subscribers || 0;
+                return { name: creator.Name, count };
+              }
+            }
+          } catch {}
+          return { name: creator.Name, count: 0 };
+        })
+      ),
+      Promise.all(
+        creators.map(async (creator) => {
+          try {
+            const res = await fetch(
+              `https://api.onthepixel.net/creators/live/${creator.Name}`,
+              { next: { revalidate: 60 } }
+            );
+            if (res.ok) {
+              const data = await res.json();
+              if (data.success && data.data) {
+                return {
+                  name: creator.Name,
+                  status: {
+                    isLive: data.data.isLive || false,
+                    platform: data.data.platform,
+                    title: data.data.title,
+                    viewers: data.data.viewers,
+                  } as LiveStatus,
+                };
+              }
+            }
+          } catch {}
+          return { name: creator.Name, status: { isLive: false } as LiveStatus };
+        })
+      ),
+    ]);
+
+    const followersMap: Record<string, number> = {};
+    followersResults.forEach(({ name, count }) => {
+      followersMap[name] = count;
+    });
+
+    const liveMap: Record<string, LiveStatus> = {};
+    liveResults.forEach(({ name, status }) => {
+      liveMap[name] = status;
+    });
+
+    return { creators, followersMap, liveMap };
+  } catch {
+    return { creators: [], followersMap: {}, liveMap: {} };
+  }
+}
+
+export default async function CreatorsPage({ params }: LocalePageProps) {
+  const [{ creators, followersMap, liveMap }, locale] = await Promise.all([
+    getCreatorsData(),
+    getRouteLocale(params),
+  ]);
+  const { title } = META_COPY[locale];
+
+  return (
+    <section className="min-h-screen bg-gray-950">
+      <script
+        {...jsonLdScriptProps(
+          buildBreadcrumbList(locale, [{ name: title, path: "/creators" }]),
+        )}
+      />
+      <TopPage />
+      <Creators
+        initialCreators={creators}
+        initialFollowers={followersMap}
+        initialLiveStatus={liveMap}
+      />
+    </section>
+  );
+}

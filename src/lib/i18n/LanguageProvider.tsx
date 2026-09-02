@@ -1,98 +1,65 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
-  DEFAULT_LOCALE,
-  isLocale,
-  Locale,
-  LOCALE_COOKIE,
-  Translations,
-  translations,
-} from "./translations";
+import { createContext, useCallback, useContext, useMemo } from "react";
+import { Locale, LOCALE_COOKIE, Translations } from "./translations";
 
 const STORAGE_KEY = "otp.locale";
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
 type LanguageContextValue = {
   locale: Locale;
-  setLocale: (locale: Locale) => void;
+  /** Records the visitor's choice; navigating is what actually changes it. */
+  rememberLocale: (locale: Locale) => void;
   t: Translations;
 };
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-function readCookieLocale(): Locale | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie
-    .split("; ")
-    .find((c) => c.startsWith(`${LOCALE_COOKIE}=`));
-  if (!match) return null;
-  const value = decodeURIComponent(match.split("=")[1] ?? "");
-  return isLocale(value) ? value : null;
-}
-
-function detectInitialLocale(): Locale {
-  if (typeof window === "undefined") return DEFAULT_LOCALE;
-  const cookieLocale = readCookieLocale();
-  if (cookieLocale) return cookieLocale;
+function writeRememberedLocale(locale: Locale) {
+  if (typeof document !== "undefined") {
+    document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${ONE_YEAR}; samesite=lax`;
+  }
   try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (isLocale(stored)) return stored;
+    window.localStorage.setItem(STORAGE_KEY, locale);
   } catch {
     // ignore storage errors
   }
-  const nav = window.navigator?.language?.slice(0, 2).toLowerCase();
-  if (isLocale(nav)) return nav;
-  return DEFAULT_LOCALE;
 }
 
-function writeCookieLocale(locale: Locale) {
-  if (typeof document === "undefined") return;
-  document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${ONE_YEAR}; samesite=lax`;
-}
-
+/**
+ * Makes the locale of the current route available to client components.
+ *
+ * The locale is not state: it is the `[locale]` route segment, handed down by
+ * the root layout. A copy in `useState` would be a second source of truth that
+ * drifts apart the moment the layout re-renders under a different segment — so
+ * the prop is passed straight through, and switching language is a navigation
+ * rather than a state update.
+ *
+ * `rememberLocale` only writes the visitor's choice down (cookie plus
+ * localStorage). Nothing on the server reads it back: the URL alone decides
+ * which language a page renders in, which is what lets those pages be
+ * prerendered and cached.
+ */
 export function LanguageProvider({
   children,
-  initialLocale,
+  locale,
+  dictionary,
 }: {
   children: React.ReactNode;
-  initialLocale?: Locale;
+  locale: Locale;
+  // Dictionary of the active locale, resolved on the server. Only this one
+  // language is shipped to the client, instead of both ending up in every
+  // client bundle.
+  dictionary: Translations;
 }) {
-  const [locale, setLocaleState] = useState<Locale>(
-    initialLocale ?? DEFAULT_LOCALE,
+  const rememberLocale = useCallback(
+    (next: Locale) => writeRememberedLocale(next),
+    [],
   );
 
-  useEffect(() => {
-    if (initialLocale) return;
-    setLocaleState(detectInitialLocale());
-  }, [initialLocale]);
-
-  useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.lang = locale;
-    }
-  }, [locale]);
-
-  const setLocale = useCallback((next: Locale) => {
-    setLocaleState(next);
-    writeCookieLocale(next);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      // ignore storage errors
-    }
-  }, []);
-
   const value = useMemo<LanguageContextValue>(
-    () => ({ locale, setLocale, t: translations[locale] }),
-    [locale, setLocale],
+    () => ({ locale, rememberLocale, t: dictionary }),
+    [locale, rememberLocale, dictionary],
   );
 
   return (

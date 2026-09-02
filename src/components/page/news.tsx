@@ -1,10 +1,10 @@
 import React from "react";
-import Link from "next/link";
-import { getServerTranslations } from "@/lib/i18n/server";
+import { LocaleLink } from "@/components/LocaleLink";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import Reveal from "@/components/gsap/Reveal";
 import { getDb, schema } from "@/lib/db";
 import { ensureTable } from "@/lib/db/migrate";
-import { desc } from "drizzle-orm";
+import { desc, inArray } from "drizzle-orm";
 import { Locale } from "@/lib/i18n/translations";
 
 interface Translation {
@@ -54,7 +54,7 @@ function NewsCard({
   const description = tr?.short_description?.trim() ? tr.short_description : item.short_description;
 
   return (
-    <Link href={`/news/${item.slug}`} className="group block h-full">
+    <LocaleLink href={`/news/${item.slug}`} className="group block h-full">
       <article className="relative flex h-full flex-col overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] transition-all duration-300 hover:border-green-500/30 hover:bg-white/[0.05] hover:shadow-[0_0_0_1px_rgba(0,222,109,0.15),0_12px_40px_rgba(0,222,109,0.07)]">
         {/* Top glow line */}
         <div className="pointer-events-none absolute left-0 top-0 z-10 h-0.5 w-full origin-left scale-x-0 bg-gradient-to-r from-green-400 via-green-500 to-transparent transition-transform duration-300 group-hover:scale-x-100" />
@@ -135,40 +135,60 @@ function NewsCard({
           )}
         </div>
       </article>
-    </Link>
+    </LocaleLink>
   );
 }
+
+/** One featured article plus the two cards next to it — nothing else is rendered. */
+const NEWS_PREVIEW_LIMIT = 3;
 
 async function getNews(): Promise<NewsItem[]> {
   try {
     await ensureTable();
     const db = getDb();
-    const items = await db.select().from(schema.news).orderBy(desc(schema.news.published_at));
-    const allTranslations = await db.select().from(schema.newsTranslations);
+    const items = await db
+      .select()
+      .from(schema.news)
+      .orderBy(desc(schema.news.published_at))
+      .limit(NEWS_PREVIEW_LIMIT);
+
+    // Only the translations of the three articles on screen. Reading the full
+    // translation table and filtering it per item made this section's cost grow
+    // with the entire archive. `inArray` needs a non-empty list.
+    const translations = items.length
+      ? await db
+          .select()
+          .from(schema.newsTranslations)
+          .where(inArray(schema.newsTranslations.news_id, items.map((i) => i.id)))
+      : [];
+
+    const byNewsId = new Map<number, Record<string, Translation>>();
+    for (const tr of translations) {
+      let group = byNewsId.get(tr.news_id);
+      if (!group) {
+        group = {};
+        byNewsId.set(tr.news_id, group);
+      }
+      group[tr.language] = { title: tr.title, short_description: tr.short_description, content: tr.content };
+    }
 
     return items.map((item) => ({
       ...item,
-      translations: allTranslations
-        .filter((tr) => tr.news_id === item.id)
-        .reduce<Record<string, Translation>>(
-          (acc, tr) => {
-            acc[tr.language] = { title: tr.title, short_description: tr.short_description, content: tr.content };
-            return acc;
-          },
-          {},
-        ),
+      translations: byNewsId.get(item.id) ?? {},
     }));
   } catch {
     return [];
   }
 }
 
-export default async function News() {
-  const { locale, t } = await getServerTranslations();
+// `locale` is handed down from the page: only pages and layouts receive the
+// route params that carry it.
+export default async function News({ locale }: { locale: Locale }) {
+  const t = getDictionary(locale);
 
   const newsItems = await getNews();
   const featured = newsItems[0] ?? null;
-  const rest = newsItems.slice(1, 3);
+  const rest = newsItems.slice(1, NEWS_PREVIEW_LIMIT);
 
   return (
     <>
@@ -205,7 +225,7 @@ export default async function News() {
                   distance={40}
                   className="grid grid-cols-1 gap-4 md:grid-cols-2"
                 >
-                  {rest.map((item, i) => (
+                  {rest.map((item) => (
                     <NewsCard
                       key={item.id}
                       item={item}

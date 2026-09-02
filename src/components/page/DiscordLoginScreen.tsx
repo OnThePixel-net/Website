@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { LocaleLink } from "@/components/LocaleLink";
 import SignInButton from "./SignInButton";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
@@ -20,12 +20,12 @@ export default function DiscordLoginScreen({ position, callbackUrl }: DiscordLog
     <section className="bg-gray-950 min-h-screen">
       <div className="container mx-auto px-4 py-10">
         <div className="max-w-xl mx-auto">
-          <Link
+          <LocaleLink
             href="/apply"
             className="inline-block mb-6 text-sm text-gray-400 hover:text-green-400 transition-colors duration-200"
           >
             ← {t.discordLogin.backToPositions}
-          </Link>
+          </LocaleLink>
           <div className="bg-white/5 rounded-lg p-8 text-center">
             <div className="w-16 h-16 bg-[#5865F2]/20 rounded-full flex items-center justify-center mx-auto mb-5">
               <DiscordIcon />
