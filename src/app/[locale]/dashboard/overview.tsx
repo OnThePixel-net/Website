@@ -10,6 +10,7 @@ import {
   ClipboardList,
   ArrowRight,
   TrendingUp,
+  Shield,
 } from "lucide-react";
 import { LEVEL_NONE, permissionLevel } from "@/lib/permissions";
 import AuthGuard from "./auth-guard";
@@ -215,6 +216,16 @@ function OverviewContent() {
                 className="flex items-center gap-2 rounded-lg bg-orange-500/10 px-3 py-2 text-sm font-medium text-orange-400 transition-colors hover:bg-orange-500/20"
               >
                 <UserCog size={14} /> Manage Team
+              </Link>
+            )}
+            {canTeam && (
+              // Ranks live in the same area as the roster, so the same level
+              // decides both links; the tiles above stay one per area.
+              <Link
+                href="/dashboard/roles"
+                className="flex items-center gap-2 rounded-lg bg-orange-500/10 px-3 py-2 text-sm font-medium text-orange-400 transition-colors hover:bg-orange-500/20"
+              >
+                <Shield size={14} /> Manage Rollen
               </Link>
             )}
             {canApply && (

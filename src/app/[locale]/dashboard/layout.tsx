@@ -52,6 +52,10 @@ const navItems: {
     area: "apply",
   },
   { href: "/dashboard/team", label: "Team", icon: UserCog, area: "team" },
+  // Ranks are team administration, so they share the `team` area rather than
+  // getting a fifth one — the levels edited there are exactly the four areas
+  // this list is filtered by.
+  { href: "/dashboard/roles", label: "Rollen", icon: Shield, area: "team" },
 ];
 
 function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
