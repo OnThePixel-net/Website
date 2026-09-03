@@ -186,6 +186,7 @@ export const de = {
     discordVerified: "Discord verifiziert",
     discordRequired: "Discord-Anmeldung erforderlich",
     login: "Anmelden",
+    logout: "Abmelden",
     required: "Pflichtfeld",
     securityVerification: "Sicherheitsüberprüfung",
     submitting: "Wird gesendet...",

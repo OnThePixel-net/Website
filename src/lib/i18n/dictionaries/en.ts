@@ -183,6 +183,7 @@ export const en = {
     discordVerified: "Discord verified",
     discordRequired: "Discord login required",
     login: "Login",
+    logout: "Log out",
     required: "Required",
     securityVerification: "Security Verification",
     submitting: "Submitting...",

@@ -3,7 +3,7 @@
 import React, { useState, useRef } from "react";
 import { LocaleLink } from "@/components/LocaleLink";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
-import { useSession, signIn } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
 import type { Translations } from "@/lib/i18n/translations";
 
@@ -181,7 +181,16 @@ export default function ApplicationForm({
                     {session.user?.name}
                   </span>
                 </div>
-                <span className="text-xs text-[#5865F2] font-medium">{t.applicationForm.discordVerified} ✓</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-[#5865F2] font-medium">{t.applicationForm.discordVerified} ✓</span>
+                  <button
+                    type="button"
+                    onClick={() => signOut()}
+                    className="text-xs text-gray-500 hover:text-white transition-colors px-2 py-1 rounded hover:bg-white/10"
+                  >
+                    {t.applicationForm.logout}
+                  </button>
+                </div>
               </>
             ) : (
               <>
