@@ -160,6 +160,15 @@ export function getGuildId(): string {
 }
 
 /**
+ * Channel new applications are announced in, or "" when the operator has not
+ * set one. Optional on purpose: an unset variable means "do not announce",
+ * which is the behaviour every deployment had before the notice existed.
+ */
+export function getApplyChannelId(): string {
+  return process.env.DISCORD_APPLY_CHANNEL_ID?.trim() ?? "";
+}
+
+/**
  * True when both the bot token and the guild id are present. Lets a caller
  * decide up front whether to offer the Discord parts of a form at all —
  * everything below throws a {@link DiscordError} rather than doing nothing
@@ -169,7 +178,16 @@ export function isDiscordConfigured(): boolean {
   return Boolean(getBotToken() && getGuildId());
 }
 
-function requireConfig(): { token: string; guildId: string } {
+/**
+ * True when a channel for the new-application notice is configured. The guild
+ * id is not part of this: a message is posted to a channel id, and Discord
+ * resolves the guild from it.
+ */
+export function isApplyChannelConfigured(): boolean {
+  return Boolean(getBotToken() && getApplyChannelId());
+}
+
+function requireBotToken(): string {
   const token = getBotToken();
   if (!token) {
     throw new DiscordError(
@@ -178,6 +196,18 @@ function requireConfig(): { token: string; guildId: string } {
       "",
     );
   }
+  return token;
+}
+
+/**
+ * Token plus guild id, for the calls that address the guild itself.
+ *
+ * Posting a message addresses a channel, not a guild, so {@link discordFetch}
+ * asks for the token alone — requiring `DISCORD_GUILD_ID` there would make the
+ * application notice depend on a variable it never reads.
+ */
+function requireConfig(): { token: string; guildId: string } {
+  const token = requireBotToken();
   const guildId = getGuildId();
   if (!guildId) {
     throw new DiscordError(
@@ -337,7 +367,7 @@ async function discordFetch(
   init: RequestInit,
   opts: DiscordFetchOpts,
 ): Promise<Response> {
-  const { token } = requireConfig();
+  const token = requireBotToken();
 
   const headers = new Headers(init.headers);
   headers.set("Authorization", `Bot ${token}`);
@@ -553,4 +583,56 @@ export async function listGuildRoles(): Promise<DiscordRole[]> {
   );
   const roles = (await res.json()) as DiscordRole[];
   return roles.slice().sort((a, b) => b.position - a.position);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Channel messages                                                          */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The subset of the message payload used here.
+ *
+ * `allowed_mentions` is not optional in practice: without it Discord resolves
+ * every `@everyone`, `@here` and role mention the text happens to contain, and
+ * the text is assembled from a position name that is edited in the dashboard.
+ * An empty `parse` turns the whole message into plain text no matter what it
+ * says, so a position called "@everyone" pings nobody.
+ */
+export interface DiscordMessage {
+  content: string;
+  /** Message flags. `1 << 2` (4) suppresses the link preview embeds. */
+  flags?: number;
+}
+
+/** `SUPPRESS_EMBEDS` — the message keeps its link, Discord adds no preview. */
+export const MESSAGE_FLAG_SUPPRESS_EMBEDS = 1 << 2;
+
+/**
+ * Post a message into a channel.
+ *
+ * `POST /channels/{channel.id}/messages` answers 200 with the created message.
+ * The bot needs `View Channel` and `Send Messages` in that channel; without
+ * them Discord answers 403 (JSON code 50001 "Missing Access" for a channel it
+ * cannot even see, 50013 "Missing Permissions" for one it can), which
+ * {@link describeFailure} turns into a message naming the fix.
+ *
+ * The channel id is not validated here beyond being URL-encoded: an id that is
+ * not a channel is a 404 from Discord, which is a clearer signal than a guess
+ * made locally.
+ */
+export async function createChannelMessage(
+  channelId: string,
+  message: DiscordMessage,
+): Promise<void> {
+  await discordFetch(
+    `/channels/${encodeURIComponent(channelId)}/messages`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        ...message,
+        allowed_mentions: { parse: [] },
+      }),
+    },
+    { what: `posting a message to channel ${channelId}` },
+  );
 }

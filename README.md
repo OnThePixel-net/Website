@@ -197,6 +197,32 @@ Behaviour worth knowing:
 - Changing a rank's role mapping does not re-stamp existing members; they pick
   the new role up the next time they are saved.
 
+### Discord notice for new applications
+
+Every application that comes in through `/apply` is announced in one Discord
+channel. Also **optional**: without `DISCORD_APPLY_CHANNEL_ID` nothing is
+posted and applications are stored and reviewed exactly as before.
+
+The notice is posted by the same bot as the role sync — one more `.env`
+variable, no webhook and therefore no second credential to store and rotate.
+It carries the position and a link, and nothing else:
+
+```
+New applicant as a **Java Developer**
+Click here to open: https://onthepixel.net/dashboard/apply/
+```
+
+That is on purpose. Name, Discord id and the answers stay behind the
+dashboard's permission check, where only people with the `apply` right can read
+them; a notice repeating them would hand everyone who can see the channel a
+permanent copy of data they are not otherwise allowed to see.
+
+The bot needs `View Channel` and `Send Messages` **in that channel** — missing
+either answers 403 (code 50001 / 50013). The notice is sent after the applicant
+already has their confirmation, so a channel that is misconfigured, full or
+unreachable is logged and skipped: it can never turn a stored application into
+a failed one.
+
 ### What does not work without external credentials
 
 The site talks to several OnThePixel services that are not part of this repo.
@@ -217,6 +243,10 @@ Without their credentials the following is unavailable locally:
 - **Discord role sync** — needs `DISCORD_BOT_TOKEN` and `DISCORD_GUILD_ID`.
   Without them the team and creator dashboards work unchanged, they just do not
   touch Discord; see "Discord role sync" above.
+- **Discord notice for new applications** — needs `DISCORD_BOT_TOKEN` and
+  `DISCORD_APPLY_CHANNEL_ID`. Without them applications are stored and listed in
+  the dashboard as usual, they are just not announced; see "Discord notice for
+  new applications" above.
 - **Stats and leaderboards** — served by `api.onthepixel.net`. These are public
   endpoints, so they work as long as you are online, but they always show live
   production data; there is no local substitute.
