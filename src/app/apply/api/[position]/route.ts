@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { ApplyValidationError, createApplySubmission } from "@/lib/apply";
+import { notifyNewApplication } from "@/lib/apply-notify";
 
 /**
  * Endpoint the public application form posts to.
@@ -138,7 +139,7 @@ export async function POST(
     // read from the request body — that is what makes the applications in the
     // inbox attributable. `createApplySubmission` re-checks that the position
     // exists and is open, so a form left open while it closed cannot post.
-    await createApplySubmission({
+    const submission = await createApplySubmission({
       positionSlug: position,
       discord: {
         id: session.user.discordId,
@@ -147,6 +148,13 @@ export async function POST(
       },
       answers: body?.applicationData,
     });
+
+    // Announced after the response is on its way, not before it: the applicant
+    // waits for their own submission, never for Discord, and a channel that is
+    // unreachable can then no longer show up as a failed application. The name
+    // is taken from the stored row rather than the URL slug, so the notice says
+    // "Java Developer" where the slug says "developer".
+    after(() => notifyNewApplication(submission.positionName));
   } catch (e) {
     if (e instanceof ApplyValidationError) {
       return reject({
