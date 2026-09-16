@@ -150,6 +150,47 @@ Denied"); if it cannot be reached **during a re-check**, the previous decision
 stands and is retried a minute later, so an admin already at work is not thrown
 out by an upstream hiccup. Every denial is logged with the reason.
 
+### API keys for the dashboard API
+
+The `/api/dashboard/**` routes accept a second credential besides the browser
+session: an **API key**, for the things that are not a person at a browser — a
+Discord bot posting a release note, a deploy script opening an application
+position, a status page counting new applications.
+
+Keys are managed at **`/dashboard/api-keys`**, which also carries the full
+reference for those endpoints (what each one takes, what it returns, which level
+it needs). That documentation is deliberately only reachable inside the
+dashboard; the public `/api-docs/` page keeps describing the read-only endpoints
+only.
+
+Send the token as a header — `Authorization: Bearer otp_…`, or `X-API-Key: otp_…`
+for tools that can only set that one. It is never read from a query parameter,
+because URLs end up in logs, history and `Referer`.
+
+```bash
+curl -H "Authorization: Bearer $OTP_API_KEY" https://onthepixel.net/api/dashboard/news
+```
+
+The rules that keep a key from becoming a skeleton key:
+
+- A key carries the **same per-area levels** as a rank, and each endpoint checks
+  the same way for both credentials — so "may post news" never also means "may
+  delete team members".
+- A key can never carry **more than its creator held** at the time it was made.
+- **Keys cannot manage keys.** Minting, renaming and revoking need a signed-in
+  dashboard session, so a leaked key cannot mint itself a successor that would
+  survive its own revocation.
+- Only the token's **SHA-256 is stored**. It is shown once, when it is created,
+  and cannot be looked up afterwards — lose it and you revoke and reissue.
+- Revoking keeps the row: the name, the prefix and the last use are exactly what
+  is wanted after a key has had to be pulled. Revoked keys stop working on the
+  next request.
+- Keys may be given an **expiry**; without one they are valid until revoked.
+
+Managing keys is gated on the `team` area — level 1 to see the list and the
+reference, level 2 to mint and revoke. Revoking deliberately does not need level
+3: pulling a leaked credential must never be harder than issuing one.
+
 ### Discord role sync
 
 When a team member or creator is created, changed or deleted in the dashboard,

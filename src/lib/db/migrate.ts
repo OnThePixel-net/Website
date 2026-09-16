@@ -210,3 +210,25 @@ export const ensureApplyTables = once("ensureApplyTables", async () => {
     `);
   }
 });
+
+/**
+ * The dashboard API's access tokens. Mirrors `drizzle/0003_api_keys.sql`; see
+ * `lib/db/schema.ts` for why only the hash of a token is kept.
+ */
+export const ensureApiKeyTable = once("ensureApiKeyTable", async () => {
+  const db = getDb();
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS api_keys (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      prefix TEXT NOT NULL UNIQUE,
+      token_hash TEXT NOT NULL UNIQUE,
+      permissions JSONB NOT NULL DEFAULT '{"news":0,"creators":0,"team":0,"apply":0}'::jsonb,
+      created_by TEXT NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_used_at TIMESTAMPTZ,
+      expires_at TIMESTAMPTZ,
+      revoked_at TIMESTAMPTZ
+    )
+  `);
+});
