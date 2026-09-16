@@ -8,12 +8,14 @@ import {
 import {
   pocketIdFetch,
   fetchAllPages,
+  isOtpGroup,
   OTP_TEAM_CLAIM,
   slugifyGroupName,
   PocketIdError,
   type CustomClaim,
   type UserGroup,
 } from "@/lib/pocketid";
+import { GROUP_INHERITS_CLAIM_KEY } from "@/lib/group-inheritance";
 import {
   GROUP_CREATOR_CLAIM_KEY,
   GROUP_CREATOR_CLAIM_VALUE,
@@ -56,6 +58,11 @@ export async function POST(req: NextRequest) {
     const weight = String(body.weight ?? "").trim();
     const rawRoleId = String(body.discordRoleId ?? "").trim();
     const isCreatorRank = body.isCreatorRank === true;
+    // The rank this one inherits from, as a Pocket ID group id ("" = none).
+    // Purely declarative — see `lib/group-inheritance.ts` for why it grants
+    // nothing on its own — but it is still validated, because a claim pointing
+    // at something that is not a rank is not a declaration, it is a typo.
+    const inheritsFrom = String(body.inheritsFrom ?? "").trim();
     // Per-area dashboard levels. `coercePermissions` is fail-closed, so a body
     // that omits `permissions`, or sends a level outside 1–3, creates a group
     // that grants nothing rather than one that guesses.
@@ -78,6 +85,18 @@ export async function POST(req: NextRequest) {
         },
         { status: 400 },
       );
+
+    // The parent has to exist and be an OTP rank, so the check happens before
+    // anything is created. No cycle check is needed here: a rank that does not
+    // exist yet cannot be anybody's ancestor.
+    if (inheritsFrom) {
+      const groups = await fetchAllPages<UserGroup>("/api/user-groups");
+      if (!groups.some((g) => g.id === inheritsFrom && isOtpGroup(g)))
+        return NextResponse.json(
+          { error: "Der Rang, von dem geerbt werden soll, existiert nicht." },
+          { status: 400 },
+        );
+    }
 
     // 1) Create the group. `name` is the technical slug, `friendlyName` the
     //    display label the user typed.
@@ -103,6 +122,8 @@ export async function POST(req: NextRequest) {
         key: GROUP_CREATOR_CLAIM_KEY,
         value: GROUP_CREATOR_CLAIM_VALUE,
       });
+    if (inheritsFrom)
+      claims.push({ key: GROUP_INHERITS_CLAIM_KEY, value: inheritsFrom });
     // Only levels above 0 become claims — "kein Zugriff" is the absence of the
     // claim, see `permissionClaims()`.
     claims.push(...permissionClaims(permissions));

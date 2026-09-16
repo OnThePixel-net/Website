@@ -653,6 +653,12 @@ export const ENDPOINT_GROUPS: EndpointGroup[] = [
             description: "Markiert den Creator-Rang; genau einer.",
           },
           {
+            name: "inheritsFrom",
+            type: "string",
+            description:
+              "ID des Rangs, von dem dieser erbt. Wird nur gespeichert und ausgeliefert — Dashboard-Rechte vererbt er nicht.",
+          },
+          {
             name: "permissions",
             type: "{ news, creators, team, apply }",
             description: "Level 0–3 je Bereich.",
@@ -683,6 +689,12 @@ export const ENDPOINT_GROUPS: EndpointGroup[] = [
             name: "isCreatorRank",
             type: "boolean",
             description: "Creator-Rang.",
+          },
+          {
+            name: "inheritsFrom",
+            type: "string",
+            description:
+              "ID des Rangs, von dem dieser erbt; leer hebt die Vererbung auf. Ein Kreis wird mit 400 abgelehnt.",
           },
           {
             name: "permissions",
