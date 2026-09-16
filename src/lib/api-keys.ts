@@ -28,13 +28,25 @@
  *    └ a fixed marker, so a leaked token is recognisable as one. Secret
  *      scanners key off exactly this kind of prefix.
  *
- * Only `sha256(token)` is stored. The token itself is shown once, by the dialog
+ * Only a salted **scrypt** digest of the token is stored, as
+ * `scrypt$<salt>$<derived key>`. The token itself is shown once, by the dialog
  * that created it, and is unrecoverable afterwards — a dumped `api_keys` table
- * hands nobody a working key. SHA-256 and not bcrypt/argon2 on purpose: the
- * secret is 256 random bits, so there is no dictionary to run against it, while
- * a key is verified on *every* API request — a deliberately slow hash would put
- * ~100 ms in front of each one. This is the same reasoning GitHub and Stripe
- * publish for their own tokens.
+ * hands nobody a working key.
+ *
+ * A fast digest (SHA-256) would in fact be sound here, and is what GitHub and
+ * Stripe use for their own tokens: the secret is 256 bits from a CSPRNG, so
+ * there is no dictionary and no offline attack to slow down. It is not what
+ * this uses, for two reasons. A memory-hard KDF is strictly harder to get wrong
+ * if the token format ever becomes shorter or part of it becomes predictable;
+ * and a fast hash over a credential is a finding every scanner raises (CodeQL's
+ * `js/insufficient-password-hash` among them), which costs a reviewer's
+ * attention on every future change to this file.
+ *
+ * What it costs is bounded, because of where it lands: the dashboard's own
+ * requests authenticate by session and never reach this code at all, so the
+ * ~100 ms is paid only by the bots and scripts that hold a key — and only once
+ * the presented prefix matches a stored one (see {@link verifyApiKey}), so
+ * unauthenticated noise cannot make the server derive anything.
  *
  * ── What a key may do ─────────────────────────────────────────────────────
  * A {@link PermissionSet}, exactly as a Pocket ID group carries one, and read
@@ -45,7 +57,8 @@
  * it, the run of Pocket ID.
  */
 
-import { createHash, randomBytes, timingSafeEqual } from "crypto";
+import { randomBytes, scrypt, timingSafeEqual } from "crypto";
+import { promisify } from "util";
 import { and, desc, eq, isNull, lt, or } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import type { ApiKeyRecord } from "@/lib/db/schema";
@@ -106,9 +119,73 @@ export interface CreatedApiKey {
   token: string;
 }
 
-/** SHA-256 of a token, hex — the only form that reaches the database. */
-export function hashApiKeyToken(token: string): string {
-  return createHash("sha256").update(token, "utf8").digest("hex");
+const scryptAsync = promisify(scrypt) as (
+  password: string,
+  salt: Buffer,
+  keylen: number,
+  options: { N: number; r: number; p: number; maxmem: number },
+) => Promise<Buffer>;
+
+/**
+ * scrypt work factors. Node's own defaults (N = 16384, r = 8, p = 1), which
+ * land around 100 ms on a small server — the figure the module header budgets
+ * for. `maxmem` has to be raised past Node's 32 MiB default because N·r·128 is
+ * 16 MiB and the implementation wants headroom on top.
+ */
+const SCRYPT_PARAMS = { N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024 };
+
+/** Bytes of per-key salt, and of the derived key. */
+const SALT_BYTES = 16;
+const DERIVED_KEY_BYTES = 32;
+
+/** Marks the stored format, so a future change can recognise the old one. */
+const HASH_SCHEME = "scrypt";
+
+/**
+ * Derive the stored digest of `token` — `scrypt$<salt hex>$<key hex>`.
+ *
+ * Salt and scheme travel with the digest instead of in columns of their own:
+ * they are meaningless apart from it, and keeping them together means the
+ * format can change later without a migration.
+ */
+async function deriveTokenHash(token: string, salt: Buffer): Promise<string> {
+  const derived = await scryptAsync(
+    token,
+    salt,
+    DERIVED_KEY_BYTES,
+    SCRYPT_PARAMS,
+  );
+  return `${HASH_SCHEME}$${salt.toString("hex")}$${derived.toString("hex")}`;
+}
+
+/** Hash a token with a fresh salt, for storage. */
+export async function hashApiKeyToken(token: string): Promise<string> {
+  return deriveTokenHash(token, randomBytes(SALT_BYTES));
+}
+
+/**
+ * Check a token against a stored digest, in constant time.
+ *
+ * A digest that is not in the expected format is a "no", not an exception: a
+ * row written by some future scheme must refuse the key rather than take the
+ * whole request down with it.
+ */
+export async function verifyTokenHash(
+  token: string,
+  stored: string,
+): Promise<boolean> {
+  const parts = stored.split("$");
+  if (parts.length !== 3 || parts[0] !== HASH_SCHEME) return false;
+
+  const salt = Buffer.from(parts[1], "hex");
+  if (salt.length !== SALT_BYTES) return false;
+
+  const candidate = await deriveTokenHash(token, salt);
+  const a = Buffer.from(candidate, "utf8");
+  const b = Buffer.from(stored, "utf8");
+  // `timingSafeEqual` throws on a length mismatch, which would itself leak the
+  // answer through an exception; a differing length is simply "no match".
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
 /**
@@ -119,11 +196,15 @@ export function hashApiKeyToken(token: string): string {
  * on 8 random bytes is caught by the UNIQUE constraint on `api_keys.prefix`,
  * which the caller retries — see {@link createApiKey}.
  */
-function mintToken(): { token: string; prefix: string; tokenHash: string } {
+async function mintToken(): Promise<{
+  token: string;
+  prefix: string;
+  tokenHash: string;
+}> {
   const prefix = `${API_KEY_TOKEN_PREFIX}_${randomBytes(PREFIX_BYTES).toString("hex")}`;
   const secret = randomBytes(SECRET_BYTES).toString("base64url");
   const token = `${prefix}_${secret}`;
-  return { token, prefix, tokenHash: hashApiKeyToken(token) };
+  return { token, prefix, tokenHash: await hashApiKeyToken(token) };
 }
 
 /**
@@ -180,16 +261,6 @@ export function readApiKeyToken(headers: Headers): string | null {
   return direct ? direct.trim() : null;
 }
 
-/** Constant-time comparison of two hex digests of equal length. */
-function hashesMatch(a: string, b: string): boolean {
-  const left = Buffer.from(a, "hex");
-  const right = Buffer.from(b, "hex");
-  // `timingSafeEqual` throws on a length mismatch, which would itself leak the
-  // answer through an exception; a differing length is simply "no match".
-  if (left.length !== right.length || left.length === 0) return false;
-  return timingSafeEqual(left, right);
-}
-
 /** Why a presented token did not authenticate. The caller turns this into 401. */
 export type ApiKeyRejection = "malformed" | "unknown" | "revoked" | "expired";
 
@@ -235,11 +306,14 @@ export async function verifyApiKey(
     .where(eq(schema.apiKeys.prefix, parsed.prefix))
     .limit(1);
 
-  // The hash is compared even when no row was found — against a throwaway
-  // digest — so "unknown prefix" and "wrong secret" take the same path and the
-  // same time.
-  const expected = row?.token_hash ?? hashApiKeyToken("no such key");
-  if (!hashesMatch(hashApiKeyToken(parsed.token), expected) || !row) {
+  // No row means no derivation: an unknown prefix is refused before the KDF
+  // runs, so nobody can make the server spend ~100 ms of CPU by posting
+  // made-up tokens at it. What that gives away is only whether a prefix is in
+  // use — 64 bits somebody has to hit before they learn it, and it is not the
+  // half of the token that authenticates anything.
+  if (!row) return { ok: false, reason: "unknown" };
+
+  if (!(await verifyTokenHash(parsed.token, row.token_hash))) {
     return { ok: false, reason: "unknown" };
   }
 
@@ -413,7 +487,7 @@ export async function createApiKey(input: {
   // constraint decides that, not this comment: on the (im)possible clash the
   // insert is simply retried with a fresh token.
   for (let attempt = 0; attempt < 3; attempt++) {
-    const { token, prefix, tokenHash } = mintToken();
+    const { token, prefix, tokenHash } = await mintToken();
     try {
       const [row] = await db
         .insert(schema.apiKeys)

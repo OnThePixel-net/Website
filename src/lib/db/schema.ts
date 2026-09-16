@@ -292,13 +292,13 @@ export type NewApplySubmissionRecord = typeof applySubmissions.$inferInsert;
  *
  * Stored like a password, because that is what it is:
  *
- *  - `token_hash` is the SHA-256 of the full token and the only copy that
- *    survives creation. The token itself is shown once, in the dialog that
- *    created it, and cannot be recovered afterwards — a leaked database row
- *    does not hand anybody a working key. SHA-256 rather than a password hash
- *    (bcrypt/argon2) on purpose: the secret is 32 bytes from a CSPRNG, so there
- *    is no dictionary to run against it, and a key is verified on *every* API
- *    request — a deliberately slow hash would put ~100 ms in front of each one.
+ *  - `token_hash` is a salted scrypt digest of the full token —
+ *    `scrypt$<salt>$<key>`, salt and scheme travelling with it rather than in
+ *    columns of their own — and the only copy that survives creation. The token
+ *    itself is shown once, in the dialog that created it, and cannot be
+ *    recovered afterwards — a leaked database row does not hand anybody a
+ *    working key. `lib/api-keys.ts` explains why a memory-hard KDF is worth its
+ *    ~100 ms here even though the secret is 256 random bits.
  *  - `prefix` is the token's leading, non-secret segment. It is what the list
  *    shows ("otp_3f9a2c7b…"), so an operator can tell which key a log line or a
  *    running script means, and it is what a request is looked up by — one
@@ -315,7 +315,7 @@ export const apiKeys = pgTable("api_keys", {
   name: text("name").notNull(),
   /** The token's public, searchable segment. See the table comment. */
   prefix: text("prefix").notNull().unique("api_keys_prefix_key"),
-  /** SHA-256 (hex) of the whole token. The token itself is never stored. */
+  /** Salted scrypt digest of the whole token; the token is never stored. */
   token_hash: text("token_hash").notNull().unique("api_keys_token_hash_key"),
   /** Per-area levels, exactly as `session.user.permissions` carries them. */
   permissions: jsonb("permissions")
