@@ -53,7 +53,8 @@ Being signed in is not enough to use `/dashboard` or the `/api/dashboard/**`
 routes — the account also has to be authorised, and **Pocket ID is the single
 source of truth for that**. Rights are not one on/off switch: they are set **per
 dashboard area and per level**, as custom claims on the Pocket ID **group**,
-right next to the existing `Team`, `prefix`, `weight` and `Discord-role-id`.
+right next to the existing `Team`, `prefix`, `weight`, `Discord-role-id` and
+`Inherits-from`.
 
 | Group claim | Area |
 | --- | --- |
@@ -150,6 +151,25 @@ Denied"); if it cannot be reached **during a re-check**, the previous decision
 stands and is retried a minute later, so an admin already at work is not thrown
 out by an upstream hiccup. Every denial is logged with the reason.
 
+### Rank inheritance
+
+A rank can name one rank it inherits from, picked under Team → Gruppen as "Erbt
+von" and stored on the group as `Inherits-from` = the parent's Pocket ID **group
+id** (an id, not a name, so renaming a rank does not orphan the ranks below it).
+`/api/dashboard/team` serves it as `inheritsFrom` on every rank.
+
+**It grants nothing here.** Dashboard rights still come from that rank's own
+`Permission-*` claims, and a member's Discord role still comes from their own
+heaviest mapped rank — the chain is a declaration the website stores, shows and
+serves, for the consumers that resolve it themselves (the Minecraft side, and
+anything else reading the dashboard API). Keeping it inert means a rank's rights
+can still be read off that one rank.
+
+The editor and both write routes refuse a rank inheriting from itself or from
+one that already sits below it. A chain edited into a loop directly in Pocket ID
+is still survivable: every walk stops at the first rank it has already seen, and
+a parent that no longer exists reads as "no inheritance".
+
 ### API keys for the dashboard API
 
 The `/api/dashboard/**` routes accept a second credential besides the browser
@@ -211,7 +231,8 @@ custom claims on the Pocket ID group, next to the existing `prefix` and
 | `Creator` = `true` | marks the one rank whose role every creator receives |
 
 (The same group also carries the four `Permission-*` claims described under
-"Dashboard authorisation" above — the rank editor writes all of them together.)
+"Dashboard authorisation" above, and the `Inherits-from` claim described above —
+the rank editor writes all of them together.)
 
 Creators therefore have no rank of their own — they borrow a team rank. The
 dashboard keeps the `Creator` marker exclusive by clearing it on every other

@@ -13,6 +13,7 @@ import {
   Tag,
   Weight,
   Star,
+  GitBranch,
 } from "lucide-react";
 import { FaDiscord } from "react-icons/fa";
 import {
@@ -27,6 +28,7 @@ import {
   type PermissionLevel,
   type PermissionSet,
 } from "@/lib/permissions";
+import { ancestorIds, parentLookup, wouldCycle } from "@/lib/group-inheritance";
 import { usePermissionLevel } from "@/lib/use-permission";
 import AuthGuard from "../auth-guard";
 import { Field, type Group } from "../team-shared";
@@ -87,6 +89,7 @@ function GroupModal({
     group?.discordRoleId ?? "",
   );
   const [isCreatorRank, setIsCreatorRank] = useState(!!group?.isCreatorRank);
+  const [inheritsFrom, setInheritsFrom] = useState(group?.inheritsFrom ?? "");
   // Read through `coercePermissions` rather than trusted as-is: what arrives
   // here came off the API as JSON, and a level nobody recognises must land on
   // "Kein Zugriff" instead of on an empty select.
@@ -112,6 +115,38 @@ function GroupModal({
     (g) => g.isCreatorRank && g.id !== group?.id,
   );
 
+  // Which ranks may be inherited from. A rank cannot inherit from itself or
+  // from one that already sits below it — both would close a loop. The server
+  // refuses either anyway; leaving them out of the picker means the operator
+  // never has to be told so. A rank being created is below nothing yet, so it
+  // may pick any of them.
+  const parentOf = parentLookup(groups);
+  const inheritable = groups.filter(
+    (g) =>
+      !group || (g.id !== group.id && !wouldCycle(group.id, g.id, parentOf)),
+  );
+
+  const rankLabel = (id: string) =>
+    groups.find((g) => g.id === id)?.friendlyName ?? id;
+
+  // The chain the current choice produces, shown below the picker so nesting
+  // stays readable without opening every rank in turn.
+  const chain = inheritsFrom
+    ? [inheritsFrom, ...ancestorIds(inheritsFrom, parentOf)].map(rankLabel)
+    : [];
+
+  // A stored parent that the filter above dropped — only reachable by editing
+  // the claim in Pocket ID into a loop — is offered anyway, so merely opening
+  // this dialog and saving cannot silently delete a mapping somebody set. The
+  // server still refuses it, which is the honest place to say no.
+  const parentOptions =
+    inheritsFrom && !inheritable.some((g) => g.id === inheritsFrom)
+      ? [
+          { id: inheritsFrom, friendlyName: rankLabel(inheritsFrom) },
+          ...inheritable,
+        ]
+      : inheritable;
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -130,6 +165,7 @@ function GroupModal({
           weight: weight.trim(),
           discordRoleId: discordRoleId.trim(),
           isCreatorRank,
+          inheritsFrom,
           permissions,
         }),
       });
@@ -274,6 +310,43 @@ function GroupModal({
             </p>
           </Field>
 
+          <Field label="Erbt von">
+            <select
+              value={inheritsFrom}
+              onChange={(e) => setInheritsFrom(e.target.value)}
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white transition-all outline-none focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20"
+            >
+              <option value="" className="bg-gray-900">
+                Keine Vererbung
+              </option>
+              {parentOptions.map((g) => (
+                <option key={g.id} value={g.id} className="bg-gray-900">
+                  {g.friendlyName}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-white/25">
+              {chain.length > 0 ? (
+                <>
+                  <span className="text-white/40">
+                    {name.trim() || "Dieser Rang"} → {chain.join(" → ")}
+                  </span>{" "}
+                  Wird als Custom Claim in Pocket ID gespeichert und über die
+                  API ausgeliefert. Auf die Dashboard-Rechte unten hat das
+                  keinen Einfluss — die gelten weiter genau so, wie sie hier am
+                  Rang stehen.
+                </>
+              ) : (
+                <>
+                  Optional: der Rang, unter dem dieser hier hängt. Wird als
+                  Custom Claim in Pocket ID gespeichert und über die API
+                  ausgeliefert (etwa für den Minecraft-Server); die
+                  Dashboard-Rechte unten erbt ein Rang nicht.
+                </>
+              )}
+            </p>
+          </Field>
+
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-white/40">
               Dashboard-Rechte
@@ -374,12 +447,15 @@ function grantedAreas(group: Group): PermissionArea[] {
 function GroupCard({
   group,
   roleLabel,
+  parentLabel,
   canWrite,
   onEdit,
 }: {
   group: Group;
   /** Show the role's name where it is known, its id where it is not. */
   roleLabel: (id: string) => string;
+  /** Name of the rank this one inherits from, its id as a fallback. */
+  parentLabel: (id: string) => string;
   /** Level 2+ on `team`: may edit the rank — including its rights. */
   canWrite: boolean;
   onEdit: (g: Group) => void;
@@ -413,6 +489,12 @@ function GroupCard({
           {group.isCreatorRank ? (
             <span className="inline-flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 text-xs text-white/60">
               <Star size={11} className="text-purple-400" /> Creator-Rang
+            </span>
+          ) : null}
+          {group.inheritsFrom ? (
+            <span className="inline-flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 text-xs text-white/60">
+              <GitBranch size={11} className="text-sky-400" /> erbt von{" "}
+              {parentLabel(group.inheritsFrom)}
             </span>
           ) : null}
           {grantedAreas(group).map((area) => (
@@ -523,6 +605,12 @@ function RolesDashboardContent() {
   const roleLabel = (id: string) =>
     discord.roles.find((r) => r.id === id)?.name ?? id;
 
+  // The same for an inherited rank. The id fallback only shows when a rank was
+  // removed between this page load and the claim being written — the endpoint
+  // already drops a parent that no longer exists.
+  const parentLabel = (id: string) =>
+    groups.find((g) => g.id === id)?.friendlyName ?? id;
+
   return (
     <div>
       {toast && (
@@ -605,6 +693,7 @@ function RolesDashboardContent() {
               key={g.id}
               group={g}
               roleLabel={roleLabel}
+              parentLabel={parentLabel}
               canWrite={canWrite}
               onEdit={(target) => setGroupModal({ group: target })}
             />

@@ -15,6 +15,12 @@ import {
   type UserGroup,
 } from "@/lib/pocketid";
 import {
+  GROUP_INHERITS_CLAIM_KEY,
+  parentGroupId,
+  parentLookup,
+  wouldCycle,
+} from "@/lib/group-inheritance";
+import {
   GROUP_CREATOR_CLAIM_KEY,
   GROUP_CREATOR_CLAIM_VALUE,
   GROUP_DISCORD_ROLE_CLAIM_KEY,
@@ -43,8 +49,8 @@ function handleError(e: unknown) {
  * `src/lib/permissions.ts` and the README.
  */
 /**
- * PUT — update an existing OTP-team group's name, prefix, weight and Discord
- * role mapping.
+ * PUT — update an existing OTP-team group's name, prefix, weight, inheritance
+ * and Discord role mapping.
  *
  * Note that changing the role mapping does not re-stamp the members who already
  * hold the old role: that would fan one edit out into an unbounded number of
@@ -70,6 +76,9 @@ export async function PUT(
     const weight = String(body.weight ?? "").trim();
     const rawRoleId = String(body.discordRoleId ?? "").trim();
     const isCreatorRank = body.isCreatorRank === true;
+    // The rank this one inherits from ("" = none), see the POST route and
+    // `lib/group-inheritance.ts`.
+    const inheritsFrom = String(body.inheritsFrom ?? "").trim();
     const permissions = coercePermissions(body.permissions);
 
     if (!name)
@@ -93,6 +102,37 @@ export async function PUT(
     const current = (await groupRes.json()) as UserGroup;
     if (!isOtpGroup(current))
       return NextResponse.json({ error: "Keine OTP-Gruppe." }, { status: 403 });
+
+    // Validate the parent before anything is written: it has to exist, be an
+    // OTP rank, and not already sit below this one — otherwise the two would
+    // inherit from each other and every consumer walking the chain would have
+    // to survive a loop this editor could have refused. (`ancestorIds` does
+    // survive one, because claims can also be edited in Pocket ID directly.)
+    if (inheritsFrom) {
+      const groups = await fetchAllPages<UserGroup>("/api/user-groups");
+      if (!groups.some((g) => g.id === inheritsFrom && isOtpGroup(g)))
+        return NextResponse.json(
+          { error: "Der Rang, von dem geerbt werden soll, existiert nicht." },
+          { status: 400 },
+        );
+
+      const parentOf = parentLookup(
+        groups.map((g) => ({
+          id: g.id,
+          inheritsFrom: parentGroupId(g.customClaims),
+        })),
+      );
+      if (wouldCycle(id, inheritsFrom, parentOf))
+        return NextResponse.json(
+          {
+            error:
+              inheritsFrom === id
+                ? "Ein Rang kann nicht von sich selbst erben."
+                : "Das ergäbe einen Kreis — der gewählte Rang erbt bereits von diesem hier.",
+          },
+          { status: 400 },
+        );
+    }
 
     // 1) Update the display name (the technical `name` slug stays stable).
     await pocketIdFetch(`/api/user-groups/${id}`, {
@@ -119,6 +159,8 @@ export async function PUT(
         key: GROUP_CREATOR_CLAIM_KEY,
         value: GROUP_CREATOR_CLAIM_VALUE,
       });
+    if (inheritsFrom)
+      claims.push({ key: GROUP_INHERITS_CLAIM_KEY, value: inheritsFrom });
     claims.push(...permissionClaims(permissions));
 
     await pocketIdFetch(`/api/custom-claims/user-group/${id}`, {

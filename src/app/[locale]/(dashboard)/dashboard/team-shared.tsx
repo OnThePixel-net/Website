@@ -25,6 +25,12 @@ export interface Group {
   discordRoleId?: string;
   /** True for the one rank whose Discord role creators receive. */
   isCreatorRank?: boolean;
+  /**
+   * Id of the rank this one inherits from ("" / absent when it inherits from
+   * nothing). Declarative only — it grants nothing in this app, see
+   * `lib/group-inheritance.ts`.
+   */
+  inheritsFrom?: string;
   /** Dashboard levels members of this rank get, per area (see permissions.ts). */
   permissions?: PermissionSet;
 }

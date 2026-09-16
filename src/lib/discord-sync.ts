@@ -51,6 +51,7 @@ import {
   type UserGroup,
 } from "@/lib/pocketid";
 import { PERMISSION_CLAIM_KEYS } from "@/lib/permissions";
+import { GROUP_INHERITS_CLAIM_KEY_LOWER } from "@/lib/group-inheritance";
 
 /* -------------------------------------------------------------------------- */
 /*  Claim keys                                                                */
@@ -78,6 +79,11 @@ export const MANAGED_GROUP_CLAIM_KEYS = new Set([
   "weight",
   GROUP_DISCORD_ROLE_CLAIM_KEY.toLowerCase(),
   GROUP_CREATOR_CLAIM_KEY.toLowerCase(),
+  // Same thought for the parent rank (see `src/lib/group-inheritance.ts`):
+  // unrelated to Discord, but the editor owns the claim, so clearing the field
+  // has to actually remove it instead of leaving a rank inheriting from one it
+  // no longer names.
+  GROUP_INHERITS_CLAIM_KEY_LOWER,
   // The four `Permission-<area>` claims (see `src/lib/permissions.ts`). They
   // have nothing to do with Discord, but this set is the single registry of
   // "claims the group editor owns and rebuilds", and an area set back to "kein

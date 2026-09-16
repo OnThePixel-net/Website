@@ -21,6 +21,7 @@ import {
   type UserGroup,
 } from "@/lib/pocketid";
 import { isDiscordConfigured } from "@/lib/discord";
+import { parentGroupId } from "@/lib/group-inheritance";
 import {
   checkGuildMembership,
   groupRoleId,
@@ -57,11 +58,21 @@ export async function GET() {
     const otpIds = otpGroupIds(groups);
     const groupById = new Map(groups.map((g) => [g.id, g]));
 
+    // The rank a rank inherits from, as a group id ("" for none). Only ever a
+    // rank that still exists and is still an OTP group: a claim left pointing
+    // at a deleted rank reads as "no inheritance", and the next save of this
+    // rank drops it. Nothing here resolves the chain — whoever cares walks it
+    // with the same list (see `lib/group-inheritance.ts`).
+    const inheritedFrom = (group: UserGroup) => {
+      const parent = parentGroupId(group.customClaims);
+      return otpIds.has(parent) ? parent : "";
+    };
+
     // Ranks go out heaviest first, ties A→Z by friendly name — the order the
     // rank list, the create dialog's picker and the edit dialog's toggles all
     // render in, since they read this one response.
-    const otpGroups = sortGroups(groups.filter((g) => otpIds.has(g.id)))
-      .map((g) => ({
+    const otpGroups = sortGroups(groups.filter((g) => otpIds.has(g.id))).map(
+      (g) => ({
         id: g.id,
         name: g.name,
         friendlyName: g.friendlyName,
@@ -69,11 +80,13 @@ export async function GET() {
         weight: readClaim(g.customClaims, "weight"),
         discordRoleId: groupRoleId(g),
         isCreatorRank: isCreatorGroup(g),
+        inheritsFrom: inheritedFrom(g),
         // What members of this rank may do in the dashboard, per area. Sent
         // even when every level is 0 so the rank editor always has a complete
         // set to render its four selects from.
         permissions: permissionsFromClaims(g.customClaims),
-      }));
+      }),
+    );
 
     const members = users
       .filter((u) => isOtpMember(u, otpIds))
