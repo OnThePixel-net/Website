@@ -94,9 +94,11 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-    // The guard above already loaded the session; reuse it instead of asking
-    // next-auth a second time within the same request.
-    const author = gate.session.user?.name ?? "";
+    // The guard above already resolved who is calling; reuse that instead of
+    // asking next-auth a second time within the same request. For an API key
+    // the author is the key's name ("Discord bot"), which is exactly what the
+    // byline should say about an article the bot posted.
+    const author = gate.actor.name;
     const published_at = new Date().toISOString().slice(0, 10);
     const db = getDb();
     const [item] = await db

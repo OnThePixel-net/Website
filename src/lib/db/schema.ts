@@ -11,6 +11,10 @@ import {
   foreignKey,
 } from "drizzle-orm/pg-core";
 
+// Relative, not the `@/` alias: drizzle-kit loads this file on its own to diff
+// the schema, outside the Next/tsconfig path resolution the app runs under.
+import { NO_PERMISSIONS, type PermissionSet } from "../permissions";
+
 /**
  * Constraint and index names are spelled out explicitly instead of relying on
  * Drizzle's naming scheme, because these objects already exist in production:
@@ -276,3 +280,69 @@ export type ApplyQuestionRecord = typeof applyQuestions.$inferSelect;
 export type NewApplyQuestionRecord = typeof applyQuestions.$inferInsert;
 export type ApplySubmissionRecord = typeof applySubmissions.$inferSelect;
 export type NewApplySubmissionRecord = typeof applySubmissions.$inferInsert;
+
+/**
+ * A personal access token for the dashboard API.
+ *
+ * The dashboard's route handlers under `/api/dashboard/**` were reachable with
+ * a browser session only, which is right for the dashboard itself and useless
+ * for everything else that wants to talk to it — a Discord bot posting a news
+ * article, a deploy script opening an application position. An API key is that
+ * second way in: the same endpoints, the same per-area levels, no cookie.
+ *
+ * Stored like a password, because that is what it is:
+ *
+ *  - `token_hash` is the SHA-256 of the full token and the only copy that
+ *    survives creation. The token itself is shown once, in the dialog that
+ *    created it, and cannot be recovered afterwards — a leaked database row
+ *    does not hand anybody a working key. SHA-256 rather than a password hash
+ *    (bcrypt/argon2) on purpose: the secret is 32 bytes from a CSPRNG, so there
+ *    is no dictionary to run against it, and a key is verified on *every* API
+ *    request — a deliberately slow hash would put ~100 ms in front of each one.
+ *  - `prefix` is the token's leading, non-secret segment. It is what the list
+ *    shows ("otp_3f9a2c7b…"), so an operator can tell which key a log line or a
+ *    running script means, and it is what a request is looked up by — one
+ *    indexed row instead of hashing against every key in the table.
+ *
+ * Rights are the same {@link PermissionSet} a Pocket ID group carries, stored
+ * as `jsonb` so a fifth area needs no migration, and always read back through
+ * `coercePermissions()` — a level nobody recognises must come out as "no
+ * access", never as an unknown the guard might misread.
+ */
+export const apiKeys = pgTable("api_keys", {
+  id: serial("id").primaryKey(),
+  /** Free-text label, e.g. "Discord bot" — only ever shown in the dashboard. */
+  name: text("name").notNull(),
+  /** The token's public, searchable segment. See the table comment. */
+  prefix: text("prefix").notNull().unique("api_keys_prefix_key"),
+  /** SHA-256 (hex) of the whole token. The token itself is never stored. */
+  token_hash: text("token_hash").notNull().unique("api_keys_token_hash_key"),
+  /** Per-area levels, exactly as `session.user.permissions` carries them. */
+  permissions: jsonb("permissions")
+    .$type<PermissionSet>()
+    .notNull()
+    .default(NO_PERMISSIONS),
+  /** Display name of the account that created the key, for the audit trail. */
+  created_by: text("created_by").notNull().default(""),
+  created_at: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  /**
+   * Last time the key authenticated a request, or null while it never has.
+   * Written at most once a minute per key (see `lib/api-keys.ts`) so a busy
+   * integration does not turn every read into a write.
+   */
+  last_used_at: timestamp("last_used_at", { withTimezone: true }),
+  /** Optional expiry; null means the key is valid until it is revoked. */
+  expires_at: timestamp("expires_at", { withTimezone: true }),
+  /**
+   * When the key was revoked, null while it is live. Revoking keeps the row
+   * rather than deleting it: the name, the prefix and `last_used_at` are the
+   * record of what that key did, and they are exactly what is wanted after a
+   * key has had to be pulled.
+   */
+  revoked_at: timestamp("revoked_at", { withTimezone: true }),
+});
+
+export type ApiKeyRecord = typeof apiKeys.$inferSelect;
+export type NewApiKeyRecord = typeof apiKeys.$inferInsert;

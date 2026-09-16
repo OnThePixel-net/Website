@@ -21,6 +21,7 @@ import {
   X,
   ChevronRight,
   Shield,
+  KeyRound,
 } from "lucide-react";
 
 /**
@@ -56,6 +57,14 @@ const navItems: {
   // getting a fifth one — the levels edited there are exactly the four areas
   // this list is filtered by.
   { href: "/dashboard/roles", label: "Rollen", icon: Shield, area: "team" },
+  // API keys are credentials for the dashboard API, and handing one out is
+  // team administration — so the same area again, for the same reason.
+  {
+    href: "/dashboard/api-keys",
+    label: "API-Keys",
+    icon: KeyRound,
+    area: "team",
+  },
 ];
 
 function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {

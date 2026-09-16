@@ -11,6 +11,7 @@ import {
   ArrowRight,
   TrendingUp,
   Shield,
+  KeyRound,
 } from "lucide-react";
 import { LEVEL_NONE, permissionLevel } from "@/lib/permissions";
 import AuthGuard from "./auth-guard";
@@ -241,6 +242,16 @@ function OverviewContent() {
                 className="flex items-center gap-2 rounded-lg bg-orange-500/10 px-3 py-2 text-sm font-medium text-orange-400 transition-colors hover:bg-orange-500/20"
               >
                 <Shield size={14} /> Manage Rollen
+              </Link>
+            )}
+            {canTeam && (
+              // Same area again: issuing a credential for the dashboard API is
+              // team administration. The page also carries that API's reference.
+              <Link
+                href="/dashboard/api-keys"
+                className="flex items-center gap-2 rounded-lg bg-orange-500/10 px-3 py-2 text-sm font-medium text-orange-400 transition-colors hover:bg-orange-500/20"
+              >
+                <KeyRound size={14} /> Manage API-Keys
               </Link>
             )}
             {canApply && (
