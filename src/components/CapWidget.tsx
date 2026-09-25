@@ -1,38 +1,33 @@
 "use client";
 
-import React, { useEffect, useImperativeHandle, useRef } from "react";
-import type { CapWidget as CapWidgetElement } from "@cap.js/widget";
-import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import React, {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+import type { Cap as CapInstance } from "@cap.js/widget";
+import { Check, Loader2, RotateCcw, ShieldCheck } from "lucide-react";
+import { useTranslations } from "@/lib/i18n/LanguageProvider";
 
 /**
- * The Cap captcha checkbox (https://trycap.dev).
+ * The captcha checkbox of the public forms, powered by Cap
+ * (https://trycap.dev).
  *
- * `<cap-widget>` is a web component; the package registers it when it is
- * imported, which touches `window`, so the import happens in an effect rather
- * than at module level. It talks to `/cap/api/`, which this site forwards to
- * the Cap container (see `lib/captcha.ts`).
+ * Cap is used in its programmatic mode: the package creates an invisible
+ * `<cap-widget>` that does the proof-of-work, and everything the visitor sees
+ * is drawn here, in the site's own style. The package touches `window` when it
+ * loads, so it is imported on first use rather than at module level. It talks
+ * to `/cap/api/`, which this site forwards to the Cap container (see
+ * `lib/captcha.ts`).
  */
 
-declare module "react" {
-  namespace JSX {
-    interface IntrinsicElements {
-      "cap-widget": React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement>,
-        HTMLElement
-      > & {
-        "data-cap-api-endpoint"?: string;
-        "data-cap-lang"?: string;
-        "data-cap-hidden-field-name"?: string;
-      };
-    }
-  }
-}
-
-/** Same-origin endpoint the widget posts `challenge` and `redeem` to. */
+/** Same-origin endpoint the solver posts `challenge` and `redeem` to. */
 const CAP_API_ENDPOINT = "/cap/api/";
 
 /**
- * The widget's WebAssembly solvers, served from `public/cap/` instead of the
+ * The solver's WebAssembly files, served from `public/cap/` instead of the
  * jsdelivr default so the captcha makes no third-party request at all. They
  * are the files of `@cap.js/wasm@0.0.8`, the version the widget pins; update
  * them together with `@cap.js/widget`.
@@ -40,82 +35,184 @@ const CAP_API_ENDPOINT = "/cap/api/";
 const CAP_WASM_URL = "/cap/cap_wasm_bg.wasm";
 const CAP_HASHWX_URL = "/cap/hashwx.wasm";
 
+type Phase = "idle" | "verifying" | "verified" | "error";
+
 export interface CapWidgetHandle {
-  /** Clear the widget after a failed submission; its token is spent. */
+  /** Clear the checkbox after a failed submission; its token is spent. */
   reset: () => void;
 }
 
-/** Dark colours matching the site's form fields. */
-const DARK_THEME = {
-  "--cap-background": "rgba(255, 255, 255, 0.05)",
-  "--cap-border-color": "rgba(255, 255, 255, 0.1)",
-  "--cap-color": "#ffffff",
-  "--cap-checkbox-background": "rgba(255, 255, 255, 0.05)",
-  "--cap-checkbox-border": "1px solid rgba(255, 255, 255, 0.25)",
-  "--cap-spinner-color": "#22c55e",
-  "--cap-spinner-background-color": "rgba(255, 255, 255, 0.1)",
-  "--cap-border-radius": "8px",
-} as React.CSSProperties;
+/** Load the package once and hand back its `Cap` class. */
+let capClass: Promise<typeof CapInstance> | null = null;
+function loadCap(): Promise<typeof CapInstance> {
+  if (!capClass) {
+    window.CAP_CUSTOM_WASM_URL = CAP_WASM_URL;
+    window.CAP_CUSTOM_HASHWX_URL = CAP_HASHWX_URL;
+    window.CAP_SILENT = true;
+    capClass = import("@cap.js/widget")
+      .then(() => window.Cap)
+      .catch((e) => {
+        capClass = null;
+        throw e;
+      });
+  }
+  return capClass;
+}
 
 const CapWidget = React.forwardRef<
   CapWidgetHandle,
   {
     onSolve: (token: string) => void;
-    /** The token expired or the widget was reset. */
+    /** The token expired or the checkbox was reset. */
     onReset: () => void;
     onError: () => void;
   }
 >(function CapWidget({ onSolve, onReset, onError }, ref) {
-  const { locale } = useLanguage();
-  const elementRef = useRef<CapWidgetElement | null>(null);
+  const t = useTranslations();
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [progress, setProgress] = useState(0);
+  const capRef = useRef<CapInstance | null>(null);
 
-  // The latest callbacks, so the listeners below are attached only once.
+  // The latest callbacks, so the Cap listeners are attached only once.
   const handlers = useRef({ onSolve, onReset, onError });
   useEffect(() => {
     handlers.current = { onSolve, onReset, onError };
   });
 
-  useImperativeHandle(ref, () => ({
-    reset: () => elementRef.current?.reset?.(),
-  }));
-
-  useEffect(() => {
-    window.CAP_CUSTOM_WASM_URL = CAP_WASM_URL;
-    window.CAP_CUSTOM_HASHWX_URL = CAP_HASHWX_URL;
-    import("@cap.js/widget").catch((e) => {
-      console.error("[captcha] loading the Cap widget failed:", e);
-      handlers.current.onError();
-    });
-
-    const element = elementRef.current;
-    if (!element) return;
-
-    const solve = (e: Event) =>
-      handlers.current.onSolve(
-        (e as CustomEvent<{ token: string }>).detail.token,
-      );
-    const reset = () => handlers.current.onReset();
-    const error = () => handlers.current.onError();
-
-    element.addEventListener("solve", solve);
-    element.addEventListener("reset", reset);
-    element.addEventListener("error", error);
-    return () => {
-      element.removeEventListener("solve", solve);
-      element.removeEventListener("reset", reset);
-      element.removeEventListener("error", error);
-    };
+  const fail = useCallback(() => {
+    setPhase("error");
+    handlers.current.onError();
   }, []);
 
+  const getCap = useCallback(async (): Promise<CapInstance> => {
+    if (capRef.current) return capRef.current;
+    const Cap = await loadCap();
+    const cap = new Cap({ apiEndpoint: CAP_API_ENDPOINT });
+    cap.addEventListener("progress", (e) =>
+      setProgress(Math.round(e.detail.progress)),
+    );
+    cap.addEventListener("solve", (e) => {
+      setPhase("verified");
+      handlers.current.onSolve(e.detail.token);
+    });
+    cap.addEventListener("error", () => fail());
+    // Fired when the token expires, too — the checkbox is then unticked again.
+    cap.addEventListener("reset", () => {
+      setPhase("idle");
+      setProgress(0);
+      handlers.current.onReset();
+    });
+    capRef.current = cap;
+    return cap;
+  }, [fail]);
+
+  // The invisible widget lives on <html>; take it along when the form goes.
+  useEffect(
+    () => () => {
+      capRef.current?.widget.remove();
+      capRef.current = null;
+    },
+    [],
+  );
+
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      capRef.current?.reset();
+      setPhase("idle");
+      setProgress(0);
+    },
+  }));
+
+  const start = async () => {
+    if (phase === "verifying" || phase === "verified") return;
+    setPhase("verifying");
+    setProgress(0);
+    try {
+      const cap = await getCap();
+      const result = await cap.solve();
+      if (!result?.success) fail();
+    } catch (e) {
+      console.error("[captcha] solving failed:", e);
+      fail();
+    }
+  };
+
+  const label =
+    phase === "verifying"
+      ? t.captcha.verifying
+      : phase === "verified"
+        ? t.captcha.verified
+        : phase === "error"
+          ? t.captcha.error
+          : t.captcha.verify;
+
   return (
-    <cap-widget
-      ref={(el: HTMLElement | null) => {
-        elementRef.current = el as CapWidgetElement | null;
-      }}
-      data-cap-api-endpoint={CAP_API_ENDPOINT}
-      data-cap-lang={locale}
-      style={DARK_THEME}
-    />
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={phase === "verified"}
+      aria-busy={phase === "verifying"}
+      aria-label={label}
+      onClick={start}
+      disabled={phase === "verified"}
+      className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-lg border px-4 py-3.5 text-left transition-colors ${
+        phase === "verified"
+          ? "cursor-default border-green-500/40 bg-green-500/10"
+          : phase === "error"
+            ? "border-red-700/50 bg-red-900/20 hover:border-red-500/60"
+            : "border-white/10 bg-white/5 hover:border-green-500/50"
+      }`}
+    >
+      <span
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border transition-all ${
+          phase === "verified"
+            ? "scale-110 border-green-500 bg-green-500 text-black"
+            : phase === "error"
+              ? "border-red-500/60 text-red-400"
+              : phase === "verifying"
+                ? "border-green-500/50 text-green-400"
+                : "border-white/25 bg-white/5 group-hover:border-green-500/60"
+        }`}
+      >
+        {phase === "verifying" && <Loader2 size={16} className="animate-spin" />}
+        {phase === "verified" && <Check size={18} strokeWidth={3} />}
+        {phase === "error" && <RotateCcw size={15} />}
+      </span>
+
+      <span className="min-w-0 flex-1">
+        <span
+          className={`block text-sm font-medium ${
+            phase === "verified"
+              ? "text-green-400"
+              : phase === "error"
+                ? "text-red-400"
+                : "text-white"
+          }`}
+        >
+          {label}
+          {phase === "verifying" && (
+            <span className="ml-1.5 tabular-nums text-gray-500">
+              {progress}%
+            </span>
+          )}
+        </span>
+        <span className="block text-xs text-gray-500">{t.captcha.hint}</span>
+      </span>
+
+      <ShieldCheck
+        size={22}
+        className={`shrink-0 ${
+          phase === "verified" ? "text-green-500" : "text-white/20"
+        }`}
+      />
+
+      {phase === "verifying" && (
+        <span
+          className="absolute bottom-0 left-0 h-0.5 bg-green-500 transition-[width] duration-200"
+          style={{ width: `${progress}%` }}
+        />
+      )}
+    </button>
   );
 });
 

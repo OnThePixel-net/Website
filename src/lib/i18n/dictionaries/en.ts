@@ -223,6 +223,13 @@ export const en = {
       },
     },
   },
+  captcha: {
+    verify: "I'm not a robot",
+    verifying: "Verifying...",
+    verified: "Verified",
+    error: "Verification failed, click to try again",
+    hint: "Spam protection that runs privately in your browser",
+  },
   bugReport: {
     metaTitle: "Report a Bug",
     metaDescription:

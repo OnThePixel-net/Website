@@ -227,6 +227,13 @@ export const de = {
       },
     },
   },
+  captcha: {
+    verify: "Ich bin kein Roboter",
+    verifying: "Wird überprüft...",
+    verified: "Bestätigt",
+    error: "Überprüfung fehlgeschlagen, klicke für einen neuen Versuch",
+    hint: "Spamschutz, der privat in deinem Browser läuft",
+  },
   bugReport: {
     metaTitle: "Bug melden",
     metaDescription:
