@@ -2,10 +2,10 @@
 
 import React, { useState, useRef } from "react";
 import { LocaleLink } from "@/components/LocaleLink";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useTranslations } from "@/lib/i18n/LanguageProvider";
 import type { Translations } from "@/lib/i18n/translations";
+import CapWidget, { type CapWidgetHandle } from "@/components/CapWidget";
 
 export interface ApplicationField {
   id: string;
@@ -60,7 +60,7 @@ export default function ApplicationForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaRef = useRef<HCaptcha>(null);
+  const captchaRef = useRef<CapWidgetHandle>(null);
 
   const handleChange = (id: string, value: string) => {
     setFormData((prev) => ({ ...prev, [id]: value }));
@@ -114,7 +114,7 @@ export default function ApplicationForm({
         err instanceof Error ? err.message : t.applicationForm.errors.submitFailed,
       );
       setCaptchaToken(null);
-      captchaRef.current?.resetCaptcha();
+      captchaRef.current?.reset();
     } finally {
       setIsSubmitting(false);
     }
@@ -246,19 +246,17 @@ export default function ApplicationForm({
                 {t.applicationForm.securityVerification}{" "}
                 <span className="text-red-400" title={t.applicationForm.required}>*</span>
               </label>
-              <HCaptcha
+              <CapWidget
                 ref={captchaRef}
-                sitekey="90d0f166-7370-42a6-8836-8f3c9af8615a"
-                onVerify={(token) => {
+                onSolve={(token) => {
                   setCaptchaToken(token);
                   setError(null);
                 }}
-                onExpire={() => setCaptchaToken(null)}
+                onReset={() => setCaptchaToken(null)}
                 onError={() => {
                   setCaptchaToken(null);
                   setError(t.applicationForm.errors.captchaError);
                 }}
-                theme="dark"
               />
             </div>
 

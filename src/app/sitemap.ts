@@ -121,6 +121,12 @@ const STATIC_PATHS: {
     lastModified: DEFAULT_LAST_MODIFIED,
   },
   {
+    path: "/bug-report",
+    priority: 0.4,
+    changeFreq: "yearly",
+    lastModified: DEFAULT_LAST_MODIFIED,
+  },
+  {
     path: "/imprint",
     priority: 0.3,
     changeFreq: "yearly",

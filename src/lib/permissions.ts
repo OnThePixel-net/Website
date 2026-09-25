@@ -7,7 +7,7 @@
  * accounts. That is wrong for a team where some ranks are meant to write
  * articles but must never touch the team roster.
  *
- * This module replaces the boolean with four independent levels, one per
+ * This module replaces the boolean with independent levels, one per
  * dashboard area, expressed as custom claims on the Pocket ID GROUP — right
  * next to the `Team`, `prefix`, `weight`, `Discord-role-id` and `Creator`
  * claims the group editor already maintains:
@@ -18,6 +18,7 @@
  * | `Permission-creators` | `/dashboard/creators`      |
  * | `Permission-team`     | `/dashboard/team`          |
  * | `Permission-apply`    | `/dashboard/apply`         |
+ * | `Permission-bugs`     | `/dashboard/bugs`          |
  *
  * with the value being a level:
  *
@@ -37,7 +38,7 @@
  *    decides the primary rank, and it means an extra group can only ever add
  *    rights, never silently take them away.
  *  - Dashboard access is "at least one area at {@link LEVEL_READ} or above". All
- *    four at {@link LEVEL_NONE} means the same "Access Denied" view as before.
+ *    at {@link LEVEL_NONE} means the same "Access Denied" view as before.
  *
  * ── Accepted risk: `team` >= LEVEL_WRITE can escalate itself ─────────────────────
  * The `Permission-*` claims live on Pocket ID groups, and editing groups IS the
@@ -55,8 +56,14 @@
  * which must not pull in server-only code. Compare `src/lib/session-role.ts`.
  */
 
-/** The four dashboard areas, one per section of the dashboard navigation. */
-export const PERMISSION_AREAS = ["news", "creators", "team", "apply"] as const;
+/** The dashboard areas, one per section of the dashboard navigation. */
+export const PERMISSION_AREAS = [
+  "news",
+  "creators",
+  "team",
+  "apply",
+  "bugs",
+] as const;
 
 /** One dashboard area. */
 export type PermissionArea = (typeof PERMISSION_AREAS)[number];
@@ -82,11 +89,12 @@ export const NO_PERMISSIONS: PermissionSet = Object.freeze({
   creators: LEVEL_NONE,
   team: LEVEL_NONE,
   apply: LEVEL_NONE,
+  bugs: LEVEL_NONE,
 });
 
 /**
  * Key of the Pocket ID group custom claim carrying an area's level. Kept as a
- * function so the four keys cannot drift apart from {@link PERMISSION_AREAS};
+ * function so the keys cannot drift apart from {@link PERMISSION_AREAS};
  * matching is case-insensitive everywhere (`readClaim`), so a hand-typed
  * `permission-news` in Pocket ID works just as well.
  */
@@ -94,7 +102,7 @@ export function permissionClaimKey(area: PermissionArea): string {
   return `Permission-${area}`;
 }
 
-/** All four claim keys, lower-cased — for the group editor's claim rebuild. */
+/** All claim keys, lower-cased — for the group editor's claim rebuild. */
 export const PERMISSION_CLAIM_KEYS: readonly string[] = PERMISSION_AREAS.map(
   (area) => permissionClaimKey(area).toLowerCase(),
 );
@@ -133,7 +141,7 @@ interface ClaimLike {
 }
 
 /**
- * Read all four levels off one group's custom claims. A group with no
+ * Read every level off one group's custom claims. A group with no
  * permission claims — every group right after this feature is deployed —
  * yields {@link NO_PERMISSIONS} and grants nothing.
  */
@@ -145,6 +153,7 @@ export function permissionsFromClaims(
     creators: LEVEL_NONE,
     team: LEVEL_NONE,
     apply: LEVEL_NONE,
+    bugs: LEVEL_NONE,
   };
 
   for (const area of PERMISSION_AREAS) {
@@ -194,7 +203,13 @@ export function mergePermissions(
 
 /** A set with the same level everywhere — used by the `ADMIN_EMAILS` path. */
 export function uniformPermissions(level: PermissionLevel): PermissionSet {
-  return { news: level, creators: level, team: level, apply: level };
+  return {
+    news: level,
+    creators: level,
+    team: level,
+    apply: level,
+    bugs: level,
+  };
 }
 
 /**

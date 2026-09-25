@@ -223,12 +223,42 @@ export const ensureApiKeyTable = once("ensureApiKeyTable", async () => {
       name TEXT NOT NULL,
       prefix TEXT NOT NULL UNIQUE,
       token_hash TEXT NOT NULL UNIQUE,
-      permissions JSONB NOT NULL DEFAULT '{"news":0,"creators":0,"team":0,"apply":0}'::jsonb,
+      permissions JSONB NOT NULL DEFAULT '{"news":0,"creators":0,"team":0,"apply":0,"bugs":0}'::jsonb,
       created_by TEXT NOT NULL DEFAULT '',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       last_used_at TIMESTAMPTZ,
       expires_at TIMESTAMPTZ,
       revoked_at TIMESTAMPTZ
     )
+  `);
+});
+
+/** The bug report inbox. Mirrors the `bug_reports` migration in `drizzle/`. */
+export const ensureBugReportTable = once("ensureBugReportTable", async () => {
+  const db = getDb();
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS bug_reports (
+      id SERIAL PRIMARY KEY,
+      category TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      steps TEXT NOT NULL DEFAULT '',
+      minecraft_name TEXT NOT NULL DEFAULT '',
+      discord_id TEXT,
+      discord_username TEXT,
+      discord_avatar_url TEXT,
+      status TEXT NOT NULL DEFAULT 'new',
+      internal_note TEXT NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS bug_reports_created_at_idx
+      ON bug_reports (created_at DESC)
+  `);
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS bug_reports_status_created_at_idx
+      ON bug_reports (status, created_at DESC)
   `);
 });

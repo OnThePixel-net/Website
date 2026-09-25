@@ -12,6 +12,10 @@
 #   npm run db:down     stop it, keeping the data
 #   npm run db:reset    throw the volume away and start over
 #
+# It also runs Cap, the captcha of the application and bug report forms, on
+# http://localhost:${CAP_PORT:-3001} (dashboard login: CAP_ADMIN_KEY, default
+# below). Create a site key there and put it into CAP_SITE_KEY / CAP_SECRET.
+#
 # Port 5432 is often already taken by a system PostgreSQL. Set POSTGRES_PORT in
 # your .env to move the published port (the container side stays 5432, so only
 # the host part of DATABASE_URL changes).
@@ -40,5 +44,30 @@ services:
       retries: 12
       start_period: 10s
 
+  cap:
+    image: tiago2/cap:latest
+    restart: unless-stopped
+    environment:
+      ADMIN_KEY: ${CAP_ADMIN_KEY:-onthepixel-local-cap-admin-key-000000}
+      REDIS_URL: redis://cap-valkey:6379
+    ports:
+      - "127.0.0.1:${CAP_PORT:-3001}:3000"
+    depends_on:
+      cap-valkey:
+        condition: service_healthy
+
+  cap-valkey:
+    image: valkey/valkey:9-alpine
+    restart: unless-stopped
+    command: valkey-server --save 60 1 --loglevel warning --maxmemory-policy noeviction
+    volumes:
+      - cap-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
 volumes:
   postgres-data:
+  cap-data:
