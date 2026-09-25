@@ -12,6 +12,7 @@ import {
   TrendingUp,
   Shield,
   KeyRound,
+  Bug,
 } from "lucide-react";
 import { LEVEL_NONE, permissionLevel } from "@/lib/permissions";
 import AuthGuard from "./auth-guard";
@@ -21,6 +22,7 @@ interface StatsState {
   creatorsCount: number | null;
   teamCount: number | null;
   applyCount: number | null;
+  bugsCount: number | null;
   loading: boolean;
 }
 
@@ -83,20 +85,22 @@ function StatCard({
 function OverviewContent() {
   const { data: session } = useSession();
   const permissions = session?.user?.permissions;
-  // Which areas this account may even look at. Everything below keys off these
-  // four: a tile, its quick-action link and — importantly — the request behind
+  // Which areas this account may even look at. Everything below keys off
+  // these: a tile, its quick-action link and — importantly — the request behind
   // it are all skipped for an area at level 0. Fetching anyway would only
   // produce a 403 the operator sees as a broken dashboard.
   const canNews = permissionLevel(permissions, "news") > LEVEL_NONE;
   const canCreators = permissionLevel(permissions, "creators") > LEVEL_NONE;
   const canTeam = permissionLevel(permissions, "team") > LEVEL_NONE;
   const canApply = permissionLevel(permissions, "apply") > LEVEL_NONE;
+  const canBugs = permissionLevel(permissions, "bugs") > LEVEL_NONE;
 
   const [stats, setStats] = useState<StatsState>({
     newsCount: null,
     creatorsCount: null,
     teamCount: null,
     applyCount: null,
+    bugsCount: null,
     loading: true,
   });
 
@@ -119,7 +123,7 @@ function OverviewContent() {
         }
       };
 
-      const [newsCount, creatorsCount, teamCount, applyCount] =
+      const [newsCount, creatorsCount, teamCount, applyCount, bugsCount] =
         await Promise.all([
           count(canNews, "/api/dashboard/news", (d) => listLength(d, "data")),
           count(canCreators, "/api/dashboard/creators", (d) =>
@@ -136,6 +140,10 @@ function OverviewContent() {
             "/api/dashboard/apply/submissions?status=new&limit=1",
             (d) => numberField(d, "total"),
           ),
+          // Same idea: new, untriaged reports.
+          count(canBugs, "/api/dashboard/bugs?status=new&limit=1", (d) =>
+            numberField(d, "total"),
+          ),
         ]);
 
       setStats({
@@ -143,11 +151,12 @@ function OverviewContent() {
         creatorsCount,
         teamCount,
         applyCount,
+        bugsCount,
         loading: false,
       });
     }
     load();
-  }, [canNews, canCreators, canTeam, canApply]);
+  }, [canNews, canCreators, canTeam, canApply, canBugs]);
 
   return (
     <div>
@@ -198,6 +207,15 @@ function OverviewContent() {
             icon={ClipboardList}
             href="/dashboard/apply"
             color="bg-purple-500/20"
+          />
+        )}
+        {canBugs && (
+          <StatCard
+            label="Neue Bug-Reports"
+            value={stats.bugsCount}
+            icon={Bug}
+            href="/dashboard/bugs"
+            color="bg-red-500/20"
           />
         )}
         <div className="rounded-xl border border-white/5 bg-white/[0.03] p-6">
@@ -260,6 +278,14 @@ function OverviewContent() {
                 className="flex items-center gap-2 rounded-lg bg-purple-500/10 px-3 py-2 text-sm font-medium text-purple-400 transition-colors hover:bg-purple-500/20"
               >
                 <ClipboardList size={14} /> Manage Bewerbungen
+              </Link>
+            )}
+            {canBugs && (
+              <Link
+                href="/dashboard/bugs"
+                className="flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
+              >
+                <Bug size={14} /> Manage Bug-Reports
               </Link>
             )}
           </div>

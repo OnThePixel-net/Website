@@ -169,6 +169,15 @@ export function getApplyChannelId(): string {
 }
 
 /**
+ * Channel new bug reports are announced in, or "" when none is set. Optional
+ * for the same reason as {@link getApplyChannelId}: reports are stored and
+ * shown in the dashboard either way.
+ */
+export function getBugReportChannelId(): string {
+  return process.env.DISCORD_BUGREPORT_CHANNEL_ID?.trim() ?? "";
+}
+
+/**
  * True when both the bot token and the guild id are present. Lets a caller
  * decide up front whether to offer the Discord parts of a form at all —
  * everything below throws a {@link DiscordError} rather than doing nothing
@@ -185,6 +194,11 @@ export function isDiscordConfigured(): boolean {
  */
 export function isApplyChannelConfigured(): boolean {
   return Boolean(getBotToken() && getApplyChannelId());
+}
+
+/** True when a channel for the new-bug-report notice is configured. */
+export function isBugReportChannelConfigured(): boolean {
+  return Boolean(getBotToken() && getBugReportChannelId());
 }
 
 function requireBotToken(): string {

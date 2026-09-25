@@ -22,6 +22,7 @@ import {
   ChevronRight,
   Shield,
   KeyRound,
+  Bug,
 } from "lucide-react";
 
 /**
@@ -52,9 +53,15 @@ const navItems: {
     icon: ClipboardList,
     area: "apply",
   },
+  {
+    href: "/dashboard/bugs",
+    label: "Bug-Reports",
+    icon: Bug,
+    area: "bugs",
+  },
   { href: "/dashboard/team", label: "Team", icon: UserCog, area: "team" },
   // Ranks are team administration, so they share the `team` area rather than
-  // getting a fifth one — the levels edited there are exactly the four areas
+  // getting one of their own — the levels edited there are exactly the areas
   // this list is filtered by.
   { href: "/dashboard/roles", label: "Rollen", icon: Shield, area: "team" },
   // API keys are credentials for the dashboard API, and handing one out is

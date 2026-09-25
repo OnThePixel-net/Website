@@ -43,9 +43,9 @@ function needsTrailingSlash(pathname: string): boolean {
  * Route handlers have no layout and therefore no language, so they live
  * outside the app/[locale] segment and must never be rewritten into it.
  *
- * /api/* is already kept out by the matcher. Two of them, though, sit inside
- * folders that otherwise hold pages — /apply/api/<position>/ and /redeem/api/
- * — so they do reach this file, and rewriting them would point at a route
+ * /api/* is already kept out by the matcher. A few of them, though, sit
+ * inside folders that otherwise hold pages — /apply/api/<position>/,
+ * /bug-report/api/ and /cap/api/<action>/ — so they do reach this file, and rewriting them would point at a route
  * that does not exist. They are recognised by an "api" path segment, which no
  * page has (/api-docs/ is one segment and does not match).
  */

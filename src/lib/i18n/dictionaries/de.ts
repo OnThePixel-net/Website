@@ -33,6 +33,7 @@ export const de = {
     status: "Status",
     api: "API",
     imprint: "Impressum",
+    bugReport: "Bug melden",
     privacy: "Datenschutz",
     sectionFollowUs: "Folge uns",
     copyright:
@@ -226,6 +227,84 @@ export const de = {
       },
     },
   },
+  captcha: {
+    verify: "Ich bin kein Roboter",
+    verifying: "Wird überprüft...",
+    verified: "Bestätigt",
+    error: "Überprüfung fehlgeschlagen, klicke für einen neuen Versuch",
+    hint: "Spamschutz, der privat in deinem Browser läuft",
+  },
+  bugReport: {
+    metaTitle: "Bug melden",
+    metaDescription:
+      "Einen Fehler auf dem OnThePixel.net Minecraft-Server, der Website oder unserem Discord gefunden? Melde ihn hier und hilf uns, ihn zu beheben.",
+    title: "Bug melden",
+    intro:
+      "Etwas funktioniert nicht so, wie es sollte? Beschreib es uns so genau wie möglich — je mehr Details, desto schneller können wir es beheben.",
+    signedInAs: "Gesendet als",
+    signedInHint:
+      "Dein Discord-Name wird mitgeschickt, damit wir bei Fragen auf dich zukommen können.",
+    signedOutHint:
+      "Optional: Melde dich mit Discord an, damit wir dich zu deiner Meldung kontaktieren können.",
+    login: "Anmelden",
+    logout: "Abmelden",
+    required: "Pflichtfeld",
+    category: "Wo ist der Bug?",
+    categories: {
+      server: "Minecraft-Server",
+      website: "Website",
+      discord: "Discord",
+      other: "Sonstiges",
+    },
+    titleLabel: "Kurze Zusammenfassung",
+    titlePlaceholder: "z. B. BedWars-Shop öffnet sich nicht",
+    descriptionLabel: "Was ist passiert?",
+    descriptionPlaceholder:
+      "Beschreibe den Bug: Was hast du erwartet und was ist stattdessen passiert?",
+    stepsLabel: "Schritte zum Nachstellen",
+    stepsPlaceholder:
+      "1. BedWars betreten\n2. Den Händler rechtsklicken\n3. …",
+    minecraftNameLabel: "Minecraft-Name",
+    minecraftNamePlaceholder: "Dein Name im Spiel",
+    securityVerification: "Sicherheitsüberprüfung",
+    submit: "Bug-Report senden",
+    submitting: "Wird gesendet...",
+    submittedTitle: "Danke für deine Meldung!",
+    submittedMessage:
+      "Dein Bug-Report wurde an unser Team geschickt. Wir schauen ihn uns so schnell wie möglich an.",
+    reportAnother: "Weiteren Bug melden",
+    backToHome: "Zurück zur Startseite",
+    errors: {
+      fillRequired: "Bitte fülle alle Pflichtfelder aus.",
+      descriptionTooShort:
+        "Bitte beschreibe den Bug etwas genauer (mindestens 20 Zeichen).",
+      minecraftNameInvalid:
+        "Das ist kein gültiger Minecraft-Name (3–16 Buchstaben, Zahlen oder _).",
+      captchaRequired: "Bitte schließe die Captcha-Überprüfung ab.",
+      captchaError: "Captcha-Fehler. Bitte versuche es erneut.",
+      submitFailed: "Senden fehlgeschlagen. Bitte versuche es erneut.",
+      codes: {
+        captcha_required: "Bitte schließe die Captcha-Überprüfung ab.",
+        captcha_invalid:
+          "Die Captcha-Überprüfung ist fehlgeschlagen. Bitte versuche es erneut.",
+        captcha_unavailable:
+          "Wir können das Captcha gerade nicht prüfen, daher sind Bug-Reports pausiert. Bitte versuche es später erneut.",
+        report_invalid:
+          "Deine Meldung konnte nicht gelesen werden. Bitte versuche es erneut.",
+        category_invalid: "Bitte wähle aus, wo der Bug ist.",
+        title_required: "Bitte fülle alle Pflichtfelder aus.",
+        title_too_long: "Die Zusammenfassung ist zu lang. Bitte kürze sie.",
+        description_required: "Bitte fülle alle Pflichtfelder aus.",
+        description_too_long: "Die Beschreibung ist zu lang. Bitte kürze sie.",
+        description_too_short:
+          "Bitte beschreibe den Bug etwas genauer (mindestens 20 Zeichen).",
+        steps_too_long: "Die Schritte sind zu lang. Bitte kürze sie.",
+        minecraft_name_invalid:
+          "Das ist kein gültiger Minecraft-Name (3–16 Buchstaben, Zahlen oder _).",
+        server_error: "Senden fehlgeschlagen. Bitte versuche es erneut.",
+      },
+    },
+  },
   discordLogin: {
     backToPositions: "Zurück zu den Positionen",
     title: "Discord-Anmeldung erforderlich",
@@ -237,33 +316,6 @@ export const de = {
   headerAuth: {
     logout: "Abmelden",
     login: "Anmelden",
-  },
-  redeem: {
-    backToHome: "Zurück zur Startseite",
-    title: "Code einlösen",
-    intro:
-      "Gib deinen Code und deinen Minecraft-Benutzernamen ein, um deine Belohnung zu erhalten.",
-    discordVerified: "Discord verifiziert",
-    discordOptional: "Optional: Discord verknüpfen",
-    login: "Anmelden",
-    labelCode: "Code",
-    placeholderCode: "z. B. PIXEL-XXXX-XXXX",
-    labelUsername: "Minecraft-Benutzername",
-    placeholderUsername: "DeinMinecraftName",
-    labelSecurity: "Sicherheitsüberprüfung",
-    required: "Pflichtfeld",
-    submitting: "Wird eingelöst...",
-    submit: "Code einlösen",
-    submittedTitle: "Code erfolgreich eingelöst!",
-    submittedMessage:
-      "Dein Code wurde eingelöst. Die Belohnung wird in Kürze deinem Konto gutgeschrieben.",
-    errors: {
-      codeRequired: "Bitte gib deinen Einlösecode ein.",
-      usernameRequired: "Bitte gib deinen Minecraft-Benutzernamen ein.",
-      captchaRequired: "Bitte schließe die Captcha-Überprüfung ab.",
-      captchaError: "Captcha-Fehler. Bitte versuche es erneut.",
-      submitFailed: "Einlösen fehlgeschlagen. Bitte versuche es erneut.",
-    },
   },
   sidequests: {
     heading: "UNSERE SIDE QUESTS",

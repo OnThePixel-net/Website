@@ -184,6 +184,14 @@ export default async function Footer({ locale }: { locale: Locale }) {
               </li>
               <li>
                 <LocaleLink
+                  href="/bug-report"
+                  className="text-gray-400 hover:text-green-500"
+                >
+                  {t.footer.bugReport}
+                </LocaleLink>
+              </li>
+              <li>
+                <LocaleLink
                   href="/imprint"
                   className="text-gray-400 hover:text-green-500"
                 >

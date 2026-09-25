@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { after, NextRequest, NextResponse } from "next/server";
 import { ApplyValidationError, createApplySubmission } from "@/lib/apply";
 import { notifyNewApplication } from "@/lib/apply-notify";
+import { verifyCaptcha } from "@/lib/captcha";
 
 /**
  * Endpoint the public application form posts to.
@@ -15,91 +16,11 @@ import { notifyNewApplication } from "@/lib/apply-notify";
  * see {@link verifyCaptcha}.
  */
 
-/** https://docs.hcaptcha.com — POST, application/x-www-form-urlencoded. */
-const HCAPTCHA_VERIFY_URL = "https://api.hcaptcha.com/siteverify";
-
-/**
- * Cap on the siteverify round trip. Without it a hanging hCaptcha would hold
- * the request (and its database connection) open for as long as the platform
- * allows.
- */
-const VERIFY_TIMEOUT_MS = 10_000;
-
 /** Rejected requests carry a stable `code` the form maps to a localized text. */
 type Rejection = { status: number; code: string; message: string };
 
 function reject({ status, code, message }: Rejection) {
   return NextResponse.json({ message, code }, { status });
-}
-
-/**
- * Verify an hCaptcha token with hCaptcha itself.
- *
- * A missing secret rejects the application. That is deliberate: without the
- * secret the captcha is decoration, and accepting unverified submissions would
- * turn the application inbox into a spam target that nobody notices until it is
- * full. A refused application is loud and recoverable; a silently unprotected
- * form is neither. The log line names the variable so whoever reads it knows
- * the fix.
- */
-async function verifyCaptcha(token: unknown): Promise<Rejection | null> {
-  const response = typeof token === "string" ? token.trim() : "";
-  if (!response)
-    return {
-      status: 400,
-      code: "captcha_required",
-      message: "Captcha token is required",
-    };
-
-  const secret = process.env.HCAPTCHA_SECRET?.trim();
-  if (!secret) {
-    console.error(
-      "[apply] HCAPTCHA_SECRET is not set — rejecting the application. " +
-        "Set the hCaptcha secret key (server-side, never NEXT_PUBLIC_) or the " +
-        "application form stays closed.",
-    );
-    return {
-      status: 503,
-      code: "captcha_unavailable",
-      message: "Captcha verification is not configured",
-    };
-  }
-
-  let payload: { success?: boolean; "error-codes"?: unknown };
-  try {
-    const res = await fetch(HCAPTCHA_VERIFY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ secret, response }),
-      cache: "no-store",
-      signal: AbortSignal.timeout(VERIFY_TIMEOUT_MS),
-    });
-    if (!res.ok) throw new Error(`siteverify answered ${res.status}`);
-    payload = await res.json();
-  } catch (e) {
-    // Unreachable or malformed: the token stays unverified, so the application
-    // is refused rather than waved through.
-    console.error("[apply] hCaptcha verification failed:", e);
-    return {
-      status: 502,
-      code: "captcha_unavailable",
-      message: "Captcha verification is currently unavailable",
-    };
-  }
-
-  if (payload?.success !== true) {
-    console.warn(
-      "[apply] hCaptcha rejected a token:",
-      payload?.["error-codes"] ?? [],
-    );
-    return {
-      status: 400,
-      code: "captcha_invalid",
-      message: "Captcha verification failed",
-    };
-  }
-
-  return null;
 }
 
 export async function POST(
@@ -131,7 +52,7 @@ export async function POST(
 
   // Before anything touches the database: an unverified request must not be
   // able to make the server do work on its behalf.
-  const captchaRejection = await verifyCaptcha(body?.captchaToken);
+  const captchaRejection = await verifyCaptcha(body?.captchaToken, "apply");
   if (captchaRejection) return reject(captchaRejection);
 
   try {

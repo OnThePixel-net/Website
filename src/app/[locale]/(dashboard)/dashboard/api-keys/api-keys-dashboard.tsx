@@ -56,6 +56,7 @@ const AREA_LABELS: Record<PermissionArea, string> = {
   creators: "Creators",
   team: "Team",
   apply: "Bewerbungen",
+  bugs: "Bug-Reports",
 };
 
 /** A key as the list endpoint serves it. Never carries a token. */

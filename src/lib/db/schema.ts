@@ -268,6 +268,43 @@ export const applySubmissions = pgTable(
   ],
 );
 
+/**
+ * A bug report sent through the public form on `/bug-report`.
+ *
+ * Sending one needs no login — the captcha is the spam barrier — so the
+ * Discord columns are nullable and only filled when the reporter happened to
+ * be signed in. They come from the server-side session, never from the form.
+ */
+export const bugReports = pgTable(
+  "bug_reports",
+  {
+    id: serial("id").primaryKey(),
+    /** One of `BUG_REPORT_CATEGORIES` in `lib/bug-reports.ts`. */
+    category: text("category").notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    /** How to reproduce it; empty when the reporter left it out. */
+    steps: text("steps").notNull().default(""),
+    /** In-game name, so the team can find the player; empty when not given. */
+    minecraft_name: text("minecraft_name").notNull().default(""),
+    /** Snowflake as text — its 64-bit value does not survive a JS number. */
+    discord_id: text("discord_id"),
+    discord_username: text("discord_username"),
+    discord_avatar_url: text("discord_avatar_url"),
+    /** One of `BUG_REPORT_STATUSES` in `lib/bug-reports.ts`. */
+    status: text("status").notNull().default("new"),
+    /** Team-internal remark; never leaves the dashboard. */
+    internal_note: text("internal_note").notNull().default(""),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    // The dashboard lists newest first, filtered by status or not.
+    index("bug_reports_created_at_idx").on(t.created_at.desc()),
+    index("bug_reports_status_created_at_idx").on(t.status, t.created_at.desc()),
+  ],
+);
+
 export type NewsItem = typeof news.$inferSelect;
 export type NewNewsItem = typeof news.$inferInsert;
 export type NewsTranslationItem = typeof newsTranslations.$inferSelect;
@@ -280,6 +317,8 @@ export type ApplyQuestionRecord = typeof applyQuestions.$inferSelect;
 export type NewApplyQuestionRecord = typeof applyQuestions.$inferInsert;
 export type ApplySubmissionRecord = typeof applySubmissions.$inferSelect;
 export type NewApplySubmissionRecord = typeof applySubmissions.$inferInsert;
+export type BugReportRecord = typeof bugReports.$inferSelect;
+export type NewBugReportRecord = typeof bugReports.$inferInsert;
 
 /**
  * A personal access token for the dashboard API.

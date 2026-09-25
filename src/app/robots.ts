@@ -4,7 +4,13 @@ import { SITE_URL } from "@/lib/i18n/seo";
 // Dashboard pages are also marked noindex via metadata, but keeping them
 // out of `disallow` too saves crawl budget by stopping bots from fetching
 // them at all.
-const DISALLOW = ["/api/", "/apply/api/", "/redeem/api/", "/dashboard/"];
+const DISALLOW = [
+  "/api/",
+  "/apply/api/",
+  "/bug-report/api/",
+  "/cap/api/",
+  "/dashboard/",
+];
 
 // AI/answer-engine crawlers that should be explicitly allowed so
 // OnThePixel.net can be cited/surfaced in AI answers. Each gets its own

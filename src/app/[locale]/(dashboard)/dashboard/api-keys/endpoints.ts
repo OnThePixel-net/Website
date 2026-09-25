@@ -774,6 +774,69 @@ export const ENDPOINT_GROUPS: EndpointGroup[] = [
       },
     ],
   },
+  {
+    area: "bugs",
+    title: "Bug-Reports",
+    description:
+      "Die über /bug-report/ eingegangenen Fehlermeldungen: lesen, Status setzen, löschen.",
+    endpoints: [
+      {
+        method: "GET",
+        path: "/api/dashboard/bugs",
+        summary: "Bug-Reports, neueste zuerst.",
+        level: LEVEL_READ,
+        query: [
+          {
+            name: "status",
+            type: "string",
+            description: '"new", "in_progress", "fixed" oder "rejected".',
+          },
+          {
+            name: "category",
+            type: "string",
+            description: '"server", "website", "discord" oder "other".',
+          },
+          {
+            name: "limit",
+            type: "number",
+            description: "Einträge pro Seite, Standard 25, höchstens 100.",
+          },
+          {
+            name: "offset",
+            type: "number",
+            description: "Wie viele Einträge übersprungen werden.",
+          },
+        ],
+        returns: "200 · { data: BugReport[], total, limit, offset }",
+      },
+      {
+        method: "PATCH",
+        path: "/api/dashboard/bugs/{id}",
+        summary: "Status und/oder interne Notiz eines Reports setzen.",
+        level: LEVEL_WRITE,
+        body: [
+          {
+            name: "status",
+            type: "string",
+            description: '"new", "in_progress", "fixed" oder "rejected".',
+          },
+          {
+            name: "internalNote",
+            type: "string",
+            description: "Nur im Dashboard sichtbar, höchstens 4000 Zeichen.",
+          },
+        ],
+        returns: "200 · { data: BugReport }",
+      },
+      {
+        method: "DELETE",
+        path: "/api/dashboard/bugs/{id}",
+        summary: "Einen Report endgültig löschen.",
+        level: LEVEL_DELETE,
+        returns: "204",
+      },
+    ],
+  },
 ];
 
 /** Every documented endpoint, flattened — for the “n Endpunkte” counter. */

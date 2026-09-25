@@ -117,6 +117,7 @@ export const DEV_ROLES: readonly DevRole[] =
             creators: LEVEL_DELETE,
             team: LEVEL_READ,
             apply: LEVEL_WRITE,
+            bugs: LEVEL_WRITE,
           },
         },
         {
@@ -132,6 +133,7 @@ export const DEV_ROLES: readonly DevRole[] =
             creators: LEVEL_READ,
             team: LEVEL_READ,
             apply: LEVEL_READ,
+            bugs: LEVEL_READ,
           },
         },
         {
@@ -147,6 +149,7 @@ export const DEV_ROLES: readonly DevRole[] =
             creators: LEVEL_NONE,
             team: LEVEL_NONE,
             apply: LEVEL_WRITE,
+            bugs: LEVEL_WRITE,
           },
         },
         {
@@ -166,6 +169,7 @@ export const DEV_ROLES: readonly DevRole[] =
             creators: LEVEL_NONE,
             team: LEVEL_NONE,
             apply: LEVEL_NONE,
+            bugs: LEVEL_NONE,
           },
         },
         {

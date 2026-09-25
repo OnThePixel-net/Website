@@ -35,6 +35,7 @@ export const en = {
     status: "Status",
     api: "API",
     imprint: "Imprint",
+    bugReport: "Report a Bug",
     privacy: "Privacy Policy",
     sectionFollowUs: "Follow Us",
     copyright:
@@ -222,6 +223,83 @@ export const en = {
       },
     },
   },
+  captcha: {
+    verify: "I'm not a robot",
+    verifying: "Verifying...",
+    verified: "Verified",
+    error: "Verification failed, click to try again",
+    hint: "Spam protection that runs privately in your browser",
+  },
+  bugReport: {
+    metaTitle: "Report a Bug",
+    metaDescription:
+      "Found a bug on the OnThePixel.net Minecraft server, the website or our Discord? Report it here and help us fix it.",
+    title: "Report a Bug",
+    intro:
+      "Found something that doesn't work as it should? Tell us as precisely as you can — the more details, the faster we can fix it.",
+    signedInAs: "Sent as",
+    signedInHint: "Your Discord name is attached so we can ask you questions.",
+    signedOutHint:
+      "Optional: log in with Discord so we can contact you about your report.",
+    login: "Login",
+    logout: "Log out",
+    required: "Required",
+    category: "Where is the bug?",
+    categories: {
+      server: "Minecraft server",
+      website: "Website",
+      discord: "Discord",
+      other: "Other",
+    },
+    titleLabel: "Short summary",
+    titlePlaceholder: "e.g. BedWars shop does not open",
+    descriptionLabel: "What happened?",
+    descriptionPlaceholder:
+      "Describe the bug: what did you expect, and what happened instead?",
+    stepsLabel: "Steps to reproduce",
+    stepsPlaceholder: "1. Join BedWars\n2. Right-click the shopkeeper\n3. …",
+    minecraftNameLabel: "Minecraft name",
+    minecraftNamePlaceholder: "Your in-game name",
+    securityVerification: "Security Verification",
+    submit: "Send Bug Report",
+    submitting: "Sending...",
+    submittedTitle: "Thanks for your report!",
+    submittedMessage:
+      "Your bug report has been sent to our team. We'll look into it as soon as possible.",
+    reportAnother: "Report another bug",
+    backToHome: "Back to Home",
+    errors: {
+      fillRequired: "Please fill out all required fields.",
+      descriptionTooShort:
+        "Please describe the bug in a bit more detail (at least 20 characters).",
+      minecraftNameInvalid:
+        "That is not a valid Minecraft name (3–16 letters, numbers or _).",
+      captchaRequired: "Please complete the captcha verification.",
+      captchaError: "Captcha error. Please try again.",
+      submitFailed: "Failed to send. Please try again.",
+      // Keyed by the `code` a rejected report answers with; unknown codes
+      // fall back to submitFailed.
+      codes: {
+        captcha_required: "Please complete the captcha verification.",
+        captcha_invalid:
+          "Captcha verification failed. Please try the captcha again.",
+        captcha_unavailable:
+          "We cannot verify the captcha right now, so bug reports are paused. Please try again later.",
+        report_invalid: "Your report could not be read. Please try again.",
+        category_invalid: "Please choose where the bug is.",
+        title_required: "Please fill out all required fields.",
+        title_too_long: "The summary is too long. Please shorten it.",
+        description_required: "Please fill out all required fields.",
+        description_too_long: "The description is too long. Please shorten it.",
+        description_too_short:
+          "Please describe the bug in a bit more detail (at least 20 characters).",
+        steps_too_long: "The steps are too long. Please shorten them.",
+        minecraft_name_invalid:
+          "That is not a valid Minecraft name (3–16 letters, numbers or _).",
+        server_error: "Failed to send. Please try again.",
+      },
+    },
+  },
   discordLogin: {
     backToPositions: "Back to Positions",
     title: "Discord Login Required",
@@ -232,32 +310,6 @@ export const en = {
   headerAuth: {
     logout: "Logout",
     login: "Login",
-  },
-  redeem: {
-    backToHome: "Back to Home",
-    title: "Redeem a Code",
-    intro: "Enter your code and Minecraft username to claim your reward.",
-    discordVerified: "Discord verified",
-    discordOptional: "Optional: Link your Discord",
-    login: "Login",
-    labelCode: "Code",
-    placeholderCode: "e.g. PIXEL-XXXX-XXXX",
-    labelUsername: "Minecraft Username",
-    placeholderUsername: "YourMinecraftName",
-    labelSecurity: "Security Verification",
-    required: "Required",
-    submitting: "Redeeming...",
-    submit: "Redeem Code",
-    submittedTitle: "Code redeemed successfully!",
-    submittedMessage:
-      "Your code has been redeemed. The reward will be credited to your account shortly.",
-    errors: {
-      codeRequired: "Please enter your redemption code.",
-      usernameRequired: "Please enter your Minecraft username.",
-      captchaRequired: "Please complete the captcha verification.",
-      captchaError: "Captcha error. Please try again.",
-      submitFailed: "Failed to redeem. Please try again.",
-    },
   },
   sidequests: {
     heading: "OUR SIDE QUESTS",

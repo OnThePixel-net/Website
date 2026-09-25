@@ -47,6 +47,24 @@ to match.
 `DATABASE_URL` is the only variable needed to run the site locally. Everything
 else in `.env.example` is optional and only unlocks specific areas.
 
+### Captcha (Cap)
+
+The application form (`/apply/<position>`) and the bug report form
+(`/bug-report`) are protected by [Cap](https://trycap.dev), a self-hosted
+proof-of-work captcha. `npm run db:up` also starts a local Cap Standalone on
+<http://localhost:3001>: log in with the admin key from `compose.yml`, create a
+site key and put it into `CAP_SITE_KEY` / `CAP_SECRET`. Without those two
+forms reject every submission (see `.env.example`).
+
+The widget posts to `/cap/api/challenge` and `/cap/api/redeem`, which the site
+forwards to `CAP_URL`; the Cap container itself never has to be public.
+
+### Bug reports
+
+`/bug-report` stores reports in the `bug_reports` table. They are read and
+triaged under **Dashboard → Bug-Reports**, gated by `Permission-bugs`. Set
+`DISCORD_BUGREPORT_CHANNEL_ID` to get a one-line notice per new report.
+
 ### Dashboard authorisation
 
 Being signed in is not enough to use `/dashboard` or the `/api/dashboard/**`
@@ -62,6 +80,7 @@ right next to the existing `Team`, `prefix`, `weight`, `Discord-role-id` and
 | `Permission-creators` | `/dashboard/creators` |
 | `Permission-team` | `/dashboard/team` (members **and** ranks) |
 | `Permission-apply` | `/dashboard/apply` |
+| `Permission-bugs` | `/dashboard/bugs` (bug reports from `/bug-report`) |
 
 | Value | Level | May |
 | --- | --- | --- |
@@ -79,7 +98,7 @@ The rules, all of them:
 - **Several groups: the highest level per area wins.** Same idea as the highest
   `weight` deciding the primary rank, so adding somebody to one more rank can
   only ever add rights.
-- **The dashboard opens for anybody with a level above 0 somewhere.** All four
+- **The dashboard opens for anybody with a level above 0 somewhere.** All five
   at 0 is the same "Access Denied" view as before, and the navigation only lists
   the areas the account actually has.
 
@@ -134,7 +153,7 @@ removed from your environment.)
 **Setting it up in Pocket ID, once:**
 
 1. Put your own address in `ADMIN_EMAILS` and deploy.
-2. Sign in, open **Team → Gruppen**, and give each rank its four levels. A
+2. Sign in, open **Team → Gruppen**, and give each rank its five levels. A
    sensible start: the admin rank 3 everywhere, a moderation rank 2 on
    `Bewerbungen` and 1 elsewhere, an editor rank 2 on News and nothing else.
 3. Sign out and back in (or wait for the 15-minute re-check) and confirm the
@@ -230,7 +249,7 @@ custom claims on the Pocket ID group, next to the existing `prefix` and
 | `Discord-role-id` | the Discord role members of this rank receive |
 | `Creator` = `true` | marks the one rank whose role every creator receives |
 
-(The same group also carries the four `Permission-*` claims described under
+(The same group also carries the five `Permission-*` claims described under
 "Dashboard authorisation" above, and the `Inherits-from` claim described above —
 the rank editor writes all of them together.)
 

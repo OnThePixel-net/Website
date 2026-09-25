@@ -41,12 +41,13 @@ const LEVEL_OPTIONS: { value: PermissionLevel; label: string }[] = [
   { value: LEVEL_DELETE, label: "Löschen" },
 ];
 
-/** German labels for the four areas, matching the sidebar wording. */
+/** German labels for the areas, matching the sidebar wording. */
 const AREA_LABELS: Record<PermissionArea, string> = {
   news: "News",
   creators: "Creators",
   team: "Team",
   apply: "Bewerbungen",
+  bugs: "Bug-Reports",
 };
 
 /** A role of the OTP Discord server, as served by the roles endpoint. */
