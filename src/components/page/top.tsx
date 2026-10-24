@@ -14,7 +14,7 @@ export default function TopPage() {
         <Image
           alt=""
           className="h-64 w-full object-cover brightness-75 filter"
-          src="/67971722-5ba1-4e3d-8788-c5a6ccbe042e"
+          src="/banner.png"
           width={1920}
           height={256}
           sizes="100vw"
