@@ -14,8 +14,8 @@ const nextConfig = {
   // removing it there too.
   skipTrailingSlashRedirect: true,
   images: {
-    loader: "imgix",
-    path: "https://cdn.onthepixel.net/",
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
   },
   async redirects() {
     return [
