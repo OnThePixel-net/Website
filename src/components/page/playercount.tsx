@@ -22,7 +22,7 @@ export default function PlayerCount() {
     <div className="flex items-center space-x-4">
       <LocaleLink href="/">
         <Image
-          src="/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"
+          src="/logo.png"
           width={40}
           height={40}
           sizes="40px"

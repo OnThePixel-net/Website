@@ -259,7 +259,7 @@ export default async function AboutPage({ params }: LocalePageProps) {
           <div className="container mx-auto max-w-4xl px-4 text-center">
             <div className="mb-6 flex justify-center">
               <Image
-                src="/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"
+                src="/logo.png"
                 alt="OnThePixel.net server logo"
                 width={80}
                 height={80}
