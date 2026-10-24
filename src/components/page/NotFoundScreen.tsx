@@ -32,7 +32,7 @@ export default function NotFoundScreen({
           className="h-full w-full object-cover brightness-75 filter"
           height="1080"
           sizes="100vw"
-          src="/bc993216-3548-4e87-bb85-bfb349c3d3b3"
+          src="/bg.png"
           style={{
             aspectRatio: "1920/1080",
             objectFit: "cover",
@@ -48,7 +48,7 @@ export default function NotFoundScreen({
             alt="OnThePixel.net"
             height="100"
             sizes="250px"
-            src="/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"
+            src="/logo.png"
             style={{
               aspectRatio: "100/100",
               objectFit: "cover",

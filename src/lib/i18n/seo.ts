@@ -14,7 +14,7 @@ export const DEFAULT_TWITTER_IMAGE = `${SITE_URL}/twitter-image.png`;
 // Square brand logo (served via CDN) for schema.org Organization markup —
 // this must stay the logo, not the wide social banner.
 export const LOGO_IMAGE =
-  "https://cdn.onthepixel.net/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e";
+  "https://cdn.onthepixel.net/logo.png";
 
 const HREFLANG_BY_LOCALE: Record<Locale, string> = {
   en: "en",

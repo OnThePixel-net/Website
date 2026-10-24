@@ -108,7 +108,7 @@ export default function Header() {
             height="1080"
             priority
             sizes="100vw"
-            src="/bc993216-3548-4e87-bb85-bfb349c3d3b3"
+            src="/bg.png"
             width="1920"
           />
         </div>
@@ -125,7 +125,7 @@ export default function Header() {
             height="100"
             priority
             sizes="250px"
-            src="/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"
+            src="/logo.png"
             style={{
               aspectRatio: "100/100",
               objectFit: "cover",

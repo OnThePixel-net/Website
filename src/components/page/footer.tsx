@@ -30,7 +30,7 @@ export default async function Footer({ locale }: { locale: Locale }) {
               <LocaleLink href={"/"}>
                 <Image
                   className="mr-2 text-3xl font-bold"
-                  src={"/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"}
+                  src={"/logo.png"}
                   alt="OnThePixel.net"
                   width={40}
                   height={40}
@@ -279,7 +279,7 @@ export default async function Footer({ locale }: { locale: Locale }) {
             <LocaleLink href={"/"}>
               <Image
                 className="mr-2 text-3xl font-bold"
-                src={"/bf6cf0de-bf69-44d1-b107-6ad846ab7c9e"}
+                src={"/logo.png"}
                 alt="OnThePixel.net"
                 width={40}
                 height={40}
