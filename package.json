@@ -34,7 +34,7 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.4",
     "gsap": "^3.15.0",
-    "lucide-react": "^1.63.0",
+    "lucide-react": "^1.64.0",
     "next": "^16.4.3",
     "next-auth": "^5.0.0-beta.32",
     "postgres": "^3.4.9",
@@ -49,7 +49,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
     "@types/eslint": "^9.6.1",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@typescript-eslint/eslint-plugin": "^8.72.1",
@@ -67,13 +67,13 @@
     "typescript": "^6.0.3"
   },
   "overrides": {
-    "esbuild": "^0.28.1",
+    "esbuild": "^0.28.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "yargs": "17.7.2",
     "yargs-parser": "21.1.1",
     "eslint-visitor-keys": "3.4.3",
     "postcss": "^8.5.32",
-    "ws": "^8.21.1"
+    "ws": "^8.22.0"
   }
 }
