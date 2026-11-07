@@ -47,7 +47,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.4",
+    "@tailwindcss/postcss": "^4.3.5",
     "@types/eslint": "^9.6.1",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
@@ -62,7 +62,7 @@
     "postcss": "^8.5.32",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "tailwindcss": "^4.3.4",
+    "tailwindcss": "^4.3.5",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3"
   },
@@ -74,6 +74,6 @@
     "yargs-parser": "21.1.1",
     "eslint-visitor-keys": "3.4.3",
     "postcss": "^8.5.32",
-    "ws": "^8.22.0"
+    "ws": "^8.22.1"
   }
 }
